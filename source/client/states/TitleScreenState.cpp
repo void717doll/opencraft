@@ -121,7 +121,7 @@ void TitleScreenState::startSingleplayer(bool showLoadingState, const std::strin
 
 	LogLevel logLevel = LoggerHandler::getInstance().maxLevel();
 	// the client and mesh workers share definitions until the game state is gone.
-	m_serverApp = std::make_shared<ServerApplication>(*m_eventHandler);
+	m_serverApp = std::make_shared<class ServerApplication>(*m_eventHandler);
 	m_thread = std::thread([app = m_serverApp, worldName, logLevel, seed, creative] () {
 
 		if (!worldName.empty())

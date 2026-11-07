@@ -60,7 +60,8 @@ class TitleScreenState : public InterfaceState {
 		RectangleShape m_background;
 
 		std::thread m_thread;
-		std::shared_ptr<ServerApplication> m_serverApp;
+		// windows headers also define a ServerApplication enumerator.
+		std::shared_ptr<class ServerApplication> m_serverApp;
 
 		Text m_titleText;
 		Text m_versionText;
