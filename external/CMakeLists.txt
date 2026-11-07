@@ -10,6 +10,9 @@ add_subdirectory(entt)
 add_subdirectory(glm)
 add_subdirectory(lua)
 add_subdirectory(sol2)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	include("${CMAKE_SOURCE_DIR}/cmake/sol2_compat.cmake")
+endif()
 add_subdirectory(tinyxml2)
 
 #------------------------------------------------------------------------------
