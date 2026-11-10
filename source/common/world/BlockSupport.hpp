@@ -37,6 +37,26 @@ inline bool hasSolidTop(const World &world, const Vector3i &pos) {
 inline bool blockHasSupport(const World &world, const Vector3i &pos, const BlockState &state, u16 data) {
 	const auto &block = state.block();
 	if (!loadedSupport(world, pos) || !block.placementConstraints().check(world, pos)) return false;
+	if (block.stringID() == "default:reeds" || block.stringID() == "default:cactus") {
+		const auto *below = loadedSupport(world, pos + Vector3i{0,0,-1});
+		if (!below) return false;
+		const auto &floor = below->block().stringID();
+		if (block.stringID() == "default:reeds") {
+			if (floor == "default:reeds") return true;
+			if (floor != "default:grass" && floor != "default:dirt") return false;
+			for (auto side : {Vector3i{-1,0,0}, Vector3i{1,0,0}, Vector3i{0,-1,0}, Vector3i{0,1,0}}) {
+				const auto *water = loadedSupport(world,pos + side + Vector3i{0,0,-1});
+				if (water && liquid::kind(water->block()) == 1) return true;
+			}
+			return false;
+		}
+		if (floor != "default:cactus" && floor != "default:sand") return false;
+		for (auto side : {Vector3i{-1,0,0}, Vector3i{1,0,0}, Vector3i{0,-1,0}, Vector3i{0,1,0}}) {
+			const auto *neighbor = loadedSupport(world,pos + side);
+			if (!neighbor || (neighbor->block().id() && neighbor->isCollidable() && neighbor->drawType() != BlockDrawType::XShape)) return false;
+		}
+		return true;
+	}
 	if (block.hasGroup("group:om_sign")) {
 		u16 rotation = block.param().getParam(BlockParam::Rotation, data);
 		if (rotation > 3) return false;

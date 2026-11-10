@@ -81,7 +81,8 @@ void BlockPhysics::enqueueNeighbors(const Vector3i &position) {
 	for (int i = 1; i <= 4; ++i) for (int height : {-1, 1}) {
 		Vector3i neighbor = position + directions[i] + Vector3i{0, 0, height};
 		const auto *state = m_world.getBlockState(neighbor.x, neighbor.y, neighbor.z);
-		if (state && state->block().getGroupValue("group:om_rail")) enqueue(neighbor);
+		if (state && (state->block().getGroupValue("group:om_rail")
+		 || (height == 1 && state->block().stringID() == "default:reeds"))) enqueue(neighbor);
 	}
 }
 
@@ -170,6 +171,19 @@ void BlockPhysics::update(const Vector3i &position) {
 	if (block.id() && !block.hasGroup("group:fence") && !block.hasGroup("group:om_chest")
 	 && (!fluidKind(block) || block.getGroupValue("group:om_waterlogged"))) {
 		bool neighborsLoaded = std::all_of(directions.begin(), directions.end(), [&](const auto &offset) { return loaded(position + offset); });
+		if (block.stringID() == "default:reeds" || block.stringID() == "default:cactus") {
+			Vector3i below = position + Vector3i{0,0,-1};
+			neighborsLoaded = loaded(below);
+			const auto *floor = neighborsLoaded ? m_world.getBlockState(below.x,below.y,below.z) : nullptr;
+			const std::string floorID = floor ? floor->block().stringID() : "";
+			bool checkSides = block.stringID() == "default:cactus"
+				? floorID == "default:cactus" || floorID == "default:sand"
+				: floorID == "default:grass" || floorID == "default:dirt";
+			if (floor && checkSides) {
+				for (int side = 1; side <= 4; ++side)
+					neighborsLoaded = neighborsLoaded && loaded((block.stringID() == "default:cactus" ? position : below) + directions[side]);
+			}
+		}
 		if (neighborsLoaded) {
 			bool supported = blockHasSupport(m_world, position, *state,
 				m_world.getData(position.x, position.y, position.z));

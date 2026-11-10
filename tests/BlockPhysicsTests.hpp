@@ -226,6 +226,73 @@ class BlockPhysicsTests : public CxxTest::TestSuite {
 			}
 		}
 
+		void testStackedPlantsDropEveryUnsupportedStalkExactlyOnce() {
+			for (const std::string id : {"default:reeds", "default:cactus"}) {
+				for (bool middle : {false,true}) {
+					Fixture f;
+					f.definitions.registerEntity("default:item_drop");
+					auto &plant = f.definitions.registerBlock<ServerBlock>(id);
+					plant.addGroup("group:attached_node",3);
+					f.definitions.registerItem<Item>({},id,id);
+					u16 ground = id == "default:cactus" ? f.sand : f.definitions.registerBlock<ServerBlock>("default:dirt").id();
+					f.world->setBlock(4,4,1,ground);
+					if (id == "default:reeds") f.world->setBlock(5,4,1,f.water);
+					for (int z=2;z<=4;++z) f.world->setBlock(4,4,z,plant.id());
+					int removed = middle ? 3 : 1;
+					f.world->setBlock(4,4,removed,0);
+					f.physics->enqueueNeighbors({4,4,removed}); f.run();
+					for (int z=removed+1;z<=4;++z) TS_ASSERT_EQUALS(f.world->getBlock(4,4,z),0);
+					if (middle) TS_ASSERT_EQUALS(f.world->getBlock(4,4,2),plant.id());
+					unsigned drops = 0;
+					f.world->scene().registry().view<ItemStack>().each([&](auto,const auto &stack) {
+						TS_ASSERT_EQUALS(stack.stringID(),id); drops += stack.amount();
+					});
+					TS_ASSERT_EQUALS(drops,middle ? 1u : 3u);
+				}
+			}
+		}
+
+		void testPlantSupportUpdatesCrossVerticalChunksWithoutLoadingTerrain() {
+			Fixture f;
+			f.definitions.registerEntity("default:item_drop");
+			auto &plant = f.definitions.registerBlock<ServerBlock>("default:reeds");
+			plant.addGroup("group:attached_node",3);
+			f.definitions.registerItem<Item>({},"default:reeds","reeds");
+			auto &upper = f.world->getOrCreateChunk(0,0,1);
+			upper.setInitialized(true);
+			for (int z=31;z<=33;++z) f.world->setBlock(4,4,z,plant.id());
+			auto chunks = f.world->chunks().size();
+			f.world->setBlock(4,4,31,0);
+			f.physics->enqueueNeighbors({4,4,31}); f.run();
+			TS_ASSERT_EQUALS(f.world->getBlock(4,4,32),0);
+			TS_ASSERT_EQUALS(f.world->getBlock(4,4,33),0);
+			TS_ASSERT_EQUALS(f.world->chunks().size(),chunks);
+			unsigned drops = 0;
+			f.world->scene().registry().view<ItemStack>().each([&](auto,const auto &stack) { drops += stack.amount(); });
+			TS_ASSERT_EQUALS(drops,2u);
+		}
+
+		void testReedWaterLossAndCactusSideObstructionDropPlants() {
+			for (const std::string id : {"default:reeds", "default:cactus"}) {
+				Fixture f;
+				f.definitions.registerEntity("default:item_drop");
+				auto &plant = f.definitions.registerBlock<ServerBlock>(id);
+				plant.addGroup("group:attached_node",3);
+				f.definitions.registerItem<Item>({},id,id);
+				u16 ground = id == "default:cactus" ? f.sand : f.definitions.registerBlock<ServerBlock>("default:dirt").id();
+				f.world->setBlock(4,4,1,ground);
+				if (id == "default:reeds") f.world->setBlock(5,4,1,f.water);
+				for (int z=2;z<=4;++z) f.world->setBlock(4,4,z,plant.id());
+				Vector3i changed = id == "default:reeds" ? Vector3i{5,4,1} : Vector3i{5,4,2};
+				f.world->setBlock(changed.x,changed.y,changed.z,id == "default:reeds" ? 0 : f.stone);
+				f.physics->enqueueNeighbors(changed); f.run();
+				for (int z=2;z<=4;++z) TS_ASSERT_EQUALS(f.world->getBlock(4,4,z),0);
+				unsigned drops = 0;
+				f.world->scene().registry().view<ItemStack>().each([&](auto,const auto &stack) { drops += stack.amount(); });
+				TS_ASSERT_EQUALS(drops,3u);
+			}
+		}
+
 		void testUnsupportedPlantsUseLootInsteadOfPlantItems() {
 			Fixture f;
 			f.definitions.registerEntity("default:item_drop");

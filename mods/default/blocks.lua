@@ -292,13 +292,7 @@ mod:block {
 
 	draw_type = "cactus",
 	bounding_box = {1/16, 1/16, 0, 14/16, 14/16, 15/16};
-
-	on_block_destroyed = function(pos, world)
-		if world:get_block(pos.x, pos.y, pos.z + 1) == world:get_block(pos.x, pos.y, pos.z) then
-			-- FIXME: Make something like "player:break_block(pos.x, pos.y, pos.z + 1)"
-			world:set_block(pos.x, pos.y, pos.z + 1, 0)
-		end
-	end,
+	groups = {attached_node = 3},
 }
 
 mod:block {
@@ -328,13 +322,9 @@ mod:block {
 	inventory_image = "reeds_item.png",
 
 	draw_type = "xshape",
+	is_collidable = false,
 	hardness = 0,
-
-	on_block_destroyed = function(pos, world)
-		if world:get_block(pos.x, pos.y, pos.z + 1) == world:get_block(pos.x, pos.y, pos.z) then
-			world:set_block(pos.x, pos.y, pos.z + 1, 0)
-		end
-	end,
+	groups = {attached_node = 3},
 }
 
 mod:reserve_block_id() -- redstone_lamp
