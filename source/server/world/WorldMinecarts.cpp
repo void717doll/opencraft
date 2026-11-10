@@ -3,6 +3,8 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "common/core/Registry.hpp"
+#include "common/core/LuaWidget.hpp"
+#include "common/scene/component/CargoMinecartComponent.hpp"
 #include "common/scene/component/DrawableDef.hpp"
 #include "common/scene/component/MinecartComponent.hpp"
 #include "common/scene/component/NetworkComponent.hpp"
@@ -87,6 +89,29 @@ bool clearBox(const World &world, const DoubleBox &box) {
 	if (!loaded) return false;
 	for (const auto &obstacle : obstacles) if (box.intersects(obstacle.box)) return false;
 	return true;
+}
+
+void showCargoInventory(ServerPlayer &player, entt::entity entity, CargoMinecartComponent &cargo) {
+	if (!player.client()) return;
+	cargo.viewer = player.name();
+	cargo.inventory.setBlockPos({s32(u32(entity)), 0, 0});
+	cargo.inventory.setInBlock(false);
+	Network::Packet packet;
+	packet << Network::Command::BlockGUIData << u16(176) << u16(166) << true << s16(-1);
+	packet << u8(LuaWidget::Inventory) << "cargo" << cargo.inventory;
+	packet << u8(LuaWidget::Image) << "background" << s32(0) << s32(0)
+		<< "mods/default/textures/gui/inventory.png" << 0.f << 0.f << 0.f << 0.f << u16(176) << u16(166) << u16(5);
+	auto slots = [&](const std::string &name, s32 y, u16 height, const std::string &destination, u16 offset, u16 count, bool cargoSlots) {
+		packet << u8(LuaWidget::InventoryWidget) << name << s32(7) << y
+			<< u16(9) << height << destination << offset << count
+			<< std::string(cargoSlots ? "temp" : "player") << std::string{} << false << false;
+		if (cargoSlots) packet << "cargo";
+		else packet << player.name() << "main";
+	};
+	slots("cart",17,3,"inv_main,inv_hotbar",0,27,true);
+	slots("inv_main",83,3,"cart",9,27,false);
+	slots("inv_hotbar",141,1,"cart",0,9,false);
+	player.client()->send(packet);
 }
 
 void sendRide(ServerPlayer &player, bool mounted) {
@@ -182,6 +207,8 @@ bool ServerWorld::placeMinecart(Player &player, const Vector3i &point) {
 	if (occupied) return false;
 	auto entity = registry.create();
 	registry.emplace<MinecartComponent>(entity);
+	unsigned kind = held.item().getGroupValue("group:om_minecart");
+	if (kind == 2 || kind == 3) registry.emplace<CargoMinecartComponent>(entity).kind = u8(kind - 1);
 	registry.emplace<PositionComponent>(entity,position.x,position.y,position.z,m_dimension.id());
 	auto &rotation = registry.emplace<RotationComponent>(entity);
 	auto ends = retro::railEnds(railShape(*rail));
@@ -189,7 +216,7 @@ bool ServerWorld::placeMinecart(Player &player, const Vector3i &point) {
 	rotation.quat = glm::angleAxis(float(std::atan2(axis.y,axis.x)),glm::vec3(0,0,1));
 	registry.emplace<DoubleBox>(entity,-0.49,-0.49,0,0.98,0.98,0.7);
 	registry.emplace<NetworkComponent>(entity,entity);
-	registry.emplace<DrawableDef>(entity).setMobModel(32);
+	registry.emplace<DrawableDef>(entity).setMobModel(32, 1.f, kind > 1 ? u8(kind - 1) : 0);
 	if (!player.isCreative()) player.inventory().setStack(u16(player.heldItemSlot()),0,
 		held.amount() > 1 ? held.stringID() : "",held.amount() - 1);
 	if (m_server) m_server->sendPlayerInvUpdate(player.clientID());
@@ -235,6 +262,22 @@ bool ServerWorld::interactMinecart(ServerPlayer &player) {
 	auto target = cartTarget(*this,player);
 	if (target == entt::null) return false;
 	auto &cart = m_scene.registry().get<MinecartComponent>(target);
+	if (auto *cargo = m_scene.registry().try_get<CargoMinecartComponent>(target)) {
+		if (cargo->kind == 1) showCargoInventory(player, target, *cargo);
+		else {
+			auto held = player.heldItemStack();
+			if (held.amount() && (held.stringID() == "default:coal" || held.stringID() == "default:charcoal") && cargo->addCoal()) {
+				if (!player.isCreative()) player.inventory().setStack(u16(player.heldItemSlot()),0,
+					held.amount() > 1 ? held.stringID() : "",held.amount() - 1);
+				if (m_server) m_server->sendPlayerInvUpdate(player.clientID());
+			}
+			const auto &position = m_scene.registry().get<PositionComponent>(target);
+			cargo->push = {position.x-player.x(),position.y-player.y(),0};
+			double length = std::hypot(cargo->push.x,cargo->push.y);
+			if (length > 0.01) cargo->push *= 1 / length;
+		}
+		return true;
+	}
 	if (!cart.rider.empty()) return true;
 	auto &position = m_scene.registry().get<PositionComponent>(target);
 	Vector3d seat{position.x,position.y,position.z + 0.15};
@@ -261,6 +304,10 @@ bool ServerWorld::attackMinecart(ServerPlayer &player) {
 		if (!dismountMinecart(*rider)) { cart.damage = 40; return true; }
 	}
 	const auto position = registry.get<PositionComponent>(target);
+	if (const auto *cargo = registry.try_get<CargoMinecartComponent>(target)) {
+		if (cargo->kind == 1) dropContainerItems({int(std::floor(position.x)),int(std::floor(position.y)),int(std::floor(position.z))},cargo->inventory);
+		if (!player.isCreative()) dropWorldItem({position.x,position.y,position.z},cargo->kind == 1 ? "default:chest" : "default:furnace",1,0,false);
+	}
 	if (!player.isCreative()) dropWorldItem({position.x,position.y,position.z},"default:minecart",1,0,false);
 	if (m_server) m_server->sendEntityDespawn(target);
 	registry.destroy(target);
@@ -274,6 +321,9 @@ void ServerWorld::updateMinecarts() {
 		Vector3d start{position.x,position.y,position.z};
 		const Chunk *chunk = getChunkAtBlockPos(int(std::floor(start.x)),int(std::floor(start.y)),int(std::floor(start.z)));
 		if (!chunk || !chunk->isInitialized()) return;
+		auto *cargo = registry.try_get<CargoMinecartComponent>(entity);
+		bool fueled = cargo && cargo->kind == 2 && cargo->fuel;
+		if (cargo) registry.get<DrawableDef>(entity).setMobAppearance(u8(cargo->kind | (fueled ? 4 : 0)));
 		ServerPlayer *rider = cart.rider.empty() ? nullptr : m_players.getPlayer(cart.rider);
 		if (rider && (!rider->isOnline() || !rider->isReady() || !rider->health() || rider->dimension() != m_dimension.id())) {
 			sendRide(*rider,false); cart.rider.clear(); rider = nullptr;
@@ -293,6 +343,21 @@ void ServerWorld::updateMinecarts() {
 			if (distance < 0.05 || distance > 0.98 || std::abs(otherPosition.z-start.z) > 0.7) return;
 			glm::vec3 forward = rotation.quat * glm::vec3(1, 0, 0);
 			if (std::abs((dx * forward.x + dy * forward.y) / distance) < 0.8) return;
+			const auto *otherCargo = registry.try_get<CargoMinecartComponent>(otherEntity);
+			bool furnace = cargo && cargo->kind == 2;
+			bool otherFurnace = otherCargo && otherCargo->kind == 2;
+			if (furnace != otherFurnace) {
+				if (furnace) {
+					other.velocity.x = other.velocity.x * 0.2 + cart.velocity.x + dx / distance * 0.05;
+					other.velocity.y = other.velocity.y * 0.2 + cart.velocity.y + dy / distance * 0.05;
+					cart.velocity *= 0.7;
+				} else {
+					cart.velocity.x = cart.velocity.x * 0.2 + other.velocity.x - dx / distance * 0.05;
+					cart.velocity.y = cart.velocity.y * 0.2 + other.velocity.y - dy / distance * 0.05;
+					other.velocity *= 0.7;
+				}
+				return;
+			}
 			double vx = (cart.velocity.x + other.velocity.x) * 0.5;
 			double vy = (cart.velocity.y + other.velocity.y) * 0.5;
 			cart.velocity.x = cart.velocity.x * 0.2 + vx - dx / distance * 0.05;
@@ -326,6 +391,7 @@ void ServerWorld::updateMinecarts() {
 			Vector3d allowed = collision::move(*this,box,horizontal,false);
 			if ((allowed-horizontal).length() > 0.001) { next = start; cart.velocity = {0,0,0}; }
 			else {
+				if (cargo && cargo->kind == 2) cargo->drive(cart.velocity);
 				cart.velocity *= rider ? double(0.997f) : double(0.96f);
 				double speed = std::hypot(cart.velocity.x,cart.velocity.y);
 				if (speed > 0) {
@@ -333,6 +399,7 @@ void ServerWorld::updateMinecarts() {
 					cart.velocity *= adjusted/speed;
 				}
 				if (nextState && nextRail != rail) retro::alignCartVelocity(cart.velocity,railShape(*nextState),false);
+				if (cargo) cargo->followTrack(cart.velocity);
 				if (powered) {
 					speed = std::hypot(cart.velocity.x, cart.velocity.y);
 					if (speed > 0.01) cart.velocity *= (speed + 0.06) / speed;

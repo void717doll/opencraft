@@ -44,6 +44,7 @@ class LuaGUIState : public InterfaceState {
 	public:
 		LuaGUIState(ClientCommandHandler &client, ClientPlayer &player, ClientWorld &world, sf::Packet &packet, ApplicationState *parent = nullptr);
 
+		~LuaGUIState() override;
 		void onEvent(const SDL_Event &event) override;
 
 		void update() override;

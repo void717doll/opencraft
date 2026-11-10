@@ -6527,6 +6527,722 @@
         16,
         16
       ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_note_block.png",
+      "source": "textures/redstone/mesecons_noteblock/mesecons_noteblock.png",
+      "operation": "copy",
+      "source_sha256": "2d89f8987cd738e12e601fbba94114483e87d5bb14ded0c59b1107a248ee2554",
+      "destination_sha256": "2d89f8987cd738e12e601fbba94114483e87d5bb14ded0c59b1107a248ee2554"
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_piston_top.png",
+      "source": "textures/redstone/mesecons_pistons/mesecons_piston_pusher_front.png",
+      "operation": "copy",
+      "source_sha256": "f8f08f7b6f27b31dbfea6de1811c951bf583baea4699fe6fe354569edd3bd4b9",
+      "destination_sha256": "f8f08f7b6f27b31dbfea6de1811c951bf583baea4699fe6fe354569edd3bd4b9"
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_piston_sticky_top.png",
+      "source": "textures/redstone/mesecons_pistons/mesecons_piston_pusher_front_sticky.png",
+      "operation": "copy",
+      "source_sha256": "8bdea814f145a3789a76415f2a10797c4bec5878b23958630e510663f142a988",
+      "destination_sha256": "8bdea814f145a3789a76415f2a10797c4bec5878b23958630e510663f142a988"
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_piston_bottom.png",
+      "source": "textures/redstone/mesecons_pistons/mesecons_piston_back.png",
+      "operation": "copy",
+      "source_sha256": "4e604fed5e2bd853b3adc859d0569c8446ed70489f2268a3ad612cbbff9f3b10",
+      "destination_sha256": "4e604fed5e2bd853b3adc859d0569c8446ed70489f2268a3ad612cbbff9f3b10"
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_piston_side.png",
+      "source": "mcimport_mods/mesecons/mesecons_pistons/mesecons_piston_right.png",
+      "operation": "copy",
+      "source_sha256": "fdc41b9c89bcaae640fa1f2475562f8fe36f35ade27adb4fbc0b4214e1ea73a6",
+      "destination_sha256": "fdc41b9c89bcaae640fa1f2475562f8fe36f35ade27adb4fbc0b4214e1ea73a6"
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_piston_extended.png",
+      "source": "textures/redstone/mesecons_pistons/mesecons_piston_on_front.png",
+      "operation": "copy",
+      "source_sha256": "4383f63fe64d6b25cb6c65de5b74e6bc19ee70b1976d7dbd85c05416e3bf8811",
+      "destination_sha256": "4383f63fe64d6b25cb6c65de5b74e6bc19ee70b1976d7dbd85c05416e3bf8811"
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_sign_board.png",
+      "source": "mcimport_mods/signs_lib/signs_lib_sign_wall_wooden.png",
+      "operation": "nearest resize 64x32 to 16x16 for the atlas; board geometry restores 2:1 aspect",
+      "source_sha256": "5cea2e5c329c5179ff683359a244f26dd3790dad371dcc2f897c48118b354234",
+      "output_sha256": "d2884deb46757fe31039d0f8e9604874ce38512216c4333568e27b8da94a46ef",
+      "source_size": [
+        64,
+        32
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_sign.png",
+      "source": "textures/default_mcl_core/default_sign.png",
+      "operation": "copy",
+      "source_sha256": "b7404e7909fcf909cbfbafe54cb76eeac65e132514f8a674db583ed94373d433",
+      "output_sha256": "b7404e7909fcf909cbfbafe54cb76eeac65e132514f8a674db583ed94373d433",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_painting.png",
+      "source": "textures/paintings_itemframes_banners/mcl_paintings_painting.png",
+      "operation": "copy",
+      "source_sha256": "7b8e073cfa817dc30b90fef573b2fb4bdc77e7fc9652ae9821d20dc665350574",
+      "output_sha256": "7b8e073cfa817dc30b90fef573b2fb4bdc77e7fc9652ae9821d20dc665350574",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_painting_0.png",
+      "source": "textures/paintings_itemframes_banners/mcl_paintings_paintings_WIP_.png",
+      "operation": "crop 16x16+0+0",
+      "source_sha256": "3535cb600b75f91877506268f41bf5db849d39427ee15e7f9fff0e73ce1541c6",
+      "output_sha256": "1572d9aded64329e9907ff4e911f4b56d29b1341be0a17e8f9eda8da5bdb410c",
+      "source_size": [
+        256,
+        256
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_painting_1.png",
+      "source": "textures/paintings_itemframes_banners/mcl_paintings_paintings_WIP_.png",
+      "operation": "crop 16x16+16+0",
+      "source_sha256": "3535cb600b75f91877506268f41bf5db849d39427ee15e7f9fff0e73ce1541c6",
+      "output_sha256": "2fa3b715e3b2e1c3d612bf940ccbc31defd877ba8839513ec14af6805e92c27d",
+      "source_size": [
+        256,
+        256
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_painting_2.png",
+      "source": "textures/paintings_itemframes_banners/mcl_paintings_paintings_WIP_.png",
+      "operation": "crop 16x16+32+0",
+      "source_sha256": "3535cb600b75f91877506268f41bf5db849d39427ee15e7f9fff0e73ce1541c6",
+      "output_sha256": "09a4ebd10525f306b33089f17d50350129e2bbaf9f75a9b3b81e469809f603d4",
+      "source_size": [
+        256,
+        256
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_painting_3.png",
+      "source": "textures/paintings_itemframes_banners/mcl_paintings_paintings_WIP_.png",
+      "operation": "crop 16x16+48+0",
+      "source_sha256": "3535cb600b75f91877506268f41bf5db849d39427ee15e7f9fff0e73ce1541c6",
+      "output_sha256": "38213fbdcebc90e9e17ae048f87a155d7aa1e449a646e6b10393149a0a1f76da",
+      "source_size": [
+        256,
+        256
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_painting_4.png",
+      "source": "textures/paintings_itemframes_banners/mcl_paintings_paintings_WIP_.png",
+      "operation": "crop 16x16+64+0",
+      "source_sha256": "3535cb600b75f91877506268f41bf5db849d39427ee15e7f9fff0e73ce1541c6",
+      "output_sha256": "283bddc44623fb345dd3dac54abb086aa4b0cbb9091d6ffb71140939052bff1d",
+      "source_size": [
+        256,
+        256
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_painting_5.png",
+      "source": "textures/paintings_itemframes_banners/mcl_paintings_paintings_WIP_.png",
+      "operation": "crop 16x16+80+0",
+      "source_sha256": "3535cb600b75f91877506268f41bf5db849d39427ee15e7f9fff0e73ce1541c6",
+      "output_sha256": "2884aa6357af394c8f2ab5a971718ad7fd063e935317a6f17f9935c1dfe2ea50",
+      "source_size": [
+        256,
+        256
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_painting_6.png",
+      "source": "textures/paintings_itemframes_banners/mcl_paintings_paintings_WIP_.png",
+      "operation": "crop 16x16+96+0",
+      "source_sha256": "3535cb600b75f91877506268f41bf5db849d39427ee15e7f9fff0e73ce1541c6",
+      "output_sha256": "971359b5f3a7bc70bad271399ed73582519f121076267969c5797ba22d535ead",
+      "source_size": [
+        256,
+        256
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_00.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_00.png",
+      "operation": "copy",
+      "source_sha256": "c81c28c32f50d81e44d4c90534e598d5917dbf0c411fe2d6a24e50256ae5e309",
+      "output_sha256": "c81c28c32f50d81e44d4c90534e598d5917dbf0c411fe2d6a24e50256ae5e309",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_01.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_01.png",
+      "operation": "copy",
+      "source_sha256": "67e16cfb67eb6647ab17a09d56cedbfffb9ddadbfb53f056eee5058211dff259",
+      "output_sha256": "67e16cfb67eb6647ab17a09d56cedbfffb9ddadbfb53f056eee5058211dff259",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_02.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_02.png",
+      "operation": "copy",
+      "source_sha256": "885bfb4f5b456e6f1dfeb56671727cc0417a3f308892bd3de1f118dacfa8181d",
+      "output_sha256": "885bfb4f5b456e6f1dfeb56671727cc0417a3f308892bd3de1f118dacfa8181d",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_03.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_03.png",
+      "operation": "copy",
+      "source_sha256": "e831d4b9a67915e2c0dd4c83a1192de2a3ca32a72d448c9ee38915836894b695",
+      "output_sha256": "e831d4b9a67915e2c0dd4c83a1192de2a3ca32a72d448c9ee38915836894b695",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_04.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_04.png",
+      "operation": "copy",
+      "source_sha256": "a3ebdc5c34a93d62f6fd5ccbc907786aaaeeb1ec1e052f3423d8c477d1c834ff",
+      "output_sha256": "a3ebdc5c34a93d62f6fd5ccbc907786aaaeeb1ec1e052f3423d8c477d1c834ff",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_05.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_05.png",
+      "operation": "copy",
+      "source_sha256": "2fe6106b0f00a8ad116164a8728ad792ed77211c465ddb09c3c26d12a54b9d7f",
+      "output_sha256": "2fe6106b0f00a8ad116164a8728ad792ed77211c465ddb09c3c26d12a54b9d7f",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_06.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_06.png",
+      "operation": "copy",
+      "source_sha256": "949ccec4967de772e1f93fda130391631202a305e59dbfcb79139e18b642e578",
+      "output_sha256": "949ccec4967de772e1f93fda130391631202a305e59dbfcb79139e18b642e578",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_07.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_07.png",
+      "operation": "copy",
+      "source_sha256": "4f00ac40660a0e7f5793971c330312ec55bea08d6f7862964ccb7944c7e688f8",
+      "output_sha256": "4f00ac40660a0e7f5793971c330312ec55bea08d6f7862964ccb7944c7e688f8",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_08.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_08.png",
+      "operation": "copy",
+      "source_sha256": "9fa7f7f8cb0fdb90538434ffece5a5b86689b7a8445620646f779be3d705894d",
+      "output_sha256": "9fa7f7f8cb0fdb90538434ffece5a5b86689b7a8445620646f779be3d705894d",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_09.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_09.png",
+      "operation": "copy",
+      "source_sha256": "9fa7f7f8cb0fdb90538434ffece5a5b86689b7a8445620646f779be3d705894d",
+      "output_sha256": "9fa7f7f8cb0fdb90538434ffece5a5b86689b7a8445620646f779be3d705894d",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_10.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_10.png",
+      "operation": "copy",
+      "source_sha256": "ff129da7ec4a53d849d59e1b85a2d3f505229a17d380e8c127c2053d392f0186",
+      "output_sha256": "ff129da7ec4a53d849d59e1b85a2d3f505229a17d380e8c127c2053d392f0186",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_11.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_11.png",
+      "operation": "copy",
+      "source_sha256": "10f5d8c9bb06e10d78779829c0f164feea5c04b5ba3acec8fdb1df294e3750ed",
+      "output_sha256": "10f5d8c9bb06e10d78779829c0f164feea5c04b5ba3acec8fdb1df294e3750ed",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_12.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_12.png",
+      "operation": "copy",
+      "source_sha256": "458e2d98e00939d5830ef583cd98642c7ba34015802c7baf12bb6f9fed3ee932",
+      "output_sha256": "458e2d98e00939d5830ef583cd98642c7ba34015802c7baf12bb6f9fed3ee932",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_13.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_13.png",
+      "operation": "copy",
+      "source_sha256": "089a73745b0810811428682ac73ec937500635c739335de002870a66fd3a9d87",
+      "output_sha256": "089a73745b0810811428682ac73ec937500635c739335de002870a66fd3a9d87",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_14.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_14.png",
+      "operation": "copy",
+      "source_sha256": "111c7a4299c42eb8093b89796a0cb9dda97fe9dbd13b859384ebccac8ec137b1",
+      "output_sha256": "111c7a4299c42eb8093b89796a0cb9dda97fe9dbd13b859384ebccac8ec137b1",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_15.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_15.png",
+      "operation": "copy",
+      "source_sha256": "4493734a951a8c7d742a4c16eb8618002be2295ae9b84788c85358b2b04ca999",
+      "output_sha256": "4493734a951a8c7d742a4c16eb8618002be2295ae9b84788c85358b2b04ca999",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_16.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_16.png",
+      "operation": "copy",
+      "source_sha256": "2b373b3fae9cdfcc4542b61b06adca3a609af3a0e926f034dc2729fe6d14f683",
+      "output_sha256": "2b373b3fae9cdfcc4542b61b06adca3a609af3a0e926f034dc2729fe6d14f683",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_17.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_17.png",
+      "operation": "copy",
+      "source_sha256": "39203f610602fc63bfde95b257971a8324f4dece431ae0016370854f7e80354a",
+      "output_sha256": "39203f610602fc63bfde95b257971a8324f4dece431ae0016370854f7e80354a",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_18.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_18.png",
+      "operation": "copy",
+      "source_sha256": "184a940358af46398188b3a68dc32f0e5ee6aa5ad343637cf8d50f1a1000da34",
+      "output_sha256": "184a940358af46398188b3a68dc32f0e5ee6aa5ad343637cf8d50f1a1000da34",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_19.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_19.png",
+      "operation": "copy",
+      "source_sha256": "8891ee27aed93c62d7053fe79f42b7057aef1613f25d9f715fc9d6c0bf8da2d6",
+      "output_sha256": "8891ee27aed93c62d7053fe79f42b7057aef1613f25d9f715fc9d6c0bf8da2d6",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_20.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_20.png",
+      "operation": "copy",
+      "source_sha256": "53c9a6df3a785396af53526f3b81d5ead2de383f78743333342671ab811216ad",
+      "output_sha256": "53c9a6df3a785396af53526f3b81d5ead2de383f78743333342671ab811216ad",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_21.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_21.png",
+      "operation": "copy",
+      "source_sha256": "f4b675eb2d74974666b64707d4c42b3456f097e9ed684fd5653acde76b861a22",
+      "output_sha256": "f4b675eb2d74974666b64707d4c42b3456f097e9ed684fd5653acde76b861a22",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_22.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_22.png",
+      "operation": "copy",
+      "source_sha256": "02c7736e375e3c5c45cb7b4feb96f13fdc85bcce2f27101a708daaf9ea7c6360",
+      "output_sha256": "02c7736e375e3c5c45cb7b4feb96f13fdc85bcce2f27101a708daaf9ea7c6360",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_23.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_23.png",
+      "operation": "copy",
+      "source_sha256": "c9b302ff24b01188081c51df6acfec24c50c877c2eaf4354e27dca2a8c04997f",
+      "output_sha256": "c9b302ff24b01188081c51df6acfec24c50c877c2eaf4354e27dca2a8c04997f",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_24.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_24.png",
+      "operation": "copy",
+      "source_sha256": "c9b302ff24b01188081c51df6acfec24c50c877c2eaf4354e27dca2a8c04997f",
+      "output_sha256": "c9b302ff24b01188081c51df6acfec24c50c877c2eaf4354e27dca2a8c04997f",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_25.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_25.png",
+      "operation": "copy",
+      "source_sha256": "d13e4ff6d905d7da60244891e1aab119d16aec6feb55234596188187d932d6a7",
+      "output_sha256": "d13e4ff6d905d7da60244891e1aab119d16aec6feb55234596188187d932d6a7",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_26.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_26.png",
+      "operation": "copy",
+      "source_sha256": "3a6ffdcbc687582d52fa33a3379ad8bb3ead0293a1acabbdc30c1b214e6c72e1",
+      "output_sha256": "3a6ffdcbc687582d52fa33a3379ad8bb3ead0293a1acabbdc30c1b214e6c72e1",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_27.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_27.png",
+      "operation": "copy",
+      "source_sha256": "6bc9ce7e6810d8babf64579b480d83d4c788486ded7369b3f01d0ef767397eed",
+      "output_sha256": "6bc9ce7e6810d8babf64579b480d83d4c788486ded7369b3f01d0ef767397eed",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_28.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_28.png",
+      "operation": "copy",
+      "source_sha256": "80ddfb6c14701dc560427e778b320592b310fc1c9461dc8941bf27b37e9947ed",
+      "output_sha256": "80ddfb6c14701dc560427e778b320592b310fc1c9461dc8941bf27b37e9947ed",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_29.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_29.png",
+      "operation": "copy",
+      "source_sha256": "bb0ce101c9c12ed3aea8780806e2a3a21495f6bf9a3a5134cb837aa914d4f82a",
+      "output_sha256": "bb0ce101c9c12ed3aea8780806e2a3a21495f6bf9a3a5134cb837aa914d4f82a",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_30.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_30.png",
+      "operation": "copy",
+      "source_sha256": "d8470b85e6b5ef7db2973447d7e67ca3b0462729c4c6af2a2b1237a9d84a9018",
+      "output_sha256": "d8470b85e6b5ef7db2973447d7e67ca3b0462729c4c6af2a2b1237a9d84a9018",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_compass_31.png",
+      "source": "textures/mcl_compass/mcl_compass_compass_31.png",
+      "operation": "copy",
+      "source_sha256": "15fe5af7be6b2242c3775cfaf4654bf9396db1338b05a59a280563a771012e97",
+      "output_sha256": "15fe5af7be6b2242c3775cfaf4654bf9396db1338b05a59a280563a771012e97",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_map.png",
+      "source": "textures/default_mcl_core/tools/mcl_maps_map_filled.png",
+      "operation": "copy",
+      "source_sha256": "fa639183d13ecc97367306d47427d3f1d69b625ced3ed04afa9a43f507017c65",
+      "output_sha256": "fa639183d13ecc97367306d47427d3f1d69b625ced3ed04afa9a43f507017c65",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_map_background.png",
+      "source": "textures/HUD/mcl_maps_map_background.png",
+      "operation": "copy",
+      "source_sha256": "dcc136350f73b0704b72423c1ed7780a0f26d7f0e49462350f00c78b43f105a3",
+      "output_sha256": "dcc136350f73b0704b72423c1ed7780a0f26d7f0e49462350f00c78b43f105a3",
+      "source_size": [
+        140,
+        140
+      ],
+      "output_size": [
+        140,
+        140
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_chest_minecart.png",
+      "source": "textures/carts_mcl_minecarts/mcl_minecarts_minecart_chest.png",
+      "operation": "copy",
+      "source_sha256": "e2f63c5399a353af936be4554aca2a3d4ce03d51f3a51ac338869cb14697ee55",
+      "destination_sha256": "e2f63c5399a353af936be4554aca2a3d4ce03d51f3a51ac338869cb14697ee55"
+    },
+    {
+      "destination": "mods/default/textures/items/refi_furnace_minecart.png",
+      "source": "textures/carts_mcl_minecarts/mcl_minecarts_minecart_furnace.png",
+      "operation": "copy",
+      "source_sha256": "02e6d0a9b4dec6547efaa513f1f1135476d34ad46970e6723dbcd32a0ddfa27b",
+      "destination_sha256": "02e6d0a9b4dec6547efaa513f1f1135476d34ad46970e6723dbcd32a0ddfa27b"
     }
   ],
   "unchanged_engine_ui": [

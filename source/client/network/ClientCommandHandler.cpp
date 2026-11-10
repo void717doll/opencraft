@@ -46,6 +46,8 @@
 #include "client/scene/component/DrawableComponent.hpp"
 #include "client/states/ConnectionErrorState.hpp"
 #include "client/states/LuaGUIState.hpp"
+#include "client/states/SignEditorState.hpp"
+#include "common/world/SignText.hpp"
 #include "client/world/ClientPlayer.hpp"
 #include "client/world/ClientWorld.hpp"
 
@@ -95,6 +97,7 @@ void ClientCommandHandler::sendPlayerDropStack(const ItemStack &stack) {
 }
 
 void ClientCommandHandler::sendPlayerInvUpdate() {
+	if (m_minecartInventory) { sendMinecartInvUpdate(*m_minecartInventory); return; }
 	Network::Packet invPacket;
 	invPacket << Network::Command::PlayerInvUpdate;
 	invPacket << m_player.inventory() << m_player.armor();
@@ -114,6 +117,12 @@ void ClientCommandHandler::sendPlayerRotUpdate() {
 	packet << Network::Command::PlayerRotUpdate;
 	packet << m_player.cameraYaw();
 	packet << m_player.cameraPitch();
+	m_client.send(packet);
+}
+
+void ClientCommandHandler::sendNotePreview(const glm::ivec4 &selectedBlock) {
+	Network::Packet packet;
+	packet << Network::Command::NotePreview << s32(selectedBlock.x) << s32(selectedBlock.y) << s32(selectedBlock.z);
 	m_client.send(packet);
 }
 
@@ -160,6 +169,23 @@ void ClientCommandHandler::sendBlockActivated(const glm::ivec4 &selectedBlock) {
 		<< s32(selectedBlock.y)
 		<< s32(selectedBlock.z)
 		<< u16(Config::screenWidth) << u16(Config::screenHeight) << u8(Config::guiScale);
+	m_client.send(packet);
+}
+
+bool ClientCommandHandler::minecartInReach(u32 id) const {
+	auto entry = m_entityMap.find(entt::entity(id));
+	if (entry == m_entityMap.end()) return false;
+	auto &registry = m_world.scene().registry();
+	const auto *position = registry.try_get<PositionComponent>(entry->second);
+	if (!position) return false;
+	Vector3d distance{position->x - m_player.x(), position->y - m_player.y(), position->z - m_player.z()};
+	return distance.length() <= 6;
+}
+
+void ClientCommandHandler::sendMinecartInvUpdate(Inventory &inventory) {
+	Network::Packet packet;
+	packet << Network::Command::MinecartInvUpdate << u32(inventory.blockPos().x) << inventory
+		<< m_player.inventory() << m_player.armor();
 	m_client.send(packet);
 }
 
@@ -374,6 +400,16 @@ void ClientCommandHandler::setupCallbacks() {
 			m_entityMap.clear();
 			sendPlayerChunkPosUpdate();
 		}
+	});
+
+	m_client.setCommandCallback(Network::Command::SignEditor, [this](Network::Packet &packet) {
+		Vector3i position;
+		sign::Lines lines;
+		packet >> position;
+		for (auto &line : lines) { packet >> line; line = sign::cleanLine(line); }
+		auto &stack = ApplicationStateStack::getInstance();
+		if (packet && !stack.empty() && !dynamic_cast<SignEditorState *>(&stack.top()))
+			stack.push<SignEditorState>(m_client, m_world, position, lines, &stack.top());
 	});
 
 	m_client.setCommandCallback(Network::Command::BlockGUIData, [this](Network::Packet &packet) {

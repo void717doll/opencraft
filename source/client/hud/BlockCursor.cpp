@@ -1,3 +1,4 @@
+#include "common/world/BetaPiston.hpp"
 /*
  * =====================================================================================
  *
@@ -117,6 +118,7 @@ void BlockCursor::onEvent(const SDL_Event &event, const Hotbar &hotbar) {
 		if (event.button.button == SDL_BUTTON_LEFT) {
 			m_animationStart = GameClock::getInstance().getTicks();
 			m_currentTool = &m_player.inventory().getStack((u16)hotbar.cursorPos(), 0);
+			if (m_currentBlock && m_currentBlock->block().hasGroup("group:om_note_block")) m_client.sendNotePreview(m_selectedBlock);
 		}
 		else if (event.button.button == SDL_BUTTON_RIGHT)
 			activateBlock(hotbar);
@@ -288,13 +290,30 @@ void BlockCursor::activateBlock(const Hotbar &hotbar) {
 				mount = torchRotationForFace(face);
 				if (mount < 0) return;
 			}
-			const BlockState &newBlockState = newBlock.getState(merged ? 1 : 0);
+			u16 decorationState = 0;
+			if (newBlock.hasGroup("group:om_sign")) {
+				if (face < 0 || face > 4) return;
+				decorationState = face == 2 ? 0 : 1;
+				static constexpr int rotations[] = {3, 0, 0, 1, 2, -1};
+				if (face != 2) mount = rotations[face];
+			}
+			if (newBlock.hasGroup("group:om_painting")) {
+				if (face < 0 || face > 5) return;
+				static constexpr int rotations[] = {16, 8, -1, 20, 12, -1};
+				mount = rotations[face];
+				if (mount < 0) return;
+				decorationState = u16((x * 31u + y * 17u + z * 13u) % newBlock.states().size());
+			}
+			const BlockState &newBlockState = newBlock.getState(merged ? 1 : decorationState);
 			u16 data = merged ? newBlock.param().setParam(BlockParam::State, 0, 1) : 0;
 			if (newBlock.isRotatable()) {
 				u16 rotation = mount >= 0 ? u16(mount) : m_player.getOppositeDirection() & 0x3;
 				if (newBlock.hasGroup("group:om_stairs")) rotation = m_player.getDirection();
+				if (newBlock.hasGroup("group:om_piston")) rotation = retro::pistonPlacementRotation(m_player,{x,y,z});
 				data = newBlock.param().setParam(BlockParam::Rotation, 0, rotation);
 			}
+			if (newBlock.hasGroup("group:om_sign") || newBlock.hasGroup("group:om_painting"))
+				data = newBlock.param().setParam(BlockParam::State, data, decorationState);
 			if (!worldBounds::contains(z) || !blockHasSupport(m_world, {x, y, z}, newBlockState, data)) return;
 			DoubleBox playerBox = m_player.hitbox();
 			playerBox.move(m_player.x(), m_player.y(), m_player.z());

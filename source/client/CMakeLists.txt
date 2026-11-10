@@ -70,6 +70,7 @@ set(SOURCE_FILES
 	hud/DebugLightmapViewer.cpp
 	hud/DebugOverlay.cpp
 	hud/DebugProfilerWindow.cpp
+	hud/PaperMap.cpp
 	hud/HUD.cpp
 	hud/HeartBar.cpp
 	hud/ArmorBar.cpp
@@ -96,6 +97,7 @@ set(SOURCE_FILES
 	states/LuaGUIState.cpp
 	states/PauseMenuState.cpp
 	states/ServerLoadingState.cpp
+	states/SignEditorState.cpp
 	states/StatisticsState.cpp
 	states/SettingsMenuState.cpp
 	states/TitleScreenState.cpp

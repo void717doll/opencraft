@@ -15,3 +15,5 @@ verification includes the native executable with sdl's dummy audio driver, every
 native address and undefined-behavior checks passed. the native shutdown leak check reports allocations from an unloaded shared library; the same allocation pattern also occurs with bare sdl initialization and shutdown, without game or audio code. the native leak check is therefore not clean.
 
 pickups play only after the server transfers at least one item, at gain 0.3 and pitch 0.7–1.1. inventory rearrangement and failed pickups stay silent. block breaking and digging use mineclonia material groups and gains. source notices accompany the clips in `MINECLONIA-CREDITS.txt` and `MINECLONIA-ITEM-CREDITS.txt`.
+
+note blocks use five instrument samples from mineclonia’s `mcl_noteblock`: piano, bass guitar, snare, percussion hit, and bass drum. pitch changes span 25 semitones; supporting block materials select the instrument. source notices are in `resources/sounds/MINECLONIA-NOTEBLOCK-CREDITS.txt`, with conversions listed in `sound-assets.json`.

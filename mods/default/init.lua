@@ -72,3 +72,7 @@ dofile("beta_woods.lua")
 dofile("ocean.lua")
 dofile("slabs.lua")
 dofile("stairs.lua")
+
+dofile("beta_mechanics.lua")
+dofile("navigation.lua")
+dofile("decorations.lua")

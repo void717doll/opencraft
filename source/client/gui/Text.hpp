@@ -55,6 +55,9 @@ class Text : public Drawable, public Transformable {
 		void setShadowEnabled(bool isShadowEnabled) { m_isShadowEnabled = isShadowEnabled; m_isUpdateNeeded = true; }
 
 		void setPadding(int x, int y);
+		void setDepthTestEnabled(bool enabled) {
+			if (m_depthTestEnabled != enabled) { m_depthTestEnabled = enabled; m_isUpdateNeeded = true; }
+		}
 
 		void setMaxLineLength(u32 maxLineLength);
 
@@ -68,6 +71,7 @@ class Text : public Drawable, public Transformable {
 		std::string m_string;
 
 		bool m_isShadowEnabled = true;
+		bool m_depthTestEnabled = false;
 		Color m_shadowColor = Color::fromRGBA32(70, 70, 70);
 
 		Font &m_font;

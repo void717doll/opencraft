@@ -1,3 +1,4 @@
+#include "common/world/BetaPiston.hpp"
 /*
  * =====================================================================================
  *
@@ -32,6 +33,7 @@
 #include "common/scene/component/DrawableDef.hpp"
 #include "common/scene/component/NetworkComponent.hpp"
 #include "common/world/BlockData.hpp"
+#include "common/world/SignText.hpp"
 #include "server/core/PlayerList.hpp"
 #include "server/lua/ScriptEngine.hpp"
 #include "server/network/Server.hpp"
@@ -39,11 +41,14 @@
 #include "common/world/WorldCollision.hpp"
 #include "common/world/BetaToolRules.hpp"
 #include "common/world/RetroMobSpawn.hpp"
+#include "common/world/NavigationMap.hpp"
 #include "common/core/GameClock.hpp"
 #include "common/scene/component/MobComponent.hpp"
 #include "server/world/ServerBlock.hpp"
 #include "server/world/ServerItem.hpp"
 #include "server/world/WorldController.hpp"
+#include "common/scene/component/CargoMinecartComponent.hpp"
+#include "common/scene/component/PositionComponent.hpp"
 
 namespace {
 bool canReachBlock(const ServerWorld &world, const ServerPlayer &player, int x, int y, int z) {
@@ -216,6 +221,11 @@ void ServerCommandHandler::sendPlayerPosUpdate(u16 clientID, bool isTeleportatio
 void ServerCommandHandler::sendPlayerInvUpdate(u16 clientID, const ClientInfo *client) const {
 	ServerPlayer *player = m_players.getPlayerFromClientID(clientID);
 	if (player) {
+		for (u16 y = 0; y < player->inventory().height(); ++y) for (u16 x = 0; x < player->inventory().width(); ++x) {
+			auto &stack = player->inventory().getStackRef(x, y);
+			if (stack.amount() && stack.stringID() == "default:map" && !stack.damage())
+				stack.setDamage(navigation::create(m_worldController.worldName(), player->x(), player->y(), player->dimension()));
+		}
 		Network::Packet packet;
 		packet << Network::Command::PlayerInvUpdate;
 		packet << clientID << player->inventory() << player->heldItemSlot() << player->armor();
@@ -379,6 +389,23 @@ void ServerCommandHandler::respawnPlayer(u16 clientID) {
 }
 
 void ServerCommandHandler::setupCallbacks() {
+	m_server.setCommandCallback(Network::Command::SignUpdate, [this](ClientInfo &client, Network::Packet &packet) {
+		Vector3i position;
+		sign::Lines lines;
+		packet >> position;
+		for (auto &line : lines) packet >> line;
+		auto *player = m_players.getPlayerFromClientID(client.id);
+		auto &world = getWorldForClient(client.id);
+		if (!packet || !player || !canReachBlock(world, *player, position.x, position.y, position.z)) return;
+		const auto *state = world.getBlockState(position.x, position.y, position.z);
+		if (!state || !state->block().hasGroup("group:om_sign")) return;
+		auto *data = world.getBlockData(position.x, position.y, position.z);
+		if (!data) data = world.addBlockData(position.x, position.y, position.z);
+		if (!data) return;
+		sign::write(data->meta, lines);
+		static_cast<ServerChunk *>(world.getChunkAtBlockPos(position.x, position.y, position.z))->setModified(true);
+		sendBlockDataUpdate(position.x, position.y, position.z, data);
+	});
 	m_server.setCommandCallback(Network::Command::PlayerStatistics, [this](ClientInfo &client, Network::Packet &) {
 		auto *player = m_players.getPlayerFromClientID(client.id);
 		if (!player) return;
@@ -604,6 +631,11 @@ void ServerCommandHandler::setupCallbacks() {
 					? definition.param().getParam(BlockParam::State, data) : 0;
 				valid = stateID < definition.states().size();
 				if (definition.stringID() == "default:bed") valid = stateID == 0;
+				if (definition.hasGroup("group:om_piston")) {
+					valid = stateID == 0;
+					data = definition.param().setParam(BlockParam::Rotation,0,retro::pistonPlacementRotation(*player,{x,y,z}));
+					block = u32(id) | (u32(data) << 16);
+				}
 				if (definition.hasGroup("group:om_slab")) valid = stateID == (merged ? 1 : 0);
 				if (definition.hasGroup("group:om_stairs") || definition.hasGroup("group:om_chest"))
 					valid = valid && definition.param().getParam(BlockParam::Rotation, data) < 4;
@@ -651,6 +683,14 @@ void ServerCommandHandler::setupCallbacks() {
 			Network::Packet answer;
 			answer << Network::Command::BlockUpdate << x << y << z << block;
 			m_server.sendToAllClients(answer);
+			if (blocks[id]->hasGroup("group:om_sign")) {
+				auto *data = world.getBlockData(x, y, z);
+				if (!data) data = world.addBlockData(x, y, z);
+				Network::Packet editor;
+				editor << Network::Command::SignEditor << Vector3i{x, y, z};
+				for (const auto &line : sign::read(data->meta)) editor << line;
+				client.send(editor);
+			}
 		}
 		else
 			logError() << ("Failed to place block using player " + std::to_string(client.id) + ": Player not found").c_str();
@@ -673,6 +713,14 @@ void ServerCommandHandler::setupCallbacks() {
 		if (!player || !player->health() || !player->tryAttack(GameClock::getInstance().getTicks(true))) return;
 		auto &world = getWorldForClient(client.id);
 		if (!world.attackMinecart(*player)) world.attackMob(*player);
+	});
+
+	m_server.setCommandCallback(Network::Command::NotePreview, [this](ClientInfo &client, Network::Packet &packet) {
+		s32 x,y,z;
+		ServerPlayer *player = m_players.getPlayerFromClientID(client.id);
+		if (!(packet >> x >> y >> z) || !player || !player->isReady() || !player->health()) return;
+		auto &world = getWorldForClient(client.id);
+		if (canReachBlock(world,*player,x,y,z)) world.playNote(x,y,z,false);
 	});
 
 	m_server.setCommandCallback(Network::Command::PlayerDigBlock, [this](ClientInfo &client, Network::Packet &packet) {
@@ -758,6 +806,15 @@ void ServerCommandHandler::setupCallbacks() {
 
 			u16 id = world.getBlock(x, y, z);
 			ServerBlock &block = (ServerBlock &)(m_registry.getBlock(id));
+			if (block.hasGroup("group:om_sign")) {
+				auto *data = world.getBlockData(x, y, z);
+				if (!data) data = world.addBlockData(x, y, z);
+				Network::Packet editor;
+				editor << Network::Command::SignEditor << Vector3i{x, y, z};
+				for (const auto &line : sign::read(data->meta)) editor << line;
+				client.send(editor);
+				return;
+			}
 			bool hasBeenActivated = block.onBlockActivated({x, y, z}, *player, world, client, *this);
 
 			if (hasBeenActivated)
@@ -765,6 +822,30 @@ void ServerCommandHandler::setupCallbacks() {
 		}
 		else
 			logError() << ("Failed to activate block using player '" + client.playerName + "': Player not found").c_str();
+	});
+
+	m_server.setCommandCallback(Network::Command::MinecartInvUpdate, [this](ClientInfo &client, Network::Packet &packet) {
+		u32 id;
+		Inventory inventory, main, armor;
+		if (!(packet >> id >> inventory >> main >> armor) || inventory.width() != 9 || inventory.height() != 3
+			|| inventory.name() != "minecart" || inventory.inBlock() || u32(inventory.blockPos().x) != id
+			|| main.width() != 9 || main.height() != 4 || armor.width() != 1 || armor.height() != 4) return;
+		auto *player = m_players.getPlayerFromClientID(client.id);
+		if (!player || !player->health()) return;
+		auto &registry = getWorldForClient(client.id).scene().registry();
+		auto entity = entt::entity(id);
+		if (!registry.valid(entity) || !registry.all_of<CargoMinecartComponent, PositionComponent>(entity)) return;
+		auto &cargo = registry.get<CargoMinecartComponent>(entity);
+		const auto &position = registry.get<PositionComponent>(entity);
+		Vector3d distance{position.x-player->x(), position.y-player->y(), position.z-player->z()};
+		if (cargo.kind != 1 || cargo.viewer != player->name() || distance.length() > 6) return;
+		for (u16 slot = 0; slot < 4; ++slot) {
+			const auto &stack = armor.getStack(0, slot);
+			if (stack.amount() && (stack.amount() != 1 || stack.item().getGroupValue("group:om_armor_slot") != slot + 1)) return;
+		}
+		cargo.inventory = std::move(inventory);
+		player->inventory() = std::move(main);
+		player->armor() = std::move(armor);
 	});
 
 	m_server.setCommandCallback(Network::Command::BlockInvUpdate, [this](ClientInfo &client, Network::Packet &packet) {

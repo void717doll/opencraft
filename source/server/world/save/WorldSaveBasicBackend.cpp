@@ -44,6 +44,7 @@
 #include "common/scene/component/FallingBlockComponent.hpp"
 #include "common/scene/component/TntComponent.hpp"
 #include "common/scene/component/MinecartComponent.hpp"
+#include "common/scene/component/CargoMinecartComponent.hpp"
 #include "common/scene/component/NetworkComponent.hpp"
 #include "server/world/ServerBlock.hpp"
 #include "server/world/ServerWorld.hpp"
@@ -429,6 +430,9 @@ void WorldSaveBasicBackend::loadEntities(sf::Packet &save, ServerWorld &world) {
 			}
 			else if (type == ComponentType::FallingBlock) {
 				save >> registry.emplace<FallingBlockComponent>(entity);
+			}
+			else if (type == ComponentType::CargoMinecart) {
+				save >> registry.emplace<CargoMinecartComponent>(entity);
 			}
 			else if (type == ComponentType::Minecart) {
 				save >> registry.emplace<MinecartComponent>(entity);

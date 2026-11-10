@@ -68,9 +68,15 @@ LuaGUIState::LuaGUIState(ClientCommandHandler &client, ClientPlayer &player, Cli
 
 	while (!packet.endOfPacket())
 		loadGUI(packet);
+	for (auto &entry : m_inventories)
+		if (entry.second.name() == "minecart") m_client.setMinecartInventory(&entry.second);
 	if (m_inventoryWidgets.count("armor_helmet") && !m_inventoryWidgets.count("inv_catalog")) m_playerPreview = std::make_unique<PlayerModel>(m_player);
 
 	isActive = true;
+}
+
+LuaGUIState::~LuaGUIState() {
+	for (auto &entry : m_inventories) m_client.clearMinecartInventory(&entry.second);
 }
 
 void LuaGUIState::onEvent(const SDL_Event &event) {
@@ -203,6 +209,9 @@ void LuaGUIState::update() {
 }
 
 bool LuaGUIState::blockInventoriesValid() const {
+	for (const auto &entry : m_inventories) {
+		if (entry.second.name() == "minecart" && !m_client.minecartInReach(u32(entry.second.blockPos().x))) return false;
+	}
 	for (const auto &source : m_blockInventories) {
 		const auto &pos = source.position;
 		const auto *data = m_world.getBlockData(pos.x, pos.y, pos.z);
@@ -237,6 +246,11 @@ void LuaGUIState::finishInventory() {
 		for (const auto &stack : crafting->second.items()) release(stack);
 		for (u16 y = 0; y < crafting->second.height(); ++y)
 			for (u16 x = 0; x < crafting->second.width(); ++x) crafting->second.clearStack(x, y);
+	}
+	for (auto &entry : m_inventories) {
+		if (entry.second.name() != "minecart") continue;
+		if (m_client.minecartInReach(u32(entry.second.blockPos().x))) m_client.sendMinecartInvUpdate(entry.second);
+		m_client.clearMinecartInventory(&entry.second);
 	}
 	m_client.sendPlayerInvUpdate();
 	for (const auto &stack : drops) m_client.sendPlayerDropStack(stack);
@@ -387,7 +401,7 @@ void LuaGUIState::loadInventoryWidget(const std::string &name, s32 x, s32 y, sf:
 	if (inventory == "catalog" && m_player.isCreative()) {
 		std::vector<const Item *> items;
 		for (const auto &item : Registry::getInstance().items()) {
-			if (!item->id()) continue;
+			if (!item->id() || item->hasGroup("group:om_creative_hidden")) continue;
 			if (item->isBlock() && Registry::getInstance().getBlockFromStringID(item->stringID()).getState(0).drawType() == BlockDrawType::Liquid) continue;
 			items.push_back(item.get());
 		}

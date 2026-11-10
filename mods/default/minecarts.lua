@@ -115,3 +115,17 @@ mod:crafting_recipe {
 	result = {id = "default:stone_pressure_plate", amount = 1},
 	pattern = {"SS"}, keys = {S = "default:stone"},
 }
+
+for _, cart in ipairs({
+	{"chest_minecart", "Minecart with Chest", "chest", 2},
+	{"furnace_minecart", "Minecart with Furnace", "furnace", 3},
+}) do
+	mod:item {
+		id = cart[1], name = cart[2], tiles = "refi_" .. cart[1] .. ".png", max_stack_size = 1,
+		groups = {om_minecart = cart[4]},
+	}
+	mod:crafting_recipe {
+		result = {id = "default:" .. cart[1], amount = 1}, pattern = {"B", "C"},
+		keys = {B = "default:" .. cart[3], C = "default:minecart"},
+	}
+end

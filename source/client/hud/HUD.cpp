@@ -27,6 +27,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "common/core/GameClock.hpp"
+#include "common/core/GameTime.hpp"
 #include "common/event/Events.hpp"
 
 #include "client/core/Config.hpp"
@@ -111,6 +112,8 @@ void HUD::onGuiScaleChanged(const GuiScaleChangedEvent &event) {
 }
 
 void HUD::update() {
+	m_paperMap.update(m_player, m_world);
+	m_world.textureAtlas().updateCompass(GameTime::getTicks(), m_player.dimension(), m_player.x(), m_player.y(), m_player.cameraYaw());
 	m_scoreValue.setString(std::to_string(m_player.score()));
 	if (Config::isCoordinatesVisible) {
 		m_coordinatesText.setString("x: " + std::to_string(int(std::floor(m_player.x())))
@@ -177,7 +180,7 @@ void HUD::update() {
 
 void HUD::draw(RenderTarget &target, RenderStates states) const {
 	OM_PROFILE_START("HUD::draw");
-	if (!m_isSpyglassActive) target.draw(m_wield, states);
+	if (!m_isSpyglassActive && !m_paperMap.visible()) target.draw(m_wield, states);
 
 	target.setView(m_view);
 
@@ -189,6 +192,7 @@ void HUD::draw(RenderTarget &target, RenderStates states) const {
 	}
 
 	states.transform *= getTransform();
+	if (!m_isSpyglassActive) target.draw(m_paperMap, states);
 
 	if (m_isDebugOverlayVisible)
 		target.draw(m_debugOverlay, states);

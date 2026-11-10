@@ -114,6 +114,20 @@ void addRail(s8f x, s8f y, s8f z, ChunkMeshBuildingJob &job, const BlockState &s
 void BlockMesher::addBlock(s8f x, s8f y, s8f z, ChunkMeshBuildingJob &job,
                            const BlockState &blockState, u16 blockParam)
 {
+	if (blockState.block().hasGroup("group:om_sign") && blockState.id() == 0) {
+		u16 rotation = blockState.block().param().getParam(BlockParam::Rotation, blockParam) & 3;
+		BlockState post = blockState;
+		FloatBox box{0.4375f, 0.4375f, 0, 0.125f, 0.125f, 0.5f};
+		post.boundingBox(box);
+		addBlock(x, y, z, job, post, box, rotation, orientMatrices[rotation]);
+	}
+	if (blockState.block().hasGroup("group:om_piston_head")) {
+		u16 rotation = blockState.block().param().getParam(BlockParam::Rotation, blockParam) & 31;
+		BlockState shaft = blockState;
+		FloatBox box{0.375f,0.375f,0,0.25f,0.25f,0.75f};
+		shaft.boundingBox(box);
+		addBlock(x,y,z,job,shaft,box,rotation,orientMatrices[rotation]);
+	}
 	if (blockState.block().hasGroup("group:om_stairs")) {
 		u16 rotation = blockState.block().param().getParam(BlockParam::Rotation, blockParam);
 		BlockState part = blockState;

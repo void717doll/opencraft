@@ -79,6 +79,7 @@ class Chunk : public NonCopyable {
 
 		BlockData *getBlockData(int x, int y, int z) const;
 		bool hasBlockMetadata() const { return !m_blockData.empty(); }
+		const auto &blockData() const { return m_blockData; }
 		BlockData *addBlockData(int x, int y, int z, u16 inventoryWidth = 0, u16 inventoryHeight = 0);
 
 		s32 x() const { return m_x; }

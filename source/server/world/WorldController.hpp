@@ -45,8 +45,10 @@ class WorldController {
 
 		void update(bool doTick);
 
-		void load(const std::string &worldName) { m_worldSaveBackend->load(worldName); }
-		void save(const std::string &worldName) { m_worldSaveBackend->save(worldName); }
+		void load(const std::string &worldName) { m_worldName = worldName; m_worldSaveBackend->load(worldName); }
+		void save(const std::string &worldName) { m_worldName = worldName; m_worldSaveBackend->save(worldName); }
+
+		const std::string &worldName() const { return m_worldName; }
 
 		ServerWorld &getWorld(u16 dimension);
 
@@ -54,6 +56,7 @@ class WorldController {
 		void setServer(ServerCommandHandler &server) { m_server = &server; }
 
 	private:
+		std::string m_worldName;
 		std::deque<ServerWorld> m_worldList;
 
 		Registry &m_registry;

@@ -36,6 +36,7 @@
 #include "client/hud/HeartBar.hpp"
 #include "client/hud/ArmorBar.hpp"
 #include "client/hud/Minimap.hpp"
+#include "client/hud/PaperMap.hpp"
 #include "client/graphics/Shader.hpp"
 #include "client/graphics/View.hpp"
 #include "client/graphics/WieldRenderer.hpp"
@@ -96,6 +97,7 @@ class HUD : public Transformable, public Drawable {
 		ArmorBar m_armor;
 
 		Minimap m_minimap;
+		PaperMap m_paperMap;
 
 		DebugLightmapViewer m_debugLightmapViewer;
 

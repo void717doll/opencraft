@@ -54,6 +54,7 @@ set(SOURCE_FILES
 	world/WorldJukebox.cpp
 	world/WorldBeds.cpp
 	world/WorldRailPower.cpp
+	world/WorldBetaDevices.cpp
 	world/WorldRedstone.cpp
 	world/WorldFauna.cpp
 	world/WorldMinecarts.cpp

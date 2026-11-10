@@ -40,6 +40,9 @@ void TextureAtlas::clear() {
 	m_textureMap.clear();
 	m_textures.clear();
 	m_clockFrames.clear();
+	m_compassFrames.clear();
+	m_compassFrame = 32;
+	m_compass = {};
 	m_clockFrame = 64;
 	m_clock = {};
 
@@ -60,15 +63,17 @@ void TextureAtlas::loadFromRegistry() {
 			std::string path = "mods/" + item->modName() + "/textures/items/";
 			for (const auto &filename : item->tiles().textureFilenames())
 				addFile(path, filename);
-			if (item->getGroupValue("group:om_clock") && item->tiles().textureFilenames().size() == 64) {
-				m_clockTexture = getTextureID(item->tiles().getTextureForFace(0));
+			bool compass = item->getGroupValue("group:om_compass") != 0;
+			if ((compass || item->getGroupValue("group:om_clock")) && item->tiles().textureFilenames().size() == (compass ? 32 : 64)) {
+				auto &frames = compass ? m_compassFrames : m_clockFrames;
+				(compass ? m_compassTexture : m_clockTexture) = getTextureID(item->tiles().getTextureForFace(0));
 				for (const auto &filename : item->tiles().textureFilenames()) {
 					SDL_Surface *surface = SDL_ConvertSurfaceFormat(m_textures.at(getTextureID(filename)).get(), SDL_PIXELFORMAT_RGBA32, 0);
 					if (!surface) throw EXCEPTION("failed to read clock frame:", filename);
 					std::vector<u8> pixels(m_tileSize * m_tileSize * 4);
 					for (unsigned y = 0; y < m_tileSize; ++y)
 						std::memcpy(pixels.data() + y * m_tileSize * 4, static_cast<u8 *>(surface->pixels) + y * surface->pitch, m_tileSize * 4);
-					m_clockFrames.emplace_back(std::move(pixels));
+					frames.emplace_back(std::move(pixels));
 					SDL_FreeSurface(surface);
 				}
 			}
@@ -82,10 +87,21 @@ void TextureAtlas::updateClock(u64 ticks, u16 dimension) {
 	unsigned frame = m_clock.update(ticks, dimension);
 	if (frame == m_clockFrame) return;
 	m_clockFrame = frame;
-	std::vector<u8> pixels = m_clockFrames[frame];
+	updateTile(m_clockTexture, m_clockFrames[frame]);
+}
+
+void TextureAtlas::updateCompass(u64 ticks, u16 dimension, double x, double y, double yaw) {
+	if (!m_isReady || m_compassFrames.size() != 32) return;
+	unsigned frame = m_compass.update(ticks, dimension, x, y, yaw);
+	if (frame == m_compassFrame) return;
+	m_compassFrame = frame;
+	updateTile(m_compassTexture, m_compassFrames[frame]);
+}
+
+void TextureAtlas::updateTile(u16 texture, std::vector<u8> pixels) {
 	u16 across = u16(m_texture.getSize().x / m_tileSize);
-	u16 x = u16((m_clockTexture % across) * m_tileSize);
-	u16 y = u16((m_clockTexture / across) * m_tileSize);
+	u16 x = u16((texture % across) * m_tileSize);
+	u16 y = u16((texture / across) * m_tileSize);
 	u16 size = m_tileSize;
 	for (u8 mip = 0; size; ++mip) {
 		m_texture.updateRegion(mip, x >> mip, y >> mip, size, size, pixels.data());

@@ -25,6 +25,8 @@ choose survival to mine, craft, farm, and fight mobs, or creative to build with 
 - ocelots and bats, working buckets, beds, clocks, minecarts, powered rails, and detector rails.
 - dungeon rooms with loot chests and mob spawners, plus jukeboxes with eight mineclonia music tracks.
 - ravines, abandoned mineshafts, coral reefs, nether brick ruins, and birch and spruce trees.
+- editable standing and wall signs, seven small refi paintings, tunable note blocks, and regular and sticky pistons.
+- paper maps that fill while exploring, compasses pointing to world spawn, chest minecarts, and coal-powered furnace minecarts.
 - building from y=0 through y=255, a hand-view depth slider in graphics settings, and optional coordinates on the hud.
 
 ## removals
@@ -57,6 +59,10 @@ choose **play** to create or open a world. new worlds have a seed and a survival
 | f11 | fullscreen |
 
 controls, sound volume, and hud options can be changed in settings. gamma and hand-view depth are under graphics; always-visible coordinates are under interface. pause and choose statistics to view time played, movement, combat, mining, building, crafting, and item use for this world. older worlds start counting these statistics after this update.
+
+right-click a sign to edit its four lines, or a painting to choose another picture. note blocks play on left click, tune on right click, and play once when redstone power turns on; the block below selects the instrument. pistons move up to twelve blocks, and sticky pistons pull one block back. containers and obsidian stay in place.
+
+craft a map to start recording nearby explored surface terrain while holding it. map files stay with their world in its `maps` folder. compasses point to world spawn. right-click a chest minecart to open its storage, or a furnace minecart with coal or charcoal to power it.
 
 worlds are stored in `saves/<world name>/map.sqlite`, with compressed chunks and player data in one database. the world list puts the most recently saved world first. old `.dat` worlds migrate when saved; their original file is retained as `legacy.dat` inside the world folder. that backup still occupies its original space.
 

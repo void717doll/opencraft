@@ -419,6 +419,9 @@ void ServerWorld::initUsertype(sol::state &lua) {
 	lua.new_usertype<ServerWorld>("ServerWorld",
 		sol::base_classes, sol::bases<World>(),
 
+		"play_note", &ServerWorld::playNote,
+		"break_piston_head", &ServerWorld::breakPistonHead,
+		"remove_piston", &ServerWorld::removePiston,
 		"tick_spawner", &ServerWorld::tickSpawner,
 		"use_jukebox", &ServerWorld::useJukebox,
 		"stop_jukebox", &ServerWorld::stopJukebox,

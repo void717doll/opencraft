@@ -1,6 +1,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 
 #include "common/core/Exception.hpp"
+#include "common/core/Registry.hpp"
 #include "common/core/GameClock.hpp"
 #include "common/core/GameTime.hpp"
 #include "common/scene/RetroMobMesh.hpp"
@@ -43,6 +44,12 @@ void MobModel::configure(unsigned model, float scale, u8 appearance) {
 		name = "rabbit_" + std::string(colors[appearance % std::size(colors)]);
 	}
 	loadTexture(m_texture, name);
+	m_cargo.reset();
+	if (model == 32 && (appearance & 3)) {
+		m_cargo = std::make_unique<InventoryCube>(0.75f, true);
+		m_cargo->setPosition(-0.375f, -0.375f, 0.25f);
+		m_cargo->updateVertexBuffer(Registry::getInstance().getBlockFromStringID((appearance & 3) == 1 ? "default:chest" : "default:furnace"), (appearance & 4) ? 1 : 0);
+	}
 	if (model == 1 && (appearance & 1)) loadTexture(m_overlay, "pig_saddle");
 	else if (model == 4) loadTexture(m_overlay, "sheep_fur");
 	else if (model == 8) loadTexture(m_overlay, "spider_eyes");
@@ -68,6 +75,10 @@ void MobModel::draw(RenderTarget &target, RenderStates states) const {
 		{0.9f,0.9f,0.2f},{0.5f,0.8f,0.1f},{0.95f,0.7f,0.8f},{0.3f,0.3f,0.3f},
 		{0.6f,0.6f,0.6f},{0.3f,0.6f,0.7f},{0.7f,0.4f,0.9f},{0.2f,0.4f,0.8f},
 		{0.5f,0.4f,0.3f},{0.4f,0.5f,0.2f},{0.8f,0.3f,0.3f},{0.1f,0.1f,0.1f}};
+	if (m_cargo) {
+		m_cargo->setLight(m_sunlight, m_torchlight);
+		target.draw(*m_cargo, states);
+	}
 	u64 now = GameClock::getInstance().getTicks();
 	float strength = now - m_lastMove < 200 ? 0.6f : 0.f;
 	float age = float(now % 100000) / 50;

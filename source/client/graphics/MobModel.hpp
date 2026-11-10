@@ -2,6 +2,8 @@
 #define MOBMODEL_HPP_
 
 #include <array>
+#include <memory>
+#include "client/gui/InventoryCube.hpp"
 
 #include "common/core/Vector3.hpp"
 #include "common/scene/component/MobComponent.hpp"
@@ -26,6 +28,7 @@ class MobModel : public Drawable {
 		unsigned m_model = 0;
 		float m_scale = 1;
 		u8 m_appearance = 0;
+		std::unique_ptr<InventoryCube> m_cargo;
 		Texture m_texture;
 		Texture m_overlay;
 		mutable std::array<VertexBuffer, 2> m_vertices;

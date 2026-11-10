@@ -37,6 +37,27 @@ inline bool hasSolidTop(const World &world, const Vector3i &pos) {
 inline bool blockHasSupport(const World &world, const Vector3i &pos, const BlockState &state, u16 data) {
 	const auto &block = state.block();
 	if (!loadedSupport(world, pos) || !block.placementConstraints().check(world, pos)) return false;
+	if (block.hasGroup("group:om_sign")) {
+		u16 rotation = block.param().getParam(BlockParam::Rotation, data);
+		if (rotation > 3) return false;
+		if (state.id() == 0) return hasSolidTop(world, pos + Vector3i{0, 0, -1});
+		static constexpr Vector3i anchors[] = {{0,-1,0}, {1,0,0}, {0,1,0}, {-1,0,0}};
+		const auto *anchor = loadedSupport(world, pos + anchors[rotation]);
+		if (!anchor || !anchor->isCollidable()) return false;
+		const auto &box = anchor->boundingBox();
+		return box.x == 0 && box.y == 0 && box.z == 0 && box.sizeX == 1 && box.sizeY == 1 && box.sizeZ == 1;
+	}
+	if (block.hasGroup("group:om_painting")) {
+		u16 rotation = block.param().getParam(BlockParam::Rotation, data);
+		if (rotation != 8 && rotation != 12 && rotation != 16 && rotation != 20) return false;
+		BlockGeometry::initOrientation();
+		glm::vec3 direction = BlockGeometry::orientMatrices[rotation] * glm::vec3{0,0,-1};
+		Vector3i anchor = pos + Vector3i{int(direction.x), int(direction.y), int(direction.z)};
+		const auto *support = loadedSupport(world, anchor);
+		if (!support || !support->isCollidable()) return false;
+		const auto &box = support->boundingBox();
+		return box.x == 0 && box.y == 0 && box.z == 0 && box.sizeX == 1 && box.sizeY == 1 && box.sizeZ == 1;
+	}
 	if (block.hasGroup("group:om_chest")) return chest::canPlace(world, pos);
 	if (block.hasGroup("group:fence")) {
 		const auto *floor = loadedSupport(world, pos + Vector3i{0, 0, -1});

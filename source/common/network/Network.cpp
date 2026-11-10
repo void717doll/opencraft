@@ -42,6 +42,7 @@ std::string Network::commandToString(Network::Command command) {
 
 		{Network::Command::PlayerPlaceBlock,      "PlayerPlaceBlock"},
 		{Network::Command::PlayerDigBlock,        "PlayerDigBlock"},
+		{Network::Command::NotePreview,           "NotePreview"},
 		{Network::Command::PlayerInvUpdate,       "PlayerInvUpdate"},
 		{Network::Command::PlayerPosUpdate,       "PlayerPosUpdate"},
 		{Network::Command::PlayerRotUpdate,       "PlayerRotUpdate"},
@@ -70,8 +71,11 @@ std::string Network::commandToString(Network::Command command) {
 		{Network::Command::BlockUpdate,           "BlockUpdate"},
 		{Network::Command::BlockActivated,        "BlockActivated"},
 		{Network::Command::BlockGUIData,          "BlockGUIData"},
+		{Network::Command::MinecartInvUpdate, "MinecartInvUpdate"},
 		{Network::Command::BlockInvUpdate,        "BlockInvUpdate"},
 		{Network::Command::BlockDataUpdate,       "BlockDataUpdate"},
+		{Network::Command::SignEditor, "SignEditor"},
+		{Network::Command::SignUpdate, "SignUpdate"},
 
 		{Network::Command::ItemActivated,         "ItemActivated"},
 		{Network::Command::WorldSound,            "WorldSound"},

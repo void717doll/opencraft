@@ -150,7 +150,10 @@ bool InventoryWidget::takeOutput(ItemStack &held) {
 }
 
 void InventoryWidget::sendUpdatePacket() {
-	if (m_inventory->inBlock()) {
+	if (m_inventory->name() == "minecart") {
+		m_client.sendMinecartInvUpdate(*m_inventory);
+	}
+	else if (m_inventory->inBlock()) {
 		m_client.sendBlockInvUpdate(*m_inventory);
 	}
 	else {

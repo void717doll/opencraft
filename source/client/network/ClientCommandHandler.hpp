@@ -55,6 +55,7 @@ class ClientCommandHandler {
 		void sendPlayerPosUpdate() const;
 		void sendPlayerRotUpdate();
 		void sendPlayerDigBlock(const glm::ivec4 &selectedBlock);
+		void sendNotePreview(const glm::ivec4 &selectedBlock);
 		void sendPlayerPlaceBlock(s32 x, s32 y, s32 z, u32 block);
 		void sendPlayerHeldItemChanged(u8 hotbarSlot, u16 itemID);
 		void sendPlayerReady();
@@ -68,6 +69,10 @@ class ClientCommandHandler {
 		void sendPlayerChunkPosUpdate() const;
 		void sendBlockActivated(const glm::ivec4 &selectedBlock);
 		void sendBlockInvUpdate(Inventory &inventory);
+		void sendMinecartInvUpdate(Inventory &inventory);
+		bool minecartInReach(u32 id) const;
+		void setMinecartInventory(Inventory *inventory) { m_minecartInventory = inventory; }
+		void clearMinecartInventory(const Inventory *inventory) { if (m_minecartInventory == inventory) m_minecartInventory = nullptr; }
 		void sendItemActivated(const glm::ivec4 &selectedBlock);
 		void sendKeyPressed(u16 keyID);
 
@@ -86,6 +91,7 @@ class ClientCommandHandler {
 		ClientPlayer &m_player;
 
 		EntityMap m_entityMap;
+		Inventory *m_minecartInventory = nullptr;
 
 		bool m_isRegistryInitialized = false;
 

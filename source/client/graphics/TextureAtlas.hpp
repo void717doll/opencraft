@@ -37,6 +37,7 @@
 #include "common/core/IntTypes.hpp"
 #include "common/core/Rect.hpp"
 #include "common/world/ClockAnimation.hpp"
+#include "common/world/CompassAnimation.hpp"
 #include "client/graphics/Texture.hpp"
 
 class TextureAtlas {
@@ -47,6 +48,7 @@ class TextureAtlas {
 
 		void loadFromRegistry();
 		void updateClock(u64 ticks, u16 dimension);
+		void updateCompass(u64 ticks, u16 dimension, double x, double y, double yaw);
 
 		FloatRect getTexCoords(const std::string &filename, bool normalized = true) const;
 
@@ -55,6 +57,7 @@ class TextureAtlas {
 		bool isReady() const { return m_isReady; }
 
 	private:
+		void updateTile(u16 texture, std::vector<u8> pixels);
 		void addFile(const std::string &path, const std::string &filename);
 
 		u16 getTextureID(const std::string &filename) const;
@@ -74,6 +77,10 @@ class TextureAtlas {
 		u16 m_clockTexture = 0;
 		unsigned m_clockFrame = 64;
 		ClockAnimation m_clock;
+		CompassAnimation m_compass;
+		std::vector<std::vector<u8>> m_compassFrames;
+		u16 m_compassTexture = 0;
+		unsigned m_compassFrame = 32;
 
 		// Packed texture
 		Texture m_texture;

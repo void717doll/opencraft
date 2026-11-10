@@ -34,6 +34,8 @@
 
 #include "client/graphics/ChunkRenderer.hpp"
 #include "client/scene/ClientScene.hpp"
+#include "client/gui/Text.hpp"
+#include <array>
 #include "client/world/ChunkMeshBuilder.hpp"
 #include "client/world/ClientChunk.hpp"
 
@@ -55,6 +57,7 @@ class ClientWorld : public World, public Drawable {
 
 		void clear();
 		const TextureAtlas &textureAtlas() const { return m_textureAtlas; }
+		TextureAtlas &textureAtlas() { return m_textureAtlas; }
 
 		void changeDimension(u16 dimensionID);
 
@@ -104,6 +107,7 @@ class ClientWorld : public World, public Drawable {
 		ChunkMeshBuilder m_chunkMeshBuilder{*this};
 
 		ChunkRenderer m_chunkRenderer;
+		mutable std::unordered_map<Vector3i, std::array<Text, 4>> m_signText;
 };
 
 #endif // CLIENTWORLD_HPP_

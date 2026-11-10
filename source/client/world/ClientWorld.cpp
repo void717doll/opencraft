@@ -25,6 +25,7 @@
  * =====================================================================================
  */
 #include <algorithm> // std::max
+#include <unordered_set>
 
 #include "common/core/EventHandler.hpp"
 #include "common/core/Registry.hpp"
@@ -34,6 +35,7 @@
 #include "common/resource/ResourceHandler.hpp"
 #include "common/world/Sky.hpp"
 #include "common/world/World.hpp"
+#include "common/world/SignText.hpp"
 
 #include "client/core/ClientProfiler.hpp"
 #include "client/graphics/Camera.hpp"
@@ -296,6 +298,53 @@ void ClientWorld::draw(RenderTarget &target, RenderStates states) const {
 
 	target.draw(m_scene, states);
 
+	std::unordered_set<Vector3i> visibleSigns;
+	const auto camera = m_camera->getDPosition();
+	// sign vertices use the same camera-relative coordinates as chunk meshes.
+	m_camera->setDPosition(0, 0, 0);
+	for (const auto &entry : m_chunks) {
+		const auto &chunk = *entry.second;
+		if (!chunk.hasBlockMetadata()) continue;
+		if (std::abs(chunk.x() * CHUNK_WIDTH - camera.x) > 48
+		 || std::abs(chunk.y() * CHUNK_DEPTH - camera.y) > 48
+		 || std::abs(chunk.z() * CHUNK_HEIGHT - camera.z) > 48) continue;
+		for (const auto &metadata : chunk.blockData()) {
+			const auto &local = metadata.first;
+			const auto *state = chunk.getBlockState(local.x, local.y, local.z);
+			if (!state || !state->block().hasGroup("group:om_sign")) continue;
+			Vector3i position{chunk.x() * CHUNK_WIDTH + local.x, chunk.y() * CHUNK_DEPTH + local.y, chunk.z() * CHUNK_HEIGHT + local.z};
+			if ((Vector3d{double(position.x), double(position.y), double(position.z)} - camera).length() > 32) continue;
+			visibleSigns.insert(position);
+			auto &text = m_signText[position];
+			auto lines = sign::read(metadata.second->meta);
+			u16 rotation = state->block().param().getParam(BlockParam::Rotation, chunk.getData(local.x, local.y, local.z)) & 3;
+			for (int i = 0; i < 4; ++i) {
+				if (lines[i].empty()) continue;
+				if (text[i].string() != lines[i]) {
+					text[i].setString(lines[i]);
+					text[i].setColor(Color::Black);
+					text[i].setShadowEnabled(false);
+					text[i].setDepthTestEnabled(true);
+				}
+				text[i].updateVertexBuffer();
+				RenderStates signStates = states;
+				signStates.transform.translate(float(position.x - camera.x + 0.5), float(position.y - camera.y + 0.5), float(position.z - camera.z + 0.5));
+				signStates.transform.rotateZ(float(rotation) * 90);
+				signStates.transform.translate(-0.5f, -0.5f, -0.5f);
+				float scale = std::min(0.0095f, 0.9f / std::max(1, text[i].getSize().x));
+				signStates.transform.translate(0.5f + text[i].getSize().x * scale / 2, state->id() ? 0.126f : 0.564f, (state->id() ? 0.71f : 0.96f) - i * 0.105f);
+				signStates.transform.rotateX(90);
+				signStates.transform.scale(-scale, -scale, scale);
+				target.draw(text[i], signStates);
+			}
+		}
+	}
+	for (auto it = m_signText.begin(); it != m_signText.end();) {
+		if (!visibleSigns.count(it->first)) it = m_signText.erase(it);
+		else ++it;
+	}
+
+	m_camera->setDPosition(camera);
 	OM_PROFILE_END("ClientWorld::draw");
 }
 

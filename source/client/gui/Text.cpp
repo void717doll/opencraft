@@ -83,7 +83,7 @@ void Text::draw(RenderTarget &target, RenderStates states) const {
 	states.texture = &m_font.texture();
 
 	states.isCullFaceEnabled = false;
-	states.isDepthTestEnabled = false;
+	states.isDepthTestEnabled = m_depthTestEnabled;
 
 	target.draw(m_vbo, 0, m_verticesCount, states);
 }
@@ -167,7 +167,8 @@ void Text::addCharacter(u32 x, u32 y, const Color &color, u8 c, std::vector<Vert
 		vertex.coord3d[0] = float(x + coords[i][0] * m_font.getTileSize().x);
 		vertex.coord3d[1] = float(y + coords[i][1] * m_font.getTileSize().y);
 		vertex.coord3d[2] = 0;
-		vertex.coord3d[3] = -1;
+		// world glyphs use the game shader's tinted sprite path.
+		vertex.coord3d[3] = m_depthTestEnabled ? 6.f : -1.f;
 
 		vertex.color[0] = color.r;
 		vertex.color[1] = color.g;

@@ -112,3 +112,11 @@ mining uses one shared tool-speed calculation. axes speed up chests, logs, plank
 verification: 300 vein cases matched the supplied java generator, including the next random value. the build and 200 tests passed. local handler checks covered slab consumption, collision, double drops, container contents, lit furnaces, fence support, and reversed ore generation order. native previews checked connected fences, slab textures, and inventory meshes.
 
 chest and stair checks cover four-direction placement, stair walking and item landing, crafting, shift transfers across both chest halves, blocked lids, triple rejection, saving across chunk boundaries, and breaking either half without duplicating contents. native checks exercised chest clicks, reopening from either half, and removal while open; screenshots checked the 54-slot layout, joined chest textures, and stair meshes. stairs retain the engine's existing partial-block lighting.
+
+## beta building and navigation
+
+signs support four lines of fifteen printable characters, with standing and wall mounts and four cardinal orientations. seven nonblank small refi paintings are available; larger paintings are not included. note blocks use twenty-five pitches, five supporting-material instruments, left-click previews, and rising-edge redstone playback.
+
+piston push-line checks follow `BlockPistonBase`: twelve blocks maximum, immovable obsidian and tile storage, six facing directions, sticky single-block retraction, and power checks around the block above the base. block movement is immediate in this engine. entity movement is swept against surrounding blocks; a pinned entity prevents extension rather than being embedded.
+
+map exploration uses persistent paper items and a north-up surface palette, with 128 by 128 pixels covering 1024 by 1024 blocks. maps reveal loaded sunlit surfaces while held. the compass follows default world spawn and spins in the nether. chest carts use twenty-seven slots; furnace carts consume coal or charcoal and push other carts. cargo is saved in a separate component so existing passenger cart serialization remains readable.

@@ -48,6 +48,7 @@ namespace Network {
 
 		PlayerPlaceBlock      = 0x30,
 		PlayerDigBlock        = 0x31,
+		NotePreview           = 0x94,
 		PlayerInvUpdate       = 0x32,
 		PlayerPosUpdate       = 0x33,
 		PlayerRotUpdate       = 0x34,
@@ -68,6 +69,8 @@ namespace Network {
 		BlockGUIData          = 0x42,
 		BlockInvUpdate        = 0x43,
 		BlockDataUpdate       = 0x44,
+		SignEditor            = 0x92,
+		SignUpdate            = 0x93,
 
 		EntitySpawn           = 0x50,
 		EntityDespawn         = 0x51,
@@ -77,6 +80,7 @@ namespace Network {
 		EntityDrawableDef     = 0x55,
 		EntityHitbox          = 0x56,
 		EntityHurt            = 0x57,
+		MinecartInvUpdate     = 0x58,
 
 		ItemActivated         = 0x60,
 		WorldSound            = 0x61,

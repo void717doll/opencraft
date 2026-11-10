@@ -127,4 +127,19 @@
   <group name="tnt_ignite">
     <clip path="resources/sounds/tnt_ignite.wav" />
   </group>
+  <group name="note_piano">
+    <clip path="resources/sounds/note_piano.wav" />
+  </group>
+  <group name="note_bass">
+    <clip path="resources/sounds/note_bass.wav" />
+  </group>
+  <group name="note_snare">
+    <clip path="resources/sounds/note_snare.wav" />
+  </group>
+  <group name="note_hat">
+    <clip path="resources/sounds/note_hat.wav" />
+  </group>
+  <group name="note_drum">
+    <clip path="resources/sounds/note_drum.wav" />
+  </group>
 </sounds>

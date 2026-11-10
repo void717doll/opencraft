@@ -38,6 +38,11 @@ void ServerWorld::refreshRedstone(const Vector3i &point) {
 	const auto *state = redstone::stateAt(*this, point);
 	if (!state) return;
 	unsigned kind = redstone::source(state);
+	if (state->block().hasGroup("group:om_piston") || state->block().hasGroup("group:om_note_block") || state->block().hasGroup("group:om_piston_head")) {
+		watchRailDevice(point);
+		refreshBetaDevice(point);
+		return;
+	}
 	if (!kind && !state->block().getGroupValue("group:om_redstone_device") && state->block().stringID() != "default:tnt") return;
 	if (kind == 7) {
 		unsigned power = redstonePower(point, false) ? 15 : 0;

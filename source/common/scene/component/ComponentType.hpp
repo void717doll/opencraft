@@ -45,6 +45,7 @@ enum class ComponentType {
 	FallingBlock = 11,
 	Tnt = 12,
 	Minecart = 13,
+	CargoMinecart = 14,
 };
 
 sf::Packet &operator<<(sf::Packet &packet, ComponentType type);

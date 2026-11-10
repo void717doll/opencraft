@@ -74,6 +74,10 @@ class ServerWorld : public World {
 		void refreshRedstone(const Vector3i &point);
 		void scheduleRedstone(const Vector3i &point, u16 state, u16 delay);
 		void updateRedstoneCircuits();
+		void refreshBetaDevice(const Vector3i &point);
+		void playNote(int x, int y, int z, bool tune);
+		void removePiston(int x, int y, int z);
+		void breakPistonHead(int x, int y, int z);
 		bool activateRedstone(const Vector3i &point);
 		bool placeRedstoneDust(Player &player, const Vector3i &point, s8 face);
 		bool placeMinecart(Player &player, const Vector3i &point);
@@ -164,6 +168,7 @@ class ServerWorld : public World {
 
 		ServerScene m_scene;
 		BlockPhysics m_blockPhysics{*this};
+		bool m_movingPiston = false;
 
 		s32 m_seed = 0;
 		u32 m_mobTick = 0;

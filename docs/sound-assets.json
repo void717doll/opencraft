@@ -574,5 +574,48 @@
     "license": "CC0",
     "source_url": "mineclonia/mods/ITEMS/mcl_tnt",
     "changes": "decoded and resampled to mono 22050 Hz signed 16-bit PCM WAV"
+  },
+  {
+    "source": "mineclonia/mods/ITEMS/REDSTONE/mcl_noteblock/sounds/mesecons_noteblock_fsharp.ogg",
+    "destination": "resources/sounds/note_piano.wav",
+    "author": "Mesecons authors",
+    "license": "CC BY 3.0",
+    "changes": "decoded and resampled to mono 22050 Hz signed 16-bit PCM WAV",
+    "credits": "resources/sounds/MINECLONIA-NOTEBLOCK-CREDITS.txt"
+  },
+  {
+    "source": "mineclonia/mods/ITEMS/REDSTONE/mcl_noteblock/sounds/mesecons_noteblock_bass_guitar.ogg",
+    "destination": "resources/sounds/note_bass.wav",
+    "author": "Vres and Kyster; see bundled upstream notice",
+    "license": "CC BY 3.0",
+    "changes": "decoded and resampled to mono 22050 Hz signed 16-bit PCM WAV",
+    "credits": "resources/sounds/MINECLONIA-NOTEBLOCK-CREDITS.txt",
+    "source_url": "https://freesound.org/people/Kyster/sounds/117707/"
+  },
+  {
+    "source": "mineclonia/mods/ITEMS/REDSTONE/mcl_noteblock/sounds/mesecons_noteblock_snare.ogg",
+    "destination": "resources/sounds/note_snare.wav",
+    "author": "Mesecons authors",
+    "license": "CC BY 3.0",
+    "changes": "decoded and resampled to mono 22050 Hz signed 16-bit PCM WAV",
+    "credits": "resources/sounds/MINECLONIA-NOTEBLOCK-CREDITS.txt"
+  },
+  {
+    "source": "mineclonia/mods/ITEMS/REDSTONE/mcl_noteblock/sounds/mesecons_noteblock_hit.ogg",
+    "destination": "resources/sounds/note_hat.wav",
+    "author": "rubberduck",
+    "license": "CC0 1.0",
+    "changes": "decoded and resampled to mono 22050 Hz signed 16-bit PCM WAV",
+    "credits": "resources/sounds/MINECLONIA-NOTEBLOCK-CREDITS.txt",
+    "source_url": "https://opengameart.org/content/100-cc0-sfx"
+  },
+  {
+    "source": "mineclonia/mods/ITEMS/REDSTONE/mcl_noteblock/sounds/mesecons_noteblock_bass_drum.ogg",
+    "destination": "resources/sounds/note_drum.wav",
+    "author": "AmateurJ and Mattc90; see bundled upstream notice",
+    "license": "CC0 1.0",
+    "changes": "decoded and resampled to mono 22050 Hz signed 16-bit PCM WAV",
+    "credits": "resources/sounds/MINECLONIA-NOTEBLOCK-CREDITS.txt",
+    "source_url": "https://freesound.org/people/Mattc90/sounds/264285/"
   }
 ]
