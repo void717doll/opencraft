@@ -41,7 +41,6 @@
 #include "common/world/WorldCollision.hpp"
 #include "common/world/BetaToolRules.hpp"
 #include "common/world/RetroMobSpawn.hpp"
-#include "common/world/NavigationMap.hpp"
 #include "common/core/GameClock.hpp"
 #include "common/scene/component/MobComponent.hpp"
 #include "server/world/ServerBlock.hpp"
@@ -218,14 +217,11 @@ void ServerCommandHandler::sendPlayerPosUpdate(u16 clientID, bool isTeleportatio
 		logError() << ("Failed to send position update for player " + std::to_string(clientID) + ": Player not found").c_str();
 }
 
+const std::string &ServerCommandHandler::worldName() const { return m_worldController.worldName(); }
+
 void ServerCommandHandler::sendPlayerInvUpdate(u16 clientID, const ClientInfo *client) const {
 	ServerPlayer *player = m_players.getPlayerFromClientID(clientID);
 	if (player) {
-		for (u16 y = 0; y < player->inventory().height(); ++y) for (u16 x = 0; x < player->inventory().width(); ++x) {
-			auto &stack = player->inventory().getStackRef(x, y);
-			if (stack.amount() && stack.stringID() == "default:map" && !stack.damage())
-				stack.setDamage(navigation::create(m_worldController.worldName(), player->x(), player->y(), player->dimension()));
-		}
 		Network::Packet packet;
 		packet << Network::Command::PlayerInvUpdate;
 		packet << clientID << player->inventory() << player->heldItemSlot() << player->armor();

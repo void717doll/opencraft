@@ -69,6 +69,6 @@ void LuaItemLoader::loadItem(const sol::table &table) const {
 		else
 			logError() << "For item" << stringID << ": 'effective_on' should be a table";
 	}
-	if (item.hasGroup("group:om_igniter") || item.hasGroup("group:om_armor_slot") || item.hasGroup("group:om_bucket") || item.hasGroup("group:om_minecart"))
+	if (item.hasGroup("group:om_igniter") || item.hasGroup("group:om_armor_slot") || item.hasGroup("group:om_bucket") || item.hasGroup("group:om_minecart") || item.hasGroup("group:om_map"))
 		item.enableActivation();
 }

@@ -240,6 +240,10 @@ void BlockCursor::activateBlock(const Hotbar &hotbar) {
 	const Block &block = Registry::getInstance().getBlock(blockId);
 	const Item &item = hotbar.currentItem();
 
+	if (item.hasGroup("group:om_map") && block.canBeActivated() && !GamePad::isKeyPressed(GameKey::Sneak)) {
+		m_client.sendBlockActivated(m_selectedBlock);
+		return;
+	}
 	bool itemActivationSent = false;
 	bool sneakedItemActivation = false;
 	if (item.id() && item.canBeActivated()) {

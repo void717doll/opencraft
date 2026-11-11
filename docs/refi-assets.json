@@ -7243,6 +7243,27 @@
       "operation": "copy",
       "source_sha256": "02e6d0a9b4dec6547efaa513f1f1135476d34ad46970e6723dbcd32a0ddfa27b",
       "destination_sha256": "02e6d0a9b4dec6547efaa513f1f1135476d34ad46970e6723dbcd32a0ddfa27b"
+    },
+    {
+      "destination": "mods/default/textures/items/refi_map_arrow.png",
+      "source": "textures/HUD/mcl_maps_player_arrow.png",
+      "operation": "copy",
+      "source_sha256": "e421426957dc9ae50e57a70d551e108c32a8ae5544d14cd90ecbd621448e06db",
+      "destination_sha256": "e421426957dc9ae50e57a70d551e108c32a8ae5544d14cd90ecbd621448e06db"
+    },
+    {
+      "destination": "mods/default/textures/items/refi_map_dot.png",
+      "source": "textures/HUD/mcl_maps_player_dot.png",
+      "operation": "copy",
+      "source_sha256": "5d8e90af982b1b51ef85bd0b4fa655f84fda0a47c499145bde3c61969fa87100",
+      "destination_sha256": "5d8e90af982b1b51ef85bd0b4fa655f84fda0a47c499145bde3c61969fa87100"
+    },
+    {
+      "destination": "mods/default/textures/items/refi_empty_map.png",
+      "source": "textures/default_mcl_core/tools/mcl_maps_map_empty.png",
+      "operation": "copy",
+      "source_sha256": "0239d5a3ed2f4c076fcabe71fcb31fc76f57dea858c562f632fa7d8644b82460",
+      "destination_sha256": "0239d5a3ed2f4c076fcabe71fcb31fc76f57dea858c562f632fa7d8644b82460"
     }
   ],
   "unchanged_engine_ui": [

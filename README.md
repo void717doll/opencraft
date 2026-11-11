@@ -62,7 +62,7 @@ controls, sound volume, and hud options can be changed in settings. gamma and ha
 
 right-click a sign to edit its four lines, or a painting to choose another picture. note blocks play on left click, tune on right click, and play once when redstone power turns on; the block below selects the instrument. pistons move up to twelve blocks, and sticky pistons pull one block back. containers and obsidian stay in place.
 
-craft a map to start recording nearby explored surface terrain while holding it. map files stay with their world in its `maps` folder. compasses point to world spawn. right-click a chest minecart to open its storage, or a furnace minecart with coal or charcoal to power it.
+craft an empty map and right-click to open it. new maps cover 128 by 128 blocks and show loaded surface terrain while held, with a direction arrow that becomes a dot outside the map. older maps keep their original coverage. map files stay with their world in its `maps` folder. compasses point to world spawn. right-click a chest minecart to open its storage, or a furnace minecart with coal or charcoal to power it.
 
 worlds are stored in `saves/<world name>/map.sqlite`, with compressed chunks and player data in one database. the world list puts the most recently saved world first. old `.dat` worlds migrate when saved; their original file is retained as `legacy.dat` inside the world folder. that backup still occupies its original space.
 

@@ -1,3 +1,4 @@
+#include "common/world/NavigationMap.hpp"
 /*
  * =====================================================================================
  *
@@ -38,6 +39,24 @@
 bool ServerItem::onItemActivated(const glm::ivec3 &pos, Block &block, Player &player, World &world, ClientInfo &client, ServerCommandHandler &server, s8 face) const {
 	if (block.stringID() == "default:campfire")
 		return static_cast<const ServerBlock &>(block).onBlockActivated(pos, static_cast<ServerPlayer &>(player), static_cast<ServerWorld &>(world), client, server);
+	if (hasGroup("group:om_map")) {
+		ItemStack held = player.heldItemStack();
+		if (held.stringID() == "default:map" && held.damage()) return true;
+		u16 id = navigation::create(server.worldName(),player.x(),player.y(),player.dimension());
+		if (!id) return false;
+		ItemStack filled("default:map",1); filled.setDamage(id);
+		Inventory inventory = player.inventory();
+		if (held.amount() == 1) inventory.setItemStack(u16(player.heldItemSlot()),0,filled);
+		else {
+			held.setAmount(held.amount()-1);
+			inventory.setItemStack(u16(player.heldItemSlot()),0,held);
+			auto remainder = inventory.addItemStack(filled);
+			if (remainder.amount() && !static_cast<ServerWorld &>(world).dropWorldItem({player.x(),player.y(),player.z()+1},"default:map",1,id,false)) return false;
+		}
+		player.inventory() = std::move(inventory);
+		server.sendPlayerInvUpdate(client.id);
+		return true;
+	}
 	if (hasGroup("group:om_minecart")) return static_cast<ServerWorld &>(world).placeMinecart(player, {pos.x, pos.y, pos.z});
 	if (hasGroup("group:om_bucket")) return useBucket(*this, pos, face, player, static_cast<ServerWorld &>(world), server);
 	if (u16 slot = getGroupValue("group:om_armor_slot")) {

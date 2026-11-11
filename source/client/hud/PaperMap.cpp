@@ -37,6 +37,8 @@ void PaperMap::upload() {
 		m_image.load(m_texture);
 		m_paperTexture.loadFromFile("mods/default/textures/items/refi_map_background.png");
 		m_paper.load(m_paperTexture);
+		m_arrowTexture.loadFromFile("mods/default/textures/items/refi_map_arrow.png");
+		m_dotTexture.loadFromFile("mods/default/textures/items/refi_map_dot.png");
 		m_ready = true;
 	} else m_texture.updateRegion(0, 0, 0, 128, 128, pixels.data());
 }
@@ -50,33 +52,43 @@ void PaperMap::update(ClientPlayer &player, ClientWorld &world) {
 		m_id = id;
 		m_worldName = GameConfig::worldName;
 		m_map = {};
+		m_sample = 0;
+		m_tick = ~u64(0);
 		if (!navigation::load(m_worldName, id, m_map)) { m_id = 0; m_visible = false; return; }
+		m_sample = unsigned(navigation::marker(m_map,player.x(),player.y(),player.cameraYaw()).y)*128;
 		upload();
 	}
-	float screenWidth = Config::screenWidth / float(Config::guiScale);
-	float screenHeight = Config::screenHeight / float(Config::guiScale);
-	float size = std::min(160.f, std::min(screenWidth - 20, screenHeight - 70));
-	size = std::max(size, 32.f);
-	setPosition((screenWidth - size) / 2, screenHeight - size - 30);
-	setScale(size / 128, size / 128, 1);
-	m_paper.setPosRect(-8, -8, 144, 144);
-	float px = float((player.x() - m_map.x) / 8 + 64);
-	float py = float(64 - (player.y() - m_map.y) / 8);
-	m_marker.setPosition(std::clamp(px, 0.f, 126.f), std::clamp(py, 0.f, 126.f));
+	float guiScale = float(std::max(1,int(Config::guiScale)));
+	float pixelScale = std::min({2.f,(float(Config::screenWidth)-16)/140,(float(Config::screenHeight)-100)/140});
+	pixelScale = std::max(0.25f,pixelScale);
+	float half = 70 * pixelScale;
+	float x = std::clamp(float(Config::screenWidth)*0.75f,half+8,float(Config::screenWidth)-half-8);
+	float bottom = std::min(float(Config::screenHeight)*0.8f,float(Config::screenHeight)-40);
+	setPosition((x-64*pixelScale)/guiScale,(bottom-134*pixelScale)/guiScale);
+	setScale(pixelScale/guiScale,pixelScale/guiScale,1);
+	m_paper.setPosRect(-6,-6,140,140);
+	auto marker = navigation::marker(m_map,player.x(),player.y(),player.cameraYaw());
+	const Texture &markerTexture = marker.outside ? m_dotTexture : m_arrowTexture;
+	if (m_marker.texture() != &markerTexture) {
+		m_marker.load(markerTexture);
+		m_marker.setPosRect(-4,-4,8,8);
+	}
+	m_marker.setPosition(marker.x,marker.y);
+	m_marker.setRotation(marker.rotation);
+	m_markerVisible = player.dimension() == m_map.dimension && player.dimension() == 0;
 	u64 tick = GameTime::getTicks();
-	if (tick == m_tick || player.dimension() != m_map.dimension || player.dimension()) return;
+	if (tick == m_tick || !m_markerVisible) return;
 	m_tick = tick;
-	int centerX = int(std::floor(px)), centerY = int(std::floor(py));
-	int column = centerX - 12 + int(tick % 25);
-	if (column < 0 || column >= 128) return;
 	bool changed = false;
-	for (int row = std::max(0, centerY - 12); row <= std::min(127, centerY + 12); ++row) {
-		if ((column-centerX)*(column-centerX)+(row-centerY)*(row-centerY) > 144) continue;
-		int x = m_map.x + (column - 64) * 8 + 4;
-		int y = m_map.y - (row - 64) * 8 - 4;
-		auto color = navigation::sampleSurface(world, x, y);
-		auto &pixel = m_map.colors[row * 128 + column];
-		if (color && pixel != *color) { pixel = *color; changed = true; }
+	for (unsigned sample = 0; sample < 64; ++sample) {
+		unsigned index = m_sample++ % (navigation::mapSize*navigation::mapSize);
+		int column = int(index%128), row = int(index/128);
+		if (m_map.scale == 8 && ((column-marker.x)*(column-marker.x)+(row-marker.y)*(row-marker.y)>144)) continue;
+		int worldX = m_map.x+(column-64)*m_map.scale+m_map.scale/2;
+		int worldY = m_map.y+(63-row)*m_map.scale+m_map.scale/2;
+		auto color = navigation::sampleSurface(world,worldX,worldY);
+		auto &pixel = m_map.colors[index];
+		if (color && pixel != *color) {pixel = *color; changed = true;}
 	}
 	if (changed) { m_dirty = true; upload(); }
 	if (tick - m_saved >= 100) { flush(); m_saved = tick; }
@@ -86,5 +98,5 @@ void PaperMap::draw(RenderTarget &target, RenderStates states) const {
 	states.transform *= getTransform();
 	target.draw(m_paper, states);
 	target.draw(m_image, states);
-	target.draw(m_marker, states);
+	if (m_markerVisible) target.draw(m_marker, states);
 }
