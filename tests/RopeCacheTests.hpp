@@ -107,7 +107,7 @@ public:
 	}
 	void testLegacyRuinNotesAndHighBuriedCacheCoordinatesStayReadable() {
 		struct Restore {std::filesystem::path original=std::filesystem::current_path(); ~Restore(){std::filesystem::current_path(original);}} restore;
-		auto path=std::filesystem::temp_directory_path()/("openminer-cache-notes-"+std::to_string(getpid()));
+		auto path=std::filesystem::temp_directory_path()/("opencraft-cache-notes-"+std::to_string(getpid()));
 		std::filesystem::create_directories(path); std::filesystem::current_path(path);
 		u16 id=exploration::saveNote("test",{-20,90,100},true);
 		TS_ASSERT(id); TS_ASSERT(exploration::noteIsCache("test",id));

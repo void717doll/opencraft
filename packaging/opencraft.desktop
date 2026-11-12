@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=OpenMiner
+Name=OpenCraft
 Comment=Build and explore a block world
-Exec=openminer
-Icon=openminer
+Exec=opencraft
+Icon=opencraft
 Terminal=false
 Categories=Game;Simulation;

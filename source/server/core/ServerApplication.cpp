@@ -51,7 +51,7 @@ bool ServerApplication::init() {
 	m_loggerHandler.setName("server");
 
 	fs::create_directory("logs");
-	m_loggerHandler.openLogFile("logs/openminer_server.log");
+	m_loggerHandler.openLogFile("logs/opencraft_server.log");
 
 	BlockGeometry::initOrientation();
 

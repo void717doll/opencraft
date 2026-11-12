@@ -11,8 +11,8 @@ fi
 echo -n "Which version are you deploying? "
 read version
 
-rm -rf deploy/win32/bin/openminer deploy/win64/bin/openminer deploy/linux64/bin/openminer && \
-mkdir -p deploy/win32/bin/openminer deploy/win64/bin/openminer deploy/linux64/bin/openminer && \
+rm -rf deploy/win32/bin/opencraft deploy/win64/bin/opencraft deploy/linux64/bin/opencraft && \
+mkdir -p deploy/win32/bin/opencraft deploy/win64/bin/opencraft deploy/linux64/bin/opencraft && \
 
 rm -rf deploy/*.zip deploy/html_docs && \
 
@@ -22,48 +22,48 @@ mkdocs build -d deploy/html_docs && \
 i686-w64-mingw32-cmake -DCMAKE_BUILD_TYPE=Release -B deploy/win32 . && \
 cp /usr/i686-w64-mingw32/bin/libssp-0.dll deploy/win32 && \
 cmake --build deploy/win32 -j8 && \
-i686-w64-mingw32-strip deploy/win32/openminer.exe && \
-cp deploy/win32/openminer.exe deploy/win32/bin/openminer && \
-cp -r mods resources deploy/win32/bin/openminer && \
-cp LICENSE *.md deploy/win32/bin/openminer && \
-cp /usr/i686-w64-mingw32/bin/libwinpthread-1.dll deploy/win32/bin/openminer && \
-cp /usr/i686-w64-mingw32/bin/libssp-0.dll deploy/win32/bin/openminer && \
-cp /usr/i686-w64-mingw32/bin/zlib1.dll deploy/win32/bin/openminer && \
-cp /usr/i686-w64-mingw32/bin/libgcc_s_dw2-1.dll deploy/win32/bin/openminer && \
-mkdir -p deploy/win32/bin/openminer/docs/markdown && \
-cp docs/*.md docs/REFI-LICENSE.txt docs/refi-assets.json deploy/win32/bin/openminer/docs/markdown/ && \
-cp -r deploy/html_docs deploy/win32/bin/openminer/docs/html && \
+i686-w64-mingw32-strip deploy/win32/opencraft.exe && \
+cp deploy/win32/opencraft.exe deploy/win32/bin/opencraft && \
+cp -r mods resources deploy/win32/bin/opencraft && \
+cp LICENSE *.md deploy/win32/bin/opencraft && \
+cp /usr/i686-w64-mingw32/bin/libwinpthread-1.dll deploy/win32/bin/opencraft && \
+cp /usr/i686-w64-mingw32/bin/libssp-0.dll deploy/win32/bin/opencraft && \
+cp /usr/i686-w64-mingw32/bin/zlib1.dll deploy/win32/bin/opencraft && \
+cp /usr/i686-w64-mingw32/bin/libgcc_s_dw2-1.dll deploy/win32/bin/opencraft && \
+mkdir -p deploy/win32/bin/opencraft/docs/markdown && \
+cp docs/*.md docs/REFI-LICENSE.txt docs/refi-assets.json deploy/win32/bin/opencraft/docs/markdown/ && \
+cp -r deploy/html_docs deploy/win32/bin/opencraft/docs/html && \
 cd deploy/win32/bin && \
-zip -T -r ../../OpenMiner-$version-win32.zip openminer &&
+zip -T -r ../../OpenCraft-$version-win32.zip opencraft &&
 cd ../../.. && \
 
 # Win64
 x86_64-w64-mingw32-cmake -DCMAKE_BUILD_TYPE=Release -B deploy/win64 . && \
 cp /usr/x86_64-w64-mingw32/bin/libssp-0.dll deploy/win64 && \
 cmake --build deploy/win64 -j8 && \
-x86_64-w64-mingw32-strip deploy/win64/openminer.exe && \
-cp deploy/win64/openminer.exe deploy/win64/bin/openminer && \
-cp -r mods resources deploy/win64/bin/openminer && \
-cp LICENSE *.md deploy/win64/bin/openminer && \
-cp /usr/x86_64-w64-mingw32/bin/libwinpthread-1.dll deploy/win64/bin/openminer && \
-cp /usr/x86_64-w64-mingw32/bin/libssp-0.dll deploy/win64/bin/openminer && \
-cp /usr/x86_64-w64-mingw32/bin/zlib1.dll deploy/win64/bin/openminer && \
-cp /usr/x86_64-w64-mingw32/bin/libgcc_s_seh-1.dll deploy/win64/bin/openminer && \
-mkdir -p deploy/win64/bin/openminer/docs/markdown && \
-cp docs/*.md docs/REFI-LICENSE.txt docs/refi-assets.json deploy/win64/bin/openminer/docs/markdown/ && \
-cp -r deploy/html_docs deploy/win64/bin/openminer/docs/html && \
+x86_64-w64-mingw32-strip deploy/win64/opencraft.exe && \
+cp deploy/win64/opencraft.exe deploy/win64/bin/opencraft && \
+cp -r mods resources deploy/win64/bin/opencraft && \
+cp LICENSE *.md deploy/win64/bin/opencraft && \
+cp /usr/x86_64-w64-mingw32/bin/libwinpthread-1.dll deploy/win64/bin/opencraft && \
+cp /usr/x86_64-w64-mingw32/bin/libssp-0.dll deploy/win64/bin/opencraft && \
+cp /usr/x86_64-w64-mingw32/bin/zlib1.dll deploy/win64/bin/opencraft && \
+cp /usr/x86_64-w64-mingw32/bin/libgcc_s_seh-1.dll deploy/win64/bin/opencraft && \
+mkdir -p deploy/win64/bin/opencraft/docs/markdown && \
+cp docs/*.md docs/REFI-LICENSE.txt docs/refi-assets.json deploy/win64/bin/opencraft/docs/markdown/ && \
+cp -r deploy/html_docs deploy/win64/bin/opencraft/docs/html && \
 cd deploy/win64/bin && \
-zip -T -r ../../OpenMiner-$version-win64.zip openminer &&
+zip -T -r ../../OpenCraft-$version-win64.zip opencraft &&
 cd ../../.. && \
 
 # Linux64
 cmake -DCMAKE_BUILD_TYPE=Release -B deploy/linux64 . && \
 cmake --build deploy/linux64 -j8 && \
-strip deploy/linux64/openminer && \
-mkdir -p deploy/linux64/bin/openminer/bin deploy/linux64/bin/openminer/lib && \
-cp deploy/linux64/openminer deploy/linux64/bin/openminer/bin && \
-cp -r mods resources deploy/linux64/bin/openminer && \
-cp LICENSE *.md deploy/linux64/bin/openminer && \
+strip deploy/linux64/opencraft && \
+mkdir -p deploy/linux64/bin/opencraft/bin deploy/linux64/bin/opencraft/lib && \
+cp deploy/linux64/opencraft deploy/linux64/bin/opencraft/bin && \
+cp -r mods resources deploy/linux64/bin/opencraft && \
+cp LICENSE *.md deploy/linux64/bin/opencraft && \
 cp /usr/lib/ld-linux-x86-64.so.2 \
 /usr/lib/libc.so.6 \
 /usr/lib/libdl.so.2 \
@@ -83,15 +83,15 @@ cp /usr/lib/ld-linux-x86-64.so.2 \
 /usr/lib/libxcb.so.1 \
 /usr/lib/libXdmcp.so.6 \
 /usr/lib/libzstd.so.1 \
-    deploy/linux64/bin/openminer/lib && \
-strip deploy/linux64/bin/openminer/lib/*.so.* && \
-echo -e "#!/bin/bash\n./lib/ld-linux-x86-64.so.2 --library-path lib ./bin/openminer \$*" > deploy/linux64/bin/openminer/openminer && \
-chmod +x deploy/linux64/bin/openminer/openminer && \
-mkdir -p deploy/linux64/bin/openminer/docs/markdown && \
-cp docs/*.md docs/REFI-LICENSE.txt docs/refi-assets.json deploy/linux64/bin/openminer/docs/markdown/ && \
-cp -r deploy/html_docs deploy/linux64/bin/openminer/docs/html && \
+    deploy/linux64/bin/opencraft/lib && \
+strip deploy/linux64/bin/opencraft/lib/*.so.* && \
+echo -e "#!/bin/bash\n./lib/ld-linux-x86-64.so.2 --library-path lib ./bin/opencraft \$*" > deploy/linux64/bin/opencraft/opencraft && \
+chmod +x deploy/linux64/bin/opencraft/opencraft && \
+mkdir -p deploy/linux64/bin/opencraft/docs/markdown && \
+cp docs/*.md docs/REFI-LICENSE.txt docs/refi-assets.json deploy/linux64/bin/opencraft/docs/markdown/ && \
+cp -r deploy/html_docs deploy/linux64/bin/opencraft/docs/html && \
 cd deploy/linux64/bin && \
-zip -T -r ../../OpenMiner-$version-linux64.zip openminer && \
+zip -T -r ../../OpenCraft-$version-linux64.zip opencraft && \
 cd ../../.. && \
 
 # mods

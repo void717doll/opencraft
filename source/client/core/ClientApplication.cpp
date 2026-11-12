@@ -56,7 +56,7 @@ bool ClientApplication::init() {
 	m_loggerHandler.setName("client");
 
 	fs::create_directory("logs");
-	m_loggerHandler.openLogFile("logs/openminer.log");
+	m_loggerHandler.openLogFile("logs/opencraft.log");
 
 	CoreApplication::init();
 

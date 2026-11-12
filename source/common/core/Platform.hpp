@@ -47,7 +47,7 @@
 		#define OM_PLATFORM_MACOS
 	#else
 		// Unsupported Apple system
-		#error This Apple operating system is not supported by OpenMiner
+		#error This Apple operating system is not supported by OpenCraft
 	#endif
 #elif defined(__unix__)
 	// UNIX system, see which one it is
@@ -65,11 +65,11 @@
 		#define OM_PLATFORM_OPENBSD
 	#else
 		// Unsupported UNIX system
-		#error This UNIX operating system is not supported by OpenMiner
+		#error This UNIX operating system is not supported by OpenCraft
 	#endif
 #else
 	// Unsupported system
-	#error This operating system is not supported by OpenMiner
+	#error This operating system is not supported by OpenCraft
 #endif
 
 #endif // PLATFORM_HPP_

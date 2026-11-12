@@ -89,7 +89,7 @@ regular and redstone torches share mineclonia's floor and wall mesh geometry, co
 
 ## compressed world folders
 
-modernmcp supplies the one-folder-per-world organization. openminer keeps its own save format inside `saves/<name>/map.sqlite`; this is not an anvil or nbt save and cannot be opened by minecraft. lunarchy's sqlite chunk storage and whole-record zstandard compression are the storage reference. chunk palettes store block names, block parameters, and sparse inventories/metadata. lighting is rebuilt on load. entities, players, game mode, generation revision, bed spawn, health, score, and armor remain in the world-state record.
+modernmcp supplies the one-folder-per-world organization. opencraft keeps its own save format inside `saves/<name>/map.sqlite`; this is not an anvil or nbt save and cannot be opened by minecraft. lunarchy's sqlite chunk storage and whole-record zstandard compression are the storage reference. chunk palettes store block names, block parameters, and sparse inventories/metadata. lighting is rebuilt on load. entities, players, game mode, generation revision, bed spawn, health, score, and armor remain in the world-state record.
 
 saves use a sqlite transaction. unchanged chunks are skipped; chunks with inventories or timers are checked on each save. old flat `.dat` saves remain readable and migrate on save, retaining the original as `<name>/legacy.dat`. new worlds do not need that backup. the menu lists both formats, sorts by last-save time, and renames or deletes the whole world folder.
 

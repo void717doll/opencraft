@@ -1,6 +1,6 @@
-# openminer
+# opencraft
 
-openminer is a small, free and libre block-building game inspired by minecraft beta 1.7.3. gather materials, make tools, build a home, and explore. it runs offline and saves worlds locally.
+opencraft is a small, free and libre block-building game inspired by minecraft beta 1.7.3. gather materials, make tools, build a home, and explore. it runs offline and saves worlds locally.
 
 choose survival to mine, craft, farm, and fight mobs, or creative to build with unlimited blocks. food restores health directly. tools wear out, armor provides protection, and caves lead to ores and underground lakes. obsidian portals connect the overworld to the nether.
 
@@ -76,8 +76,8 @@ requires git, cmake, pkg-config, a c++17 compiler, sqlite3 and zstd development 
 ```sh
 git submodule update --init --recursive
 cmake -S . -B build -DOM_BUILD_TESTS=OFF
-cmake --build build --target openminer -j4
-./build/openminer
+cmake --build build --target opencraft -j4
+./build/opencraft
 ```
 
 launch a source build from the project directory so it can find its files.
@@ -87,12 +87,12 @@ launch a source build from the project directory so it can find its files.
 the `packages` github actions workflow builds on pushes to `master` or `main`, version tags, pull requests, and manual runs. download the packages from that run's artifacts:
 
 - linux x64: deb, rpm, and AppImage.
-- macos 14 or newer: separate intel and apple silicon dmg files containing `OpenMiner.app`.
-- windows: separate 64-bit and 32-bit zip files. extract the whole zip and launch `openminer.cmd`.
+- macos 14 or newer: separate intel and apple silicon dmg files containing `OpenCraft.app`.
+- windows: separate 64-bit and 32-bit zip files. extract the whole zip and launch `opencraft.cmd`.
 
 each artifact includes sha256 checksums. package versions come from `source/common/core/EngineConfig.hpp`; a version tag must match `v` followed by that version. the workflow packages files without publishing a release. mac builds are ad-hoc signed, without apple notarization.
 
-installed linux packages and AppImages keep saves in `${XDG_DATA_HOME:-~/.local/share}/openminer`; mac apps use `~/Library/Application Support/OpenMiner`. set `OPENMINER_DATA_DIR` to choose a different folder. windows zip builds keep saves beside the executable. existing source-build saves are kept in place; copy the `saves` folder to the package's data folder to continue them.
+installed linux packages and AppImages keep saves in `${XDG_DATA_HOME:-~/.local/share}/opencraft`; mac apps use `~/Library/Application Support/OpenCraft`. set `OPENCRAFT_DATA_DIR` to choose a different folder. windows zip builds keep saves beside the executable. the first packaged launch moves the old default openminer data folder to the new name when the new folder does not exist. existing source-build saves are kept in place; copy the `saves` folder to the package's data folder to continue them.
 
 runner architectures follow [github's supported runner labels](https://docs.github.com/en/actions/reference/runners/github-hosted-runners). the AppImage uses [linuxdeploy](https://github.com/linuxdeploy/linuxdeploy), and mac library bundling uses [dylibbundler](https://github.com/auriamg/macdylibbundler). the mac app uses a native launcher and follows [apple’s bundle signing layout](https://developer.apple.com/library/archive/technotes/tn2206/).
 

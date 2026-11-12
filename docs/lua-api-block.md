@@ -21,7 +21,7 @@ Example:
 bounding_box = {0, 0, 0, 1, 1, 1} -- this is default value
 ```
 
-Format is `{x, y, z, width, depth, height}`. Note that OpenMiner uses Z axis as up.
+Format is `{x, y, z, width, depth, height}`. Note that OpenCraft uses Z axis as up.
 
 The bounding box determines collisions with the block, as well as the selection box that will be displayed when looking at the block.
 

@@ -25,13 +25,13 @@
 -- =====================================================================================
 --
 
--- openminer:add_listener(Event.BlockPlaced, function(pos, block, player, world, client, server)
+-- opencraft:add_listener(Event.BlockPlaced, function(pos, block, player, world, client, server)
 -- end)
 
--- openminer:add_listener(Event.BlockDigged, function(pos, block, player, world, client, server)
+-- opencraft:add_listener(Event.BlockDigged, function(pos, block, player, world, client, server)
 -- end)
 
-openminer:add_listener(Event.BlockActivated, function(pos, block, player, world, client, server)
+opencraft:add_listener(Event.BlockActivated, function(pos, block, player, world, client, server)
 	if block:string_id() == "default:portal" then
 	end
 end)

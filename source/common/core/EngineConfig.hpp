@@ -31,11 +31,11 @@
 
 namespace {
 	// Only used in Client
-	constexpr const char *APP_NAME = "OpenMiner";
+	constexpr const char *APP_NAME = "OpenCraft";
 
 	constexpr unsigned char VERSION_MAJOR = 0;
 	constexpr unsigned char VERSION_MINOR = 0;
-	constexpr unsigned char VERSION_PATCH = 21;
+	constexpr unsigned char VERSION_PATCH = 22;
 	constexpr const char *VERSION_SUFFIX = "";
 
 	constexpr float DIST_NEAR  = 0.1f;

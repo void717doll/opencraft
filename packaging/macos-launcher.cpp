@@ -18,14 +18,16 @@ int main(int, char **argv) {
 		}
 		namespace fs = std::filesystem;
 		fs::path contents = fs::canonical(executable.data()).parent_path().parent_path();
-		fs::path assets = contents / "Resources/openminer";
+		fs::path assets = contents / "Resources/opencraft";
 		fs::path data;
-		const char *overridePath = std::getenv("OPENMINER_DATA_DIR");
+		const char *overridePath = std::getenv("OPENCRAFT_DATA_DIR");
 		if (overridePath && *overridePath) data = overridePath;
 		else {
 			const char *homePath = std::getenv("HOME");
 			if (!homePath || !*homePath) throw std::runtime_error("home directory is unavailable");
-			data = fs::path(homePath) / "Library/Application Support/OpenMiner";
+			data = fs::path(homePath) / "Library/Application Support/OpenCraft";
+			fs::path legacy = fs::path(homePath) / "Library/Application Support/OpenMiner";
+			if (!fs::exists(data) && fs::is_directory(legacy)) fs::rename(legacy, data);
 		}
 		for (const char *directory : {"config", "saves", "logs"}) fs::create_directories(data / directory);
 		for (const char *directory : {"mods", "resources"}) {
@@ -34,12 +36,12 @@ int main(int, char **argv) {
 			if (!fs::exists(link)) fs::create_directory_symlink(assets / directory, link);
 		}
 		fs::current_path(data);
-		std::string binary = (contents / "MacOS/openminer-bin").string();
+		std::string binary = (contents / "MacOS/opencraft-bin").string();
 		argv[0] = binary.data();
 		execv(binary.c_str(), argv);
-		std::perror("cannot launch openminer");
+		std::perror("cannot launch opencraft");
 	} catch (const std::exception &error) {
-		std::fprintf(stderr, "cannot launch openminer: %s\n", error.what());
+		std::fprintf(stderr, "cannot launch opencraft: %s\n", error.what());
 	}
 	return 1;
 }

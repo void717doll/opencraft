@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(Windows) Run openminer",
+            "name": "(Windows) Run opencraft",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build_mingw/openminer.exe",
+            "program": "${workspaceFolder}/build_mingw/opencraft.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

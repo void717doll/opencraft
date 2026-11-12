@@ -108,7 +108,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: build
-        run: python packaging/run.py cmake --build build --config Release --target openminer --parallel 3
+        run: python packaging/run.py cmake --build build --config Release --target opencraft --parallel 3
 
       - name: package deb and rpm
         if: matrix.platform == 'linux'
@@ -129,11 +129,11 @@ jobs:
           cmake --install build --component Runtime --prefix "$PWD/build/AppDir/usr"
           curl -fL --retry 3 https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -o build/linuxdeploy.AppImage
           chmod +x build/linuxdeploy.AppImage
-          export OUTPUT="$PWD/dist/openminer-$VERSION-x86_64.AppImage"
+          export OUTPUT="$PWD/dist/opencraft-$VERSION-x86_64.AppImage"
           build/linuxdeploy.AppImage --appdir build/AppDir \
-            --executable build/AppDir/usr/bin/openminer-bin \
-            --desktop-file packaging/openminer.desktop \
-            --icon-file resources/textures/world_icon.png --icon-filename openminer \
+            --executable build/AppDir/usr/bin/opencraft-bin \
+            --desktop-file packaging/opencraft.desktop \
+            --icon-file resources/textures/world_icon.png --icon-filename opencraft \
             --custom-apprun packaging/AppRun --output appimage
           test -s "$OUTPUT"
 
@@ -145,14 +145,14 @@ jobs:
         run: |
           mkdir -p dist
           cmake --install build --config Release --component Runtime --prefix "$PWD/build/mac"
-          app="$PWD/build/mac/OpenMiner.app"
-          dylibbundler -b -cd -x "$app/Contents/MacOS/openminer-bin" \
+          app="$PWD/build/mac/OpenCraft.app"
+          dylibbundler -b -cd -x "$app/Contents/MacOS/opencraft-bin" \
             -d "$app/Contents/Frameworks" -p '@executable_path/../Frameworks/'
           codesign --force --deep --sign - "$app"
           codesign --verify --deep --strict "$app"
-          lipo -verify_arch "$ARCH" "$app/Contents/MacOS/openminer-bin"
+          lipo -verify_arch "$ARCH" "$app/Contents/MacOS/opencraft-bin"
           ln -s /Applications build/mac/Applications
-          hdiutil create -volname OpenMiner -srcfolder build/mac -ov -format UDZO "dist/openminer-$VERSION-macos-$ARCH.dmg"
+          hdiutil create -volname OpenCraft -srcfolder build/mac -ov -format UDZO "dist/opencraft-$VERSION-macos-$ARCH.dmg"
 
       - name: package windows zip
         if: matrix.platform == 'windows'
@@ -164,7 +164,7 @@ jobs:
 
       - uses: actions/upload-artifact@v6
         with:
-          name: openminer-${{ steps.version.outputs.version }}-${{ matrix.name }}
+          name: opencraft-${{ steps.version.outputs.version }}-${{ matrix.name }}
           path: |
             dist/*.deb
             dist/*.rpm

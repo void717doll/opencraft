@@ -49,7 +49,7 @@ void ScriptEngine::init() {
 		sol::lib::string
 	);
 
-	m_lua["openminer"] = &m_luaCore;
+	m_lua["opencraft"] = &m_luaCore;
 }
 
 void ScriptEngine::initUsertypes() {

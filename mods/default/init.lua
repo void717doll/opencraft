@@ -26,7 +26,7 @@
 --
 if not mods then mods = {} end
 
-mods["default"] = openminer.mod_loader:register_mod("default")
+mods["default"] = opencraft.mod_loader:register_mod("default")
 mod = mods["default"]
 
 dofile("blocks.lua")

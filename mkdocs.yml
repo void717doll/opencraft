@@ -1,10 +1,10 @@
-site_name: OpenMiner
+site_name: OpenCraft
 
 nav:
     - 'Home': 'index.md'
     - 'C++ classes in Lua': 'lua-api-cpp.md'
     - 'Lua: Core API':
-        - 'openminer': 'lua-api-core.md'
+        - 'opencraft': 'lua-api-core.md'
     - 'Lua: Mod API':
         - 'Overview': 'lua-api-mod.md'
         - 'Biome': 'lua-api-biome.md'

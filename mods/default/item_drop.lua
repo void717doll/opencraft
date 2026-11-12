@@ -59,7 +59,7 @@ mod:entity {
 	end,
 }
 
-openminer:add_listener(Event.BlockDigged, function(pos, block, player, world, client, server)
+opencraft:add_listener(Event.BlockDigged, function(pos, block, player, world, client, server)
 	local held_item = player:held_item_stack():item()
 	if not block:can_harvest(held_item) then return end
 	for _, drop in ipairs(block:get_item_drops(held_item)) do

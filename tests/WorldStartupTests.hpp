@@ -17,13 +17,13 @@ public:
 	void testUnknownMobReturnsFailureInsteadOfTerminatingTheSimulationThread() {
 		namespace fs = std::filesystem;
 		struct Restore { fs::path original = fs::current_path(); ~Restore() { fs::current_path(original); } } restore;
-		auto directory = fs::temp_directory_path() / ("openminer-startup-test-" + std::to_string(getpid()));
+		auto directory = fs::temp_directory_path() / ("opencraft-startup-test-" + std::to_string(getpid()));
 		fs::create_directories(directory / "mods/broken");
 		fs::create_directories(directory / "config");
 		fs::create_directories(directory / "saves");
 		std::ofstream(directory / "mods/broken/config.lua") << "mod_config = {id = 'broken', dependencies = {}}";
 		std::ofstream(directory / "mods/broken/init.lua") <<
-			"local mod = openminer.mod_loader:register_mod('broken')\n"
+			"local mod = opencraft.mod_loader:register_mod('broken')\n"
 			"mod:entity {id='test', properties={visual={type='retro_mob', model='missing_model'}}}\n";
 		std::ofstream(directory / "saves/preserved.dat") << "unchanged";
 		fs::current_path(directory);
@@ -44,7 +44,7 @@ public:
 		std::ifstream save(directory / "saves/preserved.dat");
 		std::string content; save >> content;
 		TS_ASSERT_EQUALS(content, "unchanged");
-		std::ifstream log(directory / "logs/openminer_server.log");
+		std::ifstream log(directory / "logs/opencraft_server.log");
 		std::string logged((std::istreambuf_iterator<char>(log)), std::istreambuf_iterator<char>());
 		TS_ASSERT(logged.find("missing_model") != std::string::npos);
 		TS_ASSERT(logged.find("broken:test") != std::string::npos);

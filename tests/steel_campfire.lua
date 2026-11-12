@@ -35,7 +35,7 @@ ItemStack = {new = function(id, amount)
 end}
 local smelts = {['default:iron_ore'] = 'default:iron_ingot', ['default:potato'] = 'default:baked_potato',
 	['default:porkchop_raw'] = 'default:porkchop_cooked'}
-openminer = {registry = {get_recipe = function(_, inventory)
+opencraft = {registry = {get_recipe = function(_, inventory)
 	local input = inventory:get_stack(0, 0)
 	local result = smelts[input.id]
 	if result and input.count > 0 then

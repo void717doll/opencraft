@@ -141,7 +141,7 @@ public:
 
 	void testTreasureNotesKeepSeparateSavedDestinations() {
 		struct Restore {std::filesystem::path original=std::filesystem::current_path(); ~Restore(){std::filesystem::current_path(original);}} restore;
-		auto directory=std::filesystem::temp_directory_path()/("openminer-notes-"+std::to_string(getpid()));
+		auto directory=std::filesystem::temp_directory_path()/("opencraft-notes-"+std::to_string(getpid()));
 		std::filesystem::remove_all(directory); std::filesystem::create_directories(directory); std::filesystem::current_path(directory);
 		auto first=exploration::saveNote("test",{-214,300,20});
 		auto second=exploration::saveNote("test",{128,-512,30});
@@ -154,7 +154,7 @@ public:
 
 	void testReadingANoteAssignsOneDestinationWithoutConsumingIt() {
 		struct Restore {std::filesystem::path original=std::filesystem::current_path(); ~Restore(){std::filesystem::current_path(original);}} restore;
-		auto directory=std::filesystem::temp_directory_path()/("openminer-note-use-"+std::to_string(getpid()));
+		auto directory=std::filesystem::temp_directory_path()/("opencraft-note-use-"+std::to_string(getpid()));
 		std::filesystem::remove_all(directory); std::filesystem::create_directories(directory); std::filesystem::current_path(directory);
 		Registry registry; definitions(registry);
 		auto &note=registry.registerItem<ServerItem>({},"test:note","Note");

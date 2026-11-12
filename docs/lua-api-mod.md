@@ -26,7 +26,7 @@ The `*` before `default` means it's an optional dependency.
 
 You can create a mod using this function:
 ```
-openminer.mod_loader:register_mod("mod_name")
+opencraft.mod_loader:register_mod("mod_name")
 ```
 
 Mod name should match this regex: `^[a-zA-Z0-9_]+$`
@@ -39,7 +39,7 @@ The name can't be `group` because this namespace is already used by the engine.
 ## Example
 
 ```lua
-local mod = openminer.mod_loader:register_mod("mymod")
+local mod = opencraft.mod_loader:register_mod("mymod")
 
 mod:block {
 	id = "myblock",
@@ -141,7 +141,7 @@ Example:
 mod:option("use_item_drops", false);
 ```
 
-See [this page](lua-api-core.md#openminerget_configname) for more details.
+See [this page](lua-api-core.md#opencraftget_configname) for more details.
 
 ### Other functions
 

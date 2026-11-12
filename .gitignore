@@ -36,10 +36,10 @@ Makefile
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
-openminer.dir
-openminer_common.dir
-openminer_client.dir
-openminer_server.dir
+opencraft.dir
+opencraft_common.dir
+opencraft_client.dir
+opencraft_server.dir
 Win32
 Debug
 Release
@@ -61,8 +61,8 @@ build_mingw
 build_clang
 build_debug
 deploy
-openminer
-openminer_server
+opencraft
+opencraft_server
 *.exe
 *.dll
 

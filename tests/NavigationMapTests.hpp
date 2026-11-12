@@ -25,7 +25,7 @@ public:
 	}
 	void testMapActivationConsumesOneEmptyMapAndKeepsTheFilledIdentity() {
 		struct Restore {std::filesystem::path original=std::filesystem::current_path(); ~Restore(){std::filesystem::current_path(original);}} restore;
-		auto directory=std::filesystem::temp_directory_path()/("openminer-map-use-"+std::to_string(getpid()));
+		auto directory=std::filesystem::temp_directory_path()/("opencraft-map-use-"+std::to_string(getpid()));
 		std::filesystem::remove_all(directory); std::filesystem::create_directories(directory); std::filesystem::current_path(directory);
 		Registry definitions; Registry::setInstance(definitions);
 		auto &air=definitions.registerBlock<ServerBlock>(BLOCK_AIR);
@@ -71,7 +71,7 @@ public:
 	}
 	void testNewMapsAndLegacyMapsKeepTheirOwnScale() {
 		struct Restore {std::filesystem::path original=std::filesystem::current_path(); ~Restore(){std::filesystem::current_path(original);}} restore;
-		auto directory=std::filesystem::temp_directory_path()/("openminer-navigation-"+std::to_string(getpid()));
+		auto directory=std::filesystem::temp_directory_path()/("opencraft-navigation-"+std::to_string(getpid()));
 		std::filesystem::remove_all(directory); std::filesystem::create_directories(directory); std::filesystem::current_path(directory);
 		u16 id=navigation::create("test",-1,128,0);
 		TS_ASSERT(id); navigation::Map map;

@@ -1,4 +1,4 @@
-# working in openminer
+# working in opencraft
 
 - keep changes focused and match nearby code.
 - keep new comments, commit messages, and explanations lowercase; preserve identifier and api casing.
@@ -15,5 +15,5 @@
 
 # checks
 
-- build `openminer` and run the relevant regression checks.
+- build `opencraft` and run the relevant regression checks.
 - for native interface changes, check the actual screen and interactions when possible. state any untested platforms or runtime paths.

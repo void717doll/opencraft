@@ -29,7 +29,7 @@ script:
   - cd build
   - cmake -DOM_BUILD_TESTS:BOOL=ON ..
   - make -j8
-  - ./openminer_tests
+  - ./opencraft_tests
 
 notifications:
   email: false

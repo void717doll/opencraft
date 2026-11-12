@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-<key>CFBundleName</key><string>OpenMiner</string>
-<key>CFBundleDisplayName</key><string>OpenMiner</string>
-<key>CFBundleIdentifier</key><string>org.openminer.game</string>
-<key>CFBundleExecutable</key><string>openminer</string>
+<key>CFBundleName</key><string>OpenCraft</string>
+<key>CFBundleDisplayName</key><string>OpenCraft</string>
+<key>CFBundleIdentifier</key><string>org.opencraft.game</string>
+<key>CFBundleExecutable</key><string>opencraft</string>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleShortVersionString</key><string>@OPENMINER_VERSION@</string>
-<key>CFBundleVersion</key><string>@OPENMINER_VERSION@</string>
+<key>CFBundleShortVersionString</key><string>@OPENCRAFT_VERSION@</string>
+<key>CFBundleVersion</key><string>@OPENCRAFT_VERSION@</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>NSHighResolutionCapable</key><true/>
 </dict></plist>

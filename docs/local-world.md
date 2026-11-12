@@ -1,6 +1,6 @@
 # local world runtime
 
-the game supports one local player. choose play on the title screen to create or load a world, or run `build/openminer --world MyWorld`. `-s` opens world selection. world names use letters, digits, and underscores.
+the game supports one local player. choose play on the title screen to create or load a world, or run `build/opencraft --world MyWorld`. `-s` opens world selection. world names use letters, digits, and underscores.
 
 rendering and gameplay simulation run in separate threads in the same process. `Network::LocalSession` carries serialized messages through two mutex-protected fifo queues. the existing packet serializer is retained for saves and local messages; the sfml socket module and packet compression transport are no longer compiled. there are no listening ports, remote connections, host/join screens, dedicated executable, peer avatars, or address settings.
 

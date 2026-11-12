@@ -1,4 +1,4 @@
-# OpenMiner Lua API documentation
+# OpenCraft Lua API documentation
 
 - [C++ classes in Lua](lua-api-cpp.md)
 - [Core API](lua-api-core.md)

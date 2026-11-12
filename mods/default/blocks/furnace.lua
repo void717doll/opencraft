@@ -219,7 +219,7 @@ mod:block {
 		local input_id = input_stack:item():string_id()
 		if data.meta:get_string("input_id") ~= input_id then item_progress = 0 end
 
-		local recipe = openminer.registry:get_recipe(data.inventory)
+		local recipe = opencraft.registry:get_recipe(data.inventory)
 		if recipe and recipe:type() ~= "smelt" then
 			recipe = nil
 		end
