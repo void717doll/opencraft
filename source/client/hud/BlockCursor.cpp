@@ -226,7 +226,7 @@ void BlockCursor::update(const Hotbar &hotbar) {
 	// Repeat block activation when right click is held
 	u64 now = GameClock::getInstance().getTicks();
 	u64 last = m_lastActivationTime.value_or(now);
-	if (now - last > m_activationRepeatDelay)
+	if (now - last > m_activationRepeatDelay && !hotbar.currentItem().hasGroup("group:om_treasure_note"))
 		activateBlock(hotbar);
 }
 

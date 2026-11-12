@@ -56,6 +56,9 @@ void decorateDungeonTerrain(ServerChunk &chunk, Heightmap &heightmap, s32 seed) 
 				const auto &loot = cell.chest->slots[slot];
 				if (loot.count && definitions.hasItem(loot.id)) data->inventory.setStack(slot % 9, slot / 9, loot.id, loot.count);
 			}
+			if (definitions.hasItem("default:treasure_note")
+			 && (u32(seed) ^ u32(chunk.x()*16+x)*31u ^ u32(chunk.y()*16+y)*17u ^ u32(chunk.z()*32+z)) % 6 == 0)
+				data->inventory.addStack("default:treasure_note", 1);
 			chunk.setModified(true);
 		}
 		if (cell.block == 52) {

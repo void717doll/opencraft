@@ -2,6 +2,8 @@
 #define RETROORE_HPP_
 
 #include <array>
+#include <algorithm>
+#include <limits>
 #include <cmath>
 #include "common/world/RetroRandom.hpp"
 
@@ -19,7 +21,7 @@ inline float oreSine(float angle, bool cosine = false) {
 
 // WorldGenMinable's ellipsoids, with minecraft y mapped to our z axis.
 template<class Place>
-void oreVein(Random &random, int x, int y, int z, int size, Place place) {
+void oreVein(Random &random, int x, int y, int z, int size, Place place, int minimumZ = std::numeric_limits<int>::min(), int maximumZ = std::numeric_limits<int>::max()) {
 	float angle = random.nextFloat() * float(3.141592653589793);
 	float sine = oreSine(angle);
 	float cosine = oreSine(angle, true);
@@ -37,7 +39,7 @@ void oreVein(Random &random, int x, int y, int z, int size, Place place) {
 		double diameter = double(oreSine(float(step) * float(3.141592653589793) / float(size)) + 1.f) * width + 1;
 		double radius = diameter / 2;
 		for (int bx = int(std::floor(cx - radius)); bx <= int(std::floor(cx + radius)); ++bx)
-			for (int bz = int(std::floor(cz - radius)); bz <= int(std::floor(cz + radius)); ++bz)
+			for (int bz = std::max(minimumZ, int(std::floor(cz - radius))); bz <= std::min(maximumZ, int(std::floor(cz + radius))); ++bz)
 				for (int by = int(std::floor(cy - radius)); by <= int(std::floor(cy + radius)); ++by) {
 					double dx = (bx + 0.5 - cx) / radius, dy = (by + 0.5 - cy) / radius, dz = (bz + 0.5 - cz) / radius;
 					if (dx * dx + dz * dz + dy * dy < 1) place(bx, by, bz);

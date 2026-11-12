@@ -16,6 +16,7 @@ if(OM_BUILD_TESTS)
 
 		file(GLOB_RECURSE TEST_FILES "${PROJECT_SOURCE_DIR}/tests/*.hpp")
 		CXXTEST_ADD_TEST(${CMAKE_PROJECT_NAME}_tests unit-test.cpp ${TEST_FILES})
+		target_compile_definitions(${CMAKE_PROJECT_NAME}_tests PRIVATE OM_TEST_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 		target_link_libraries(${CMAKE_PROJECT_NAME}_tests ${CMAKE_PROJECT_NAME}_common ${CMAKE_PROJECT_NAME}_server_lib)
 	endif()
 endif()

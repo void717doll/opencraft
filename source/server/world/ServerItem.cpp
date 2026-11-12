@@ -1,4 +1,6 @@
 #include "common/world/NavigationMap.hpp"
+#include "common/world/Exploration.hpp"
+#include "server/world/RuinsTerrain.hpp"
 /*
  * =====================================================================================
  *
@@ -39,6 +41,30 @@
 bool ServerItem::onItemActivated(const glm::ivec3 &pos, Block &block, Player &player, World &world, ClientInfo &client, ServerCommandHandler &server, s8 face) const {
 	if (block.stringID() == "default:campfire")
 		return static_cast<const ServerBlock &>(block).onBlockActivated(pos, static_cast<ServerPlayer &>(player), static_cast<ServerWorld &>(world), client, server);
+	if (hasGroup("group:om_treasure_note")) {
+		if (player.dimension() != 0) {
+			server.sendPlayerMessage(client.id, "The note describes a ruin in the Overworld.");
+			return true;
+		}
+		ItemStack note = player.heldItemStack();
+		if (!note.damage()) {
+			auto target = nearestUndergroundRuin(static_cast<ServerWorld &>(world),
+				{int(std::floor(player.x())), int(std::floor(player.y())), int(std::floor(player.z()))});
+			u16 id = target ? exploration::saveNote(server.worldName(), *target) : 0;
+			if (!id) {
+				server.sendPlayerMessage(client.id, "The faded note cannot be read here.");
+				return true;
+			}
+			note.setDamage(id);
+			player.inventory().setItemStack(u16(player.heldItemSlot()), 0, note);
+			server.sendPlayerInvUpdate(client.id);
+		}
+		auto target = exploration::loadNote(server.worldName(), note.damage());
+		if (target) server.sendPlayerMessage(client.id, "Beneath the mossy stone lies a forgotten store: x "
+			+ std::to_string(target->x) + ", y " + std::to_string(target->z) + ", z " + std::to_string(target->y) + ".");
+		else server.sendPlayerMessage(client.id, "The note is too faded to read.");
+		return true;
+	}
 	if (hasGroup("group:om_map")) {
 		ItemStack held = player.heldItemStack();
 		if (held.stringID() == "default:map" && held.damage()) return true;

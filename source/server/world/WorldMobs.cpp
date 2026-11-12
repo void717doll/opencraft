@@ -13,6 +13,8 @@
 #include "common/scene/component/PositionComponent.hpp"
 #include "common/scene/component/RotationComponent.hpp"
 #include "common/world/Dimension.hpp"
+#include "common/world/Exploration.hpp"
+#include "common/scene/component/RareMobComponent.hpp"
 #include "common/world/WorldCollision.hpp"
 #include "common/world/BetaMining.hpp"
 #include "common/world/BetaToolRules.hpp"
@@ -166,6 +168,7 @@ void syncAppearance(entt::registry &registry, entt::entity entity) {
 	if (traits.kind == Kind::Pig) appearance = traits.saddled ? 1 : 0;
 	if (traits.kind == Kind::Ghast) appearance = traits.attackCharge > 10 ? 1 : 0;
 	if (traits.kind == Kind::Bat || traits.kind == Kind::Ocelot) appearance = traits.sitting ? 1 : 0;
+	if (registry.all_of<RareMobComponent>(entity)) appearance |= 128;
 	if (visual->mobAppearance() != appearance) {
 		visual->setMobAppearance(appearance);
 		visual->isUpdated = true;
@@ -498,6 +501,15 @@ bool ServerWorld::spawnMob(const std::string &id, double x, double y, double z, 
 		traits.color = biome == retro::Biome::Desert ? 1 : biome == retro::Biome::Taiga || biome == retro::Biome::Tundra
 			? (color < 80 ? 2 : 3) : color < 50 ? 0 : color < 90 ? 4 : 5;
 	}
+	if (m_dimension.id() == 0 && z < 56 && registry.view<RareMobComponent>().size() < 2
+	 && (traits.kind == Kind::Zombie || traits.kind == Kind::Skeleton || traits.kind == Kind::Spider)
+	 && unitRandom(mob) < 1.0 / 192.0) {
+		auto &rare = registry.emplace<RareMobComponent>(entity);
+		rare.name = exploration::rareName(unsigned(traits.kind), nextRandom(mob) >> 16);
+		mob.health = u16(mob.health + mob.health / 2);
+		++mob.attackStrength;
+		mob.moveSpeed *= 1.08f;
+	}
 	syncAppearance(registry, entity);
 	if (traits.kind == Kind::Slime) setSlimeSize(registry, entity, slimeSize, true);
 	if (spawned) *spawned = entity;
@@ -521,6 +533,17 @@ void ServerWorld::updateMobs() {
 			if (!current || !current->isInitialized()) {
 				if (projectile(kind)) dead.emplace_back(entity);
 				return;
+			}
+			if (auto *rare = registry.try_get<RareMobComponent>(entity); rare && !rare->announced && m_server) {
+				for (const auto &entry : m_players) {
+					const auto &player = entry.second;
+					if (!player.isReady() || !player.isOnline() || player.dimension() != m_dimension.id()) continue;
+					Vector3d eye{player.x(), player.y(), player.z() + 1.6};
+					if ((eye - origin).length() <= 10 && clearPath(*this, eye, origin + Vector3d{0,0,0.8})) {
+						m_server->sendPlayerMessage(player.clientID(), rare->name + " lurks nearby.");
+						rare->announced = true;
+					}
+				}
 			}
 			++mob.age;
 			if (mob.attackCooldown) --mob.attackCooldown;
@@ -825,6 +848,10 @@ void ServerWorld::updateMobs() {
 			dropItem(*this, {position.x, position.y, position.z}, mob.dropItem, count);
 			if (traits.kind == Kind::Skeleton)
 				dropItem(*this, {position.x, position.y, position.z}, "default:bone", u16(nextRandom(random) % 3));
+		}
+		if (registry.all_of<RareMobComponent>(entity)) {
+			dropItem(*this, {position.x, position.y, position.z}, "default:iron_ingot", 2);
+			dropItem(*this, {position.x, position.y, position.z}, "default:treasure_note", 1);
 		}
 		if (m_server) m_server->sendEntityDespawn(entity);
 		registry.destroy(entity);

@@ -23,7 +23,7 @@ class JukeboxTests : public CxxTest::TestSuite {
 			static GameClock clock; GameClock::setInstance(clock);
 			namespace fs = std::filesystem;
 			struct Restore { fs::path original = fs::current_path(); ~Restore() { fs::current_path(original); } } restore;
-			fs::current_path("/home/mia/oldworld");
+			fs::current_path(OM_TEST_SOURCE_DIR);
 			ScriptEngine scripts; Registry definitions; Registry::setInstance(definitions);
 			auto &air = definitions.registerBlock<ServerBlock>(BLOCK_AIR).getState(0); air.isOpaque(false); air.isCollidable(false);
 			definitions.registerItem<Item>({}, BLOCK_AIR, "air").setIsBlock(true);

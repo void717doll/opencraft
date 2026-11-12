@@ -103,6 +103,10 @@ void MobModel::draw(RenderTarget &target, RenderStates states) const {
 			vertex.coord3d[0] = position.x; vertex.coord3d[1] = position.y; vertex.coord3d[2] = position.z;
 			vertex.texCoord[0] = point.u; vertex.texCoord[1] = point.v;
 			for (float &color : vertex.color) color = 1;
+			if ((m_appearance & 128) && (m_model == 2 || m_model == 6 || m_model == 8)) {
+				vertex.color[0] = 0.88f;
+				vertex.color[1] = 0.94f;
+			}
 			if (layer == 1 && m_model == 4) {
 				for (int channel = 0; channel < 3; ++channel) vertex.color[channel] = fleece[m_appearance & 15][channel];
 			}

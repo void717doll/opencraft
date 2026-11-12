@@ -39,7 +39,7 @@ class WorldItemTests : public CxxTest::TestSuite {
 			try {
 			namespace fs = std::filesystem;
 			struct RestoreDirectory { fs::path original = fs::current_path(); ~RestoreDirectory() { fs::current_path(original); } } restore;
-			fs::current_path("/home/mia/oldworld");
+			fs::current_path(OM_TEST_SOURCE_DIR);
 			ScriptEngine scripts;
 			Registry definitions; Registry::setInstance(definitions);
 			definitions.registerBlock<ServerBlock>(BLOCK_AIR).getState(0).isCollidable(false);

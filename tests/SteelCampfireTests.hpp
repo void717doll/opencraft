@@ -28,7 +28,7 @@ class SteelCampfireTests : public CxxTest::TestSuite {
 		Server server;
 		ServerCommandHandler commands{scripts, server, worlds, players, definitions};
 		Fixture() {
-			std::filesystem::current_path("/home/mia/oldworld");
+			std::filesystem::current_path(OM_TEST_SOURCE_DIR);
 			Registry::setInstance(definitions);
 			auto &air = definitions.registerBlock<ServerBlock>(BLOCK_AIR).getState(0);
 			air.isOpaque(false); air.isCollidable(false);

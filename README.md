@@ -25,6 +25,8 @@ choose survival to mine, craft, farm, and fight mobs, or creative to build with 
 - ocelots and bats, working buckets, beds, clocks, minecarts, powered rails, and detector rails.
 - dungeon rooms with loot chests and mob spawners, plus jukeboxes with eight mineclonia music tracks.
 - ravines, abandoned mineshafts, coral reefs, nether brick ruins, and birch and spruce trees.
+- connected beta-style ore pockets, including larger coal veins and underground dirt and gravel. copper remains more common than iron.
+- rare named cave monsters and treasure notes leading to small mossy underground ruins. right-click a note to read its coordinates; notes are saved per world. new ore pockets and ruins appear in newly generated terrain.
 - editable standing and wall signs, seven small refi paintings, tunable note blocks, and regular and sticky pistons.
 - paper maps that fill while exploring, compasses pointing to world spawn, chest minecarts, and coal-powered furnace minecarts.
 - building from y=0 through y=255, a hand-view depth slider in graphics settings, and optional coordinates on the hud.
@@ -64,7 +66,7 @@ right-click a sign to edit its four lines, or a painting to choose another pictu
 
 craft an empty map and right-click to open it. new maps cover 128 by 128 blocks and show loaded surface terrain while held, with a direction arrow that becomes a dot outside the map. older maps keep their original coverage. map files stay with their world in its `maps` folder. compasses point to world spawn. right-click a chest minecart to open its storage, or a furnace minecart with coal or charcoal to power it.
 
-worlds are stored in `saves/<world name>/map.sqlite`, with compressed chunks and player data in one database. the world list puts the most recently saved world first. old `.dat` worlds migrate when saved; their original file is retained as `legacy.dat` inside the world folder. that backup still occupies its original space.
+worlds are stored in `saves/<world name>/map.sqlite`, with compressed chunks and player data in one database. maps and treasure-note records use subfolders beside it. the world list puts the most recently saved world first. old `.dat` worlds migrate when saved; their original file is retained as `legacy.dat` inside the world folder. that backup still occupies its original space.
 
 ## build
 

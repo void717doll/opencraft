@@ -124,9 +124,11 @@ void extend_meta_type(const std::string &name, ComponentType type, bool isSerial
 #include "common/scene/component/TntComponent.hpp"
 #include "common/scene/component/MinecartComponent.hpp"
 #include "common/scene/component/CargoMinecartComponent.hpp"
+#include "common/scene/component/RareMobComponent.hpp"
 #include "common/scene/component/RotationComponent.hpp"
 
 void Scene::registerComponents() {
+	extend_meta_type<RareMobComponent>("RareMobComponent",ComponentType::RareMob, false, true);
 	extend_meta_type<CargoMinecartComponent>("CargoMinecartComponent", ComponentType::CargoMinecart, false, true);
 	extend_meta_type<MinecartComponent>("MinecartComponent", ComponentType::Minecart, false, true);
 	extend_meta_type<TntComponent>("TntComponent", ComponentType::Tnt, false, true);

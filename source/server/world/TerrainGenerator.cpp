@@ -35,6 +35,7 @@
 #include "server/world/MineshaftTerrain.hpp"
 #include "server/world/OceanTerrain.hpp"
 #include "server/world/OreTerrain.hpp"
+#include "server/world/RuinsTerrain.hpp"
 #include "common/world/BetaTreeShape.hpp"
 
 #include <array>
@@ -55,6 +56,7 @@ void TerrainGenerator::generate(ServerChunk &chunk) {
 	if (m_dimensionID == 0) decorateOceanTerrain(chunk, m_heightmap, m_seed);
 	if (m_dimensionID == 1) decorateNetherRuins(chunk, m_heightmap, m_seed);
 	if (m_dimensionID == 0) decorateMineshaftTerrain(chunk, m_heightmap, m_seed, m_mineshafts);
+	if (m_dimensionID == 0) decorateRuinsTerrain(chunk, m_heightmap, m_seed);
 }
 
 void TerrainGenerator::fastNoiseGeneration(ServerChunk &chunk) {
@@ -66,11 +68,6 @@ void TerrainGenerator::fastNoiseGeneration(ServerChunk &chunk) {
 	std::array<u32, 1> chunkSeed;
 	seed.generate(chunkSeed.begin(), chunkSeed.end());
 	rand.seed(chunkSeed[0]);
-	Random_t copperRandom;
-	copperRandom.seed(chunkSeed[0] ^ 0x43555052u);
-	auto &definitions = Registry::getInstance();
-	u16 copper = m_dimensionID == 0 && definitions.hasBlock("default:copper_ore")
-		? definitions.getBlockFromStringID("default:copper_ore").id() : 0;
 
 	for(s8 y = 0 ; y < CHUNK_DEPTH ; y++) {
 		for(s8 x = 0 ; x < CHUNK_WIDTH ; x++) {
@@ -120,10 +117,7 @@ void TerrainGenerator::fastNoiseGeneration(ServerChunk &chunk) {
 					else if (worldZ > h - 3) chunk.setBlockRaw(x, y, z, biome.getGroundBlockID());
 					else chunk.setBlockRaw(x, y, z, biome.getDeepBlockID());
 				}
-				if (chunk.getBlock(x, y, z) == biome.getDeepBlockID()) generateOres(chunk, x, y, z, biome, rand);
-				if (copper && worldZ >= 4 && worldZ <= 64 && chunk.getBlock(x, y, z) == biome.getDeepBlockID()
-				 && copperRandom.get<bool>(0.0045f))
-					randomWalkOrePlace(chunk, x, y, z, copperRandom, copper, biome.getDeepBlockID(), 8);
+				if (m_dimensionID != 0 && chunk.getBlock(x, y, z) == biome.getDeepBlockID()) generateOres(chunk, x, y, z, biome, rand);
 				if (isGeneratingTopBlock && chunk.getBlock(x, y, z) == biome.getTopBlockID()) {
 					bool placedTree = tryPlaceTree(chunk, x, y, z + 1, biome, rand);
 					if (!placedTree) tryPlaceFlora(chunk, x, y, z + 1, biome, rand);
