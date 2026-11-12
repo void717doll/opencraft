@@ -26,7 +26,8 @@ choose survival to mine, craft, farm, and fight mobs, or creative to build with 
 - dungeon rooms with loot chests and mob spawners, plus jukeboxes with eight mineclonia music tracks.
 - ravines, abandoned mineshafts, coral reefs, nether brick ruins, and birch and spruce trees.
 - connected beta-style ore pockets, including larger coal veins and underground dirt and gravel. copper remains more common than iron.
-- rare named cave monsters and treasure notes leading to small mossy underground ruins. right-click a note to read its coordinates; notes are saved per world. new ore pockets and ruins appear in newly generated terrain.
+- rare named cave monsters, mossy underground ruins, and treasure notes leading to buried caches. caches contain supplies and can hold rare discs or worn equipment. right-click a note to read its coordinates; earlier notes keep their ruin destinations. new ore pockets, ruins, and caches appear in newly generated terrain.
+- climbing rope that lowers in eight-block batches, up to 32 blocks per hanging line.
 - editable standing and wall signs, seven small refi paintings, tunable note blocks, and regular and sticky pistons.
 - paper maps that fill while exploring, compasses pointing to world spawn, chest minecarts, and coal-powered furnace minecarts.
 - building from y=0 through y=255, a hand-view depth slider in graphics settings, and optional coordinates on the hud.

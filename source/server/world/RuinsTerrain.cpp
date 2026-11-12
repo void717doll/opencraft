@@ -89,3 +89,78 @@ void decorateRuinsTerrain(ServerChunk &chunk, Heightmap &heightmap, s32 seed) {
 		}
 	}
 }
+
+namespace {
+std::optional<Vector3i> cacheLocation(Heightmap &heightmap, Vector3i point) {
+	auto &column = heightmap.getOrCreateChunk((point.x & -16)/16,(point.y & -16)/16);
+	int surface = column.landHeightAt(point.x & 15,point.y & 15);
+	if (surface < 12 || surface > 120 || column.blockAt(point.x & 15,point.y & 15,surface+1) != 0) return {};
+	point.z = surface - 4;
+	for (int z = point.z; z <= surface; ++z) {
+		u8 block = column.blockAt(point.x & 15,point.y & 15,z);
+		if (block != 1 && block != 2 && block != 3 && block != 12 && block != 13) return {};
+	}
+	return point;
+}
+}
+
+std::optional<Vector3i> nearestTreasureCache(ServerWorld &world, const Vector3i &point) {
+	std::vector<Vector3i> candidates;
+	int cx = exploration::cellAt(point.x), cy = exploration::cellAt(point.y);
+	for (int x = cx-3; x <= cx+3; ++x) for (int y = cy-3; y <= cy+3; ++y)
+		if (auto candidate = exploration::cache(world.seed(),x,y)) candidates.push_back(*candidate);
+	auto distance = [&](Vector3i p) { double x=double(p.x)-point.x,y=double(p.y)-point.y; return x*x+y*y; };
+	std::sort(candidates.begin(),candidates.end(),[&](Vector3i a,Vector3i b) { return distance(a)<distance(b); });
+	for (const auto &candidate : candidates) {
+		auto target = cacheLocation(world.heightmap(),candidate);
+		if (!target) continue;
+		if (const auto *chunk = world.getChunkAtBlockPos(target->x,target->y,target->z); chunk && chunk->isInitialized()) {
+			auto *data = chunk->getBlockData(target->x & 15,target->y & 15,target->z & 31);
+			if (!data || !data->meta.hasInt("treasure_cache")) continue;
+			bool hasLoot = false;
+			for (const auto &stack : data->inventory.items()) hasLoot |= stack.amount() != 0;
+			if (!hasLoot) continue;
+		}
+		return target;
+	}
+	return {};
+}
+
+void decorateCacheTerrain(ServerChunk &chunk, Heightmap &heightmap, s32 seed) {
+	if (chunk.isInitialized() || chunk.z() < 0 || chunk.z() > 3) return;
+	auto &registry = Registry::getInstance();
+	if (!registry.hasBlock("default:chest")) return;
+	auto candidate = exploration::cache(seed,exploration::cellAt(chunk.x()*16),exploration::cellAt(chunk.y()*16));
+	if (!candidate || (candidate->x & -16)/16 != chunk.x() || (candidate->y & -16)/16 != chunk.y()) return;
+	auto target = cacheLocation(heightmap,*candidate);
+	if (!target || target->z/32 != chunk.z()) return;
+	int x=target->x & 15,y=target->y & 15,z=target->z & 31;
+	const auto *state = chunk.getBlockState(x,y,z);
+	if (!state || !state->isCollidable() || chunk.getBlockData(x,y,z)) return;
+	chunk.setBlockRaw(x,y,z,registry.getBlockFromStringID("default:chest").id());
+	chunk.setData(x,y,z,0);
+	auto *data = chunk.addBlockData(x,y,z,9,3);
+	data->meta.setInt("treasure_cache",1);
+	retro::Random random(std::int64_t(std::uint64_t(std::int64_t(seed)) ^ std::uint64_t(std::int64_t(target->x))*341873ULL
+		^ std::uint64_t(std::int64_t(target->y))*132897ULL));
+	auto add = [&](const char *id,u16 count,u16 damage=0) {
+		if (registry.hasItem(id)) data->inventory.addItemStack(ItemStack{id,count,damage});
+	};
+	add("default:coal",u16(3+random.nextInt(6)));
+	add("default:iron_ingot",u16(1+random.nextInt(3)));
+	add("default:torch",u16(8+random.nextInt(9)));
+	add("default:bread",1);
+	if (random.nextInt(64) == 0) {
+		const char *records[]={"record_blocks","record_far","record_chirp","record_strad","record_mellohi","record_mall"};
+		std::string id=std::string("default:")+records[random.nextInt(6)];
+		add(id.c_str(),1);
+	} else if (random.nextInt(3) == 0) {
+		const char *tools[]={"iron_pickaxe","iron_sword","bronze_pickaxe","bronze_axe","bronze_sword","helmet_bronze","boots_iron","chestplate_bronze"};
+		std::string id=std::string("default:")+tools[random.nextInt(8)];
+		if (registry.hasItem(id)) {
+			u16 maximum=registry.getItemFromStringID(id).getGroupValue("group:om_max_damage");
+			add(id.c_str(),1,u16(unsigned(maximum)*(50+random.nextInt(36))/100));
+		}
+	}
+	chunk.setModified(true);
+}

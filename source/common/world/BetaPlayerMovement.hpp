@@ -10,6 +10,7 @@ struct MovementEnvironment {
 	bool water = false;
 	bool lava = false;
 	bool ladder = false;
+	bool rope = false;
 	bool web = false;
 	float slipperiness = 0.6f;
 };
@@ -48,6 +49,7 @@ inline MovementEnvironment movementEnvironment(const World &world, const DoubleB
 	int z = int(std::floor(box.z));
 	const BlockState *feet = world.getBlockState(x, y, z);
 	result.ladder = feet && feet->block().getGroupValue("group:climbable");
+	result.rope = feet && feet->block().hasGroup("group:om_rope");
 	const BlockState *below = world.getBlockState(x, y, z - 1);
 	if (below && below->block().stringID() == "default:ice") result.slipperiness = 0.98f;
 	return result;
@@ -58,6 +60,7 @@ inline void acceleratePlayer(Vector3d &motion, float forward, float strafe, doub
 	bool jump, bool sneak, bool grounded, const MovementEnvironment &environment) {
 	if (jump) {
 		if (environment.water || environment.lava) motion.z += double(0.04f);
+		else if (environment.rope) motion.z = 0.2;
 		else if (grounded) motion.z = double(0.42f);
 	}
 	if (sneak) { forward = float(forward * 0.3); strafe = float(strafe * 0.3); }

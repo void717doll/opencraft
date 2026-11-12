@@ -57,6 +57,7 @@ void TerrainGenerator::generate(ServerChunk &chunk) {
 	if (m_dimensionID == 1) decorateNetherRuins(chunk, m_heightmap, m_seed);
 	if (m_dimensionID == 0) decorateMineshaftTerrain(chunk, m_heightmap, m_seed, m_mineshafts);
 	if (m_dimensionID == 0) decorateRuinsTerrain(chunk, m_heightmap, m_seed);
+	if (m_dimensionID == 0) decorateCacheTerrain(chunk, m_heightmap, m_seed);
 }
 
 void TerrainGenerator::fastNoiseGeneration(ServerChunk &chunk) {

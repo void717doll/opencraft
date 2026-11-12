@@ -171,6 +171,7 @@ void BlockPhysics::update(const Vector3i &position) {
 	if (block.id() && !block.hasGroup("group:fence") && !block.hasGroup("group:om_chest")
 	 && (!fluidKind(block) || block.getGroupValue("group:om_waterlogged"))) {
 		bool neighborsLoaded = std::all_of(directions.begin(), directions.end(), [&](const auto &offset) { return loaded(position + offset); });
+		if (block.hasGroup("group:om_rope")) neighborsLoaded = loaded(position + Vector3i{0,0,1});
 		if (block.stringID() == "default:reeds" || block.stringID() == "default:cactus") {
 			Vector3i below = position + Vector3i{0,0,-1};
 			neighborsLoaded = loaded(below);

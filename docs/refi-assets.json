@@ -7504,6 +7504,36 @@
         64,
         32
       ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_rope_strand.png",
+      "source": "mcimport_mods/basic_materials/basic_materials_chain_brass.png",
+      "operation": "copy",
+      "source_sha256": "dec159ba078e4109bff16fcc67c2b07916f3ab4236dae4454eb3a3a04d102646",
+      "output_sha256": "dec159ba078e4109bff16fcc67c2b07916f3ab4236dae4454eb3a3a04d102646",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_rope.png",
+      "source": "skyfactory/farming/farming_hemp_rope.png",
+      "operation": "copy",
+      "source_sha256": "cefae1671bceadec6fa0145c988f826cbcccf875dd828be80a34766ff173eb34",
+      "output_sha256": "cefae1671bceadec6fa0145c988f826cbcccf875dd828be80a34766ff173eb34",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
     }
   ],
   "unchanged_engine_ui": [

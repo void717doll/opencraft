@@ -117,6 +117,8 @@ inline bool blockHasSupport(const World &world, const Vector3i &pos, const Block
 		offset = {int(std::round(direction.x)), int(std::round(direction.y)), int(std::round(direction.z))};
 	}
 	const auto *support = loadedSupport(world, pos + offset);
+	if (block.hasGroup("group:om_rope"))
+		return support && ((support->isCollidable() && support->isOpaque()) || support->block().hasGroup("group:om_rope"));
 	return support && (support->isCollidable() || (attached == 4
 		&& block.hasGroup("group:om_hanging_chain") && support->block().hasGroup("group:om_hanging_chain")));
 }

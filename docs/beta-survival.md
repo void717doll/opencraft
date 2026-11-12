@@ -110,3 +110,11 @@ tin veins start at y=16–63, with eight size-six attempts per column. stone pic
 three copper ingots and one tin ingot in a two-by-two crafting square make four bronze ingots. bronze uses the usual five tool recipes, with 220 durability and mining speed 5.5 between copper and iron. its pickaxe can harvest iron, while gold, redstone, and diamond ores still require iron-tier tools. bronze swords deal seven damage.
 
 the usual armor patterns make a bronze helmet, chestplate, leggings, and boots. they have 99, 144, 135, and 117 durability, between chain and iron, with beta's durability-dependent armor protection. each usable bronze piece adds ten percent resistance to direct projectiles, including skeleton arrows. a full set reduces the damage remaining after normal armor by forty percent. the bonus does not apply to melee, explosions, falls, fire, or lava. armor still wears by the original incoming damage, and a broken piece loses its bonus.
+
+## climbing rope and buried caches
+
+three string in a vertical recipe make eight climbing-rope sections. right-click the underside of a solid opaque block to lower up to eight sections, using one item per block in survival. right-click any attached section to extend its line. each line is limited to 32 blocks and stops at terrain, liquids, the world boundary, or an unloaded chunk. creative placement keeps its items and follows the same length limit.
+
+hold space while touching rope to climb, release it to descend, or hold sneak to stay in place. climbing clears accumulated fall distance. breaking a section releases the sections below it; breaking the anchor releases the whole line. each removed section drops one reusable rope item.
+
+treasure notes without an assigned destination choose a buried cache in new overworld terrain. caches lie four blocks below dry ground and contain coal, iron, torches, and bread. each cache has a one-in-64 chance of a music disc; other caches have a one-in-three chance of worn iron or bronze tools or armor. worn equipment starts with 50–85 percent of its durability spent. caches do not contain apples or golden apples. their inventories persist and never refill during generation. earlier notes retain their saved ruin destinations.

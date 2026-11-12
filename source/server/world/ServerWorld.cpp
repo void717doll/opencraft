@@ -166,17 +166,19 @@ bool ServerWorld::moveSurvivalPlayer(ServerPlayer &player, double x, double y, d
 	u64 horizontal = u64(std::round(std::hypot(requested.x, requested.y) * 100));
 	const auto *feet = getBlockState(int(std::floor(x)), int(std::floor(y)), int(std::floor(z)));
 	bool climbing = feet && feet->block().getGroupValue("group:climbable");
+	const auto *previousFeet = getBlockState(int(std::floor(player.x())), int(std::floor(player.y())), int(std::floor(player.z())));
+	bool wasClimbing = previousFeet && previousFeet->block().hasGroup("group:climbable");
 	if (player.isNoclip() || (player.isCreative() && !environment.grounded))
 		stats[PlayerStatistics::FlyCm] += u64(std::round(requested.length() * 100));
 	else if (environment.water) stats[PlayerStatistics::SwimCm] += u64(std::round(requested.length() * 100));
 	else if (climbing && requested.z > 0) stats[PlayerStatistics::ClimbCm] += u64(std::round(requested.z * 100));
 	else stats[PlayerStatistics::WalkCm] += horizontal;
-	if (requested.z < 0 && !environment.water && !player.isCreative())
+	if (requested.z < 0 && !environment.water && !climbing && !wasClimbing && !player.isCreative())
 		stats[PlayerStatistics::FallCm] += u64(std::round(-requested.z * 100));
 	if (previousEnvironment.grounded && requested.z > 0 && !environment.grounded && !climbing && !environment.water)
 		++stats[PlayerStatistics::Jumps];
 	player.setPosition(x, y, z);
-	u16 damage = player.isCreative() ? 0 : player.survival().moved(requested.z, environment.grounded, environment.water);
+	u16 damage = player.isCreative() ? 0 : player.survival().moved(requested.z, environment.grounded, environment.water || climbing || wasClimbing);
 	if (damage) {
 		if (m_server) m_server->damagePlayer(player.clientID(), damage, player.survival().damageCause);
 		else player.damage(player.survival().filterDamage(damage));

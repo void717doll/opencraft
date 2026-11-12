@@ -1,3 +1,4 @@
+#include "client/graphics/MaterialPalette.hpp"
 /*
  * =====================================================================================
  *
@@ -74,6 +75,7 @@ void Texture::loadFromFile(const std::string &filename) {
 		throw EXCEPTION("Failed to load texture:", filename);
 	}
 
+	applyMaterialPalette(surface,filename);
 	loadFromSurface(surface);
 
 	SDL_FreeSurface(surface);

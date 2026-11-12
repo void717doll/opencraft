@@ -51,3 +51,7 @@ double chests use the unchanged front halves, back half, and top half from `text
 tin ore, tin and bronze ingots, and four bronze tools use unchanged `textures/default_mcl_core` artwork. the hoe comes from `textures/farming_mcl_farming`; all four armor icons and worn layers come from `minetest_game_mods/3d_armor/3d_armor`. the supplied pack is now located at `~/Desktop/oldold/refi_textures`. all sixteen copies and hashes are recorded in the manifest.
 
 tin's transparent mineral sprite is layered over the existing stone tile while building the atlas, using `stone.png^tin_ore.png`. the source png stays unchanged, and the combined tile is used for terrain, held blocks, drops, and inventory cubes.
+
+climbing rope uses an unchanged `skyfactory/farming/farming_hemp_rope.png` inventory sprite and the braid-like `mcimport_mods/basic_materials/basic_materials_chain_brass.png` tile on a thin vertical strand. the two supplied refi files and their hashes are recorded in the manifest.
+
+copper, bronze, and rope receive material palettes when their textures load: reddish orange copper, warm brown bronze, and natural tan rope. the same mapping covers inventory and held items, dropped items, copper ore, and worn bronze armor. stone-gray ore backgrounds, wooden handles, shading, and transparency are preserved; the copied source png files remain unchanged.
