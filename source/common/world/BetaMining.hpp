@@ -32,7 +32,7 @@ inline bool canHarvest(const BlockState &state, const Item &item) {
 	 || id == "default:gold_ore" || id == "default:gold_block"
 	 || id == "default:redstone_ore" || id == "default:redstone_block") return level >= 2;
 	if (id == "default:iron_ore" || id == "default:iron_block")
-		return level >= 2 || item.getGroupValue("group:om_copper_tool") != 0;
+		return level >= 2 || item.getGroupValue("group:om_copper_tool") != 0 || item.getGroupValue("group:om_bronze_tool") != 0;
 	if (id == "default:copper_ore" || id == "default:lapis_ore" || id == "default:lapis_block") return level >= 1;
 	return true;
 }
@@ -68,7 +68,7 @@ inline float breakTime(const BlockState &state, const Item &item) {
 		if (kind == 2) {
 			effective = state.block().hasGroup("group:om_slab");
 			for (const char *block : {"cobblestone", "cobblestone_mossy", "stone", "sandstone", "iron_ore",
-				"iron_block", "copper_ore", "coal_ore", "gold_block", "gold_ore", "diamond_ore", "diamond_block", "ice",
+				"iron_block", "copper_ore", "tin_ore", "coal_ore", "gold_block", "gold_ore", "diamond_ore", "diamond_block", "ice",
 				"netherrack", "lapis_ore", "lapis_block", "stone_slab", "double_stone_slab"})
 				if (id == std::string("default:") + block) { effective = true; break; }
 		}

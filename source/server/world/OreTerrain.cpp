@@ -13,7 +13,8 @@ void decorateOreTerrain(ServerChunk &chunk, s32 seed) {
 		{"dirt", 20, 128, 32}, {"gravel", 10, 128, 32}, {"coal_ore", 20, 128, 16},
 		{"iron_ore", 12, 64, 8}, {"copper_ore", 18, 72, 8, false, 8},
 		{"gold_ore", 2, 32, 8}, {"redstone_ore", 8, 16, 7},
-		{"diamond_ore", 1, 16, 7}, {"lapis_ore", 1, 16, 6, true}
+		{"diamond_ore", 1, 16, 7}, {"lapis_ore", 1, 16, 6, true},
+		{"tin_ore", 8, 48, 6, false, 16}
 	};
 	retro::Random worldRandom(seed);
 	std::uint64_t multiplierX = std::uint64_t(worldRandom.nextLong() / 2 * 2 + 1);

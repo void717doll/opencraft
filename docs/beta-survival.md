@@ -75,7 +75,7 @@ creative grants instant block breaking, unlimited placement and item use, no too
 
 ## copper progression
 
-stone pickaxes mine copper ore, found in newly generated overworld stone from height 4 through 64. smelt the ore into copper ingots and use the usual tool patterns to make a pickaxe, axe, shovel, hoe or sword. copper tools have 190 durability and mining speed 5, between stone and iron.
+stone pickaxes mine copper ore, with vein starting heights from 8 through 79 in newly generated overworld stone. smelt the ore into copper ingots and use the usual tool patterns to make a pickaxe, axe, shovel, hoe or sword. copper tools have 190 durability and mining speed 5, between stone and iron.
 
 iron ore and iron blocks require a copper, iron or diamond pickaxe. stone and golden pickaxes cannot harvest iron. copper cannot harvest gold, redstone, diamond or obsidian. copper is an explicit addition to the beta item set; iron tool recipes continue to use iron ingots.
 
@@ -102,3 +102,11 @@ new block registrations are appended so existing saves retain their numeric ids.
 these additions adapt the supplied refi assets to oldworld's existing systems. they are deliberate extensions to beta, with no hunger, shields, fireworks, or extra equipment tier after diamond. asset mappings and transformations are recorded in `refi-assets.json`.
 
 wild hives appear occasionally in forests. a comb surrounded by planks makes a wooden hive. hives need daylight, light level 12, and two nearby flowers; they produce one comb after roughly four minutes of active checks and hold up to three. right-click to harvest. a smoker made from four iron ingots and coal calms bees for 45 seconds and lasts 64 uses. harvesting without smoke can cause one heart of damage through normal armor and hurt immunity. comb makes honey or wax; wax and a stick make torches. each hive can advance one crop every two minutes, and overlapping hives share the same per-crop cooldown. nearby bee sprites are cosmetic and capped for rendering.
+
+## tin and bronze
+
+tin veins start at y=16–63, with eight size-six attempts per column. stone pickaxes can mine tin ore; smelting it produces one tin ingot. the blast furnace also accepts tin ore. existing generated chunks are unchanged.
+
+three copper ingots and one tin ingot in a two-by-two crafting square make four bronze ingots. bronze uses the usual five tool recipes, with 220 durability and mining speed 5.5 between copper and iron. its pickaxe can harvest iron, while gold, redstone, and diamond ores still require iron-tier tools. bronze swords deal seven damage.
+
+the usual armor patterns make a bronze helmet, chestplate, leggings, and boots. they have 99, 144, 135, and 117 durability, between chain and iron, with beta's durability-dependent armor protection. each usable bronze piece adds ten percent resistance to direct projectiles, including skeleton arrows. a full set reduces the damage remaining after normal armor by forty percent. the bonus does not apply to melee, explosions, falls, fire, or lava. armor still wears by the original incoming damage, and a broken piece loses its bonus.

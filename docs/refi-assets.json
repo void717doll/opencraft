@@ -3,7 +3,7 @@
   "author": "MysticTempest",
   "source_url": "https://github.com/MysticTempest/REFI_Textures",
   "license": "CC BY-SA 4.0",
-  "source_root": "/home/mia/Downloads/refi_textures",
+  "source_root": "/home/mia/Desktop/oldold/refi_textures",
   "entries": [
     {
       "destination": "mods/default/textures/gui/inventory.png",
@@ -7264,6 +7264,246 @@
       "operation": "copy",
       "source_sha256": "0239d5a3ed2f4c076fcabe71fcb31fc76f57dea858c562f632fa7d8644b82460",
       "destination_sha256": "0239d5a3ed2f4c076fcabe71fcb31fc76f57dea858c562f632fa7d8644b82460"
+    },
+    {
+      "destination": "mods/default/textures/blocks/tin_ore.png",
+      "source": "textures/default_mcl_core/minerals_ores/default_mineral_tin.png",
+      "operation": "copy",
+      "source_sha256": "389f09519fd0be93b379c5b5c7c7237dce1168fec9719b8f274f7788b3e03bbf",
+      "output_sha256": "389f09519fd0be93b379c5b5c7c7237dce1168fec9719b8f274f7788b3e03bbf",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/tin_ingot.png",
+      "source": "textures/default_mcl_core/minerals_ores/default_tin_ingot.png",
+      "operation": "copy",
+      "source_sha256": "f8c175ea548a478c996cd8963ce6bf29f81c2e84d43a43ddb2687020622a846a",
+      "output_sha256": "f8c175ea548a478c996cd8963ce6bf29f81c2e84d43a43ddb2687020622a846a",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/bronze_ingot.png",
+      "source": "textures/default_mcl_core/minerals_ores/default_bronze_ingot.png",
+      "operation": "copy",
+      "source_sha256": "78391d75a1483507eafa8a53e23da312d7ecb1b5a2d9a86d9813f3a745907910",
+      "output_sha256": "78391d75a1483507eafa8a53e23da312d7ecb1b5a2d9a86d9813f3a745907910",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/bronze_pickaxe.png",
+      "source": "textures/default_mcl_core/tools/default_tool_bronzepick.png",
+      "operation": "copy",
+      "source_sha256": "cf64f67e4be9ec00f213fe1578061effc518fe0fa26f2b8b25103de04ab8c576",
+      "output_sha256": "cf64f67e4be9ec00f213fe1578061effc518fe0fa26f2b8b25103de04ab8c576",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/bronze_axe.png",
+      "source": "textures/default_mcl_core/tools/default_tool_bronzeaxe.png",
+      "operation": "copy",
+      "source_sha256": "866cf3f90775a5e9959fd4310612a37917b3afe350f425268b0450a75326cc33",
+      "output_sha256": "866cf3f90775a5e9959fd4310612a37917b3afe350f425268b0450a75326cc33",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/bronze_shovel.png",
+      "source": "textures/default_mcl_core/tools/default_tool_bronzeshovel.png",
+      "operation": "copy",
+      "source_sha256": "476fe666b011b5f8d3b1f4df35edf5bd3c65cfda68fa5b15d6836da0d33ce3a4",
+      "output_sha256": "476fe666b011b5f8d3b1f4df35edf5bd3c65cfda68fa5b15d6836da0d33ce3a4",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/bronze_sword.png",
+      "source": "textures/default_mcl_core/tools/default_tool_bronzesword.png",
+      "operation": "copy",
+      "source_sha256": "2fbe88378ffda5766ff6524b32ce50472828ea286cefd6d859fd419793b032fa",
+      "output_sha256": "2fbe88378ffda5766ff6524b32ce50472828ea286cefd6d859fd419793b032fa",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/bronze_hoe.png",
+      "source": "textures/farming_mcl_farming/farming_tool_bronzehoe.png",
+      "operation": "copy",
+      "source_sha256": "55ace23fe6c61fd44125f02891e8cdab80d2ae577630f907b1118630c192abd7",
+      "output_sha256": "55ace23fe6c61fd44125f02891e8cdab80d2ae577630f907b1118630c192abd7",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/helmet_bronze.png",
+      "source": "minetest_game_mods/3d_armor/3d_armor/3d_armor_inv_helmet_bronze.png",
+      "operation": "copy",
+      "source_sha256": "ce74e994a77fb9a375877f2baa4ea3e61dd380283611f7cc091e83be89637716",
+      "output_sha256": "ce74e994a77fb9a375877f2baa4ea3e61dd380283611f7cc091e83be89637716",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/armor/helmet_bronze.png",
+      "source": "minetest_game_mods/3d_armor/3d_armor/3d_armor_helmet_bronze.png",
+      "operation": "copy",
+      "source_sha256": "315ce07742b3ab50f644153f34826eb637e373c341c9ab43341164594280388b",
+      "output_sha256": "315ce07742b3ab50f644153f34826eb637e373c341c9ab43341164594280388b",
+      "source_size": [
+        64,
+        32
+      ],
+      "output_size": [
+        64,
+        32
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/chestplate_bronze.png",
+      "source": "minetest_game_mods/3d_armor/3d_armor/3d_armor_inv_chestplate_bronze.png",
+      "operation": "copy",
+      "source_sha256": "31a0049902defe41d26cd998c789f27ea149e167b439fe7b3cb7f30ff9ff9b32",
+      "output_sha256": "31a0049902defe41d26cd998c789f27ea149e167b439fe7b3cb7f30ff9ff9b32",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/armor/chestplate_bronze.png",
+      "source": "minetest_game_mods/3d_armor/3d_armor/3d_armor_chestplate_bronze.png",
+      "operation": "copy",
+      "source_sha256": "da09949f8ada7101fe2192226441f9b8b59ba6cb82f8b0c4507468dbc8b11b08",
+      "output_sha256": "da09949f8ada7101fe2192226441f9b8b59ba6cb82f8b0c4507468dbc8b11b08",
+      "source_size": [
+        64,
+        32
+      ],
+      "output_size": [
+        64,
+        32
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/leggings_bronze.png",
+      "source": "minetest_game_mods/3d_armor/3d_armor/3d_armor_inv_leggings_bronze.png",
+      "operation": "copy",
+      "source_sha256": "ce459ac732af1154c8fd9dfa6161c48a770905bd00555e4a33ccc811c101354f",
+      "output_sha256": "ce459ac732af1154c8fd9dfa6161c48a770905bd00555e4a33ccc811c101354f",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/armor/leggings_bronze.png",
+      "source": "minetest_game_mods/3d_armor/3d_armor/3d_armor_leggings_bronze.png",
+      "operation": "copy",
+      "source_sha256": "df739a1e33e178d04084809c05c606b35d77227dede4b57ea27645cfa3cb7925",
+      "output_sha256": "df739a1e33e178d04084809c05c606b35d77227dede4b57ea27645cfa3cb7925",
+      "source_size": [
+        64,
+        32
+      ],
+      "output_size": [
+        64,
+        32
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/boots_bronze.png",
+      "source": "minetest_game_mods/3d_armor/3d_armor/3d_armor_inv_boots_bronze.png",
+      "operation": "copy",
+      "source_sha256": "ea0404fdd902da8897c59e75718459b5a4217b2e714f3e31023b19984c638105",
+      "output_sha256": "ea0404fdd902da8897c59e75718459b5a4217b2e714f3e31023b19984c638105",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/armor/boots_bronze.png",
+      "source": "minetest_game_mods/3d_armor/3d_armor/3d_armor_boots_bronze.png",
+      "operation": "copy",
+      "source_sha256": "05c389462e14ea882d754711407241b108acbdcc06eb0db4816bfce7403bbecd",
+      "output_sha256": "05c389462e14ea882d754711407241b108acbdcc06eb0db4816bfce7403bbecd",
+      "source_size": [
+        64,
+        32
+      ],
+      "output_size": [
+        64,
+        32
+      ]
     }
   ],
   "unchanged_engine_ui": [

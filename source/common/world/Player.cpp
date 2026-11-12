@@ -80,9 +80,12 @@ u16 Player::armorValue() const {
 
 u16 Player::absorbDamage(u16 amount, const std::string &cause) {
 	unsigned bonus = 0;
+	bool projectile = cause == "arrow" || cause.compare(0, 6, "arrow:") == 0
+		|| cause == "projectile" || cause.compare(0, 11, "projectile:") == 0;
 	for (const auto &stack : m_armor.items()) {
 		if (!stack.amount() || !stack.maxDamage() || stack.damage() >= stack.maxDamage()) continue;
 		bonus += stack.item().getGroupValue("group:om_damage_reduction");
+		if (projectile) bonus += stack.item().getGroupValue("group:om_projectile_reduction");
 		if (cause == "fall") bonus += stack.item().getGroupValue("group:om_fall_reduction");
 		if (cause == "fire" || cause == "lava") bonus += stack.item().getGroupValue("group:om_fire_reduction");
 	}

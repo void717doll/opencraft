@@ -45,3 +45,9 @@ additional bundled textures cover birch and spruce wood, leaves and saplings; fi
 stone slabs use the unchanged top and side textures from `textures/stairs_mcl_stairs_mcl_walls`. oak, sandstone, and cobblestone slabs reuse their existing block textures.
 
 double chests use the unchanged front halves, back half, and top half from `textures/mcl_chests`. runtime texture coordinates mirror the back and top onto their matching halves; the front has one central latch.
+
+## tin and bronze
+
+tin ore, tin and bronze ingots, and four bronze tools use unchanged `textures/default_mcl_core` artwork. the hoe comes from `textures/farming_mcl_farming`; all four armor icons and worn layers come from `minetest_game_mods/3d_armor/3d_armor`. the supplied pack is now located at `~/Desktop/oldold/refi_textures`. all sixteen copies and hashes are recorded in the manifest.
+
+tin's transparent mineral sprite is layered over the existing stone tile while building the atlas, using `stone.png^tin_ore.png`. the source png stays unchanged, and the combined tile is used for terrain, held blocks, drops, and inventory cubes.

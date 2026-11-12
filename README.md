@@ -17,7 +17,7 @@ choose survival to mine, craft, farm, and fight mobs, or creative to build with 
 ## additions
 
 - survival and creative world creation, saved game modes, automatic names for unnamed worlds, and a searchable creative inventory.
-- copper ore and tools, craftable tnt, ferns, three-dimensional armor, and held-item tooltips.
+- copper and tin ores, bronze alloy tools and projectile-resistant bronze armor, craftable tnt, ferns, three-dimensional armor, and held-item tooltips.
 - natural diamond, redstone, lapis, and gold veins; connected fences, merging slabs, oak and cobblestone stairs, and double chests with shared storage.
 - nether portals, ghasts, zombie pigmen, glowstone clusters, basalt, quartz, and nether masonry.
 - cave moss, fungi, crystals, lush cave plants, cherry trees, and a spyglass.

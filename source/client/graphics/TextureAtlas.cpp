@@ -151,10 +151,20 @@ void TextureAtlas::addFile(const std::string &path, const std::string &filename)
 	if (it != m_textureMap.end())
 		return;
 
-	SurfacePtr surface{IMG_Load((path + filename).c_str()), &SDL_FreeSurface};
+	auto separator = filename.find('^');
+	SurfacePtr surface{IMG_Load((path + filename.substr(0, separator)).c_str()), &SDL_FreeSurface};
 	if(!surface) {
 		logError() << "Failed to load texture:" << path + filename;
 		return;
+	}
+
+	if (separator != std::string::npos) {
+		SurfacePtr overlay{IMG_Load((path + filename.substr(separator + 1)).c_str()), &SDL_FreeSurface};
+		if (!overlay || overlay->w != surface->w || overlay->h != surface->h)
+			throw EXCEPTION("invalid texture overlay:", path + filename);
+		SDL_SetSurfaceBlendMode(overlay.get(), SDL_BLENDMODE_BLEND);
+		if (SDL_BlitSurface(overlay.get(), nullptr, surface.get(), nullptr) != 0)
+			throw EXCEPTION("failed to blend texture overlay:", path + filename, SDL_GetError());
 	}
 
 	if (!m_tileSize)

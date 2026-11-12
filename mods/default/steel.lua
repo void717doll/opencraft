@@ -3,7 +3,7 @@ mod:item {id = "steel_ingot", name = "Steel Ingot", tiles = "refi_carbon_steel.p
 
 local blast_ores = {
 	["default:iron_ore"] = true, ["default:gold_ore"] = true,
-	["default:copper_ore"] = true, ["default:coal_ore"] = true,
+	["default:tin_ore"] = true, ["default:copper_ore"] = true, ["default:coal_ore"] = true,
 	["default:redstone_ore"] = true, ["default:lapis_ore"] = true,
 }
 
