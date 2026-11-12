@@ -22,9 +22,9 @@ for _, piston in ipairs({{"piston", "Piston", 1, "refi_piston_top.png"},
 	}
 end
 mod:block {
-	id = "piston_head", name = "Piston Head", tiles = {"refi_piston_top.png", "refi_piston_extended.png", "refi_piston_side.png"},
+	id = "piston_head", name = "Piston Head", tiles = {"refi_piston_top.png", "refi_piston_head_back.png", "refi_piston_head_side.png"},
 	hardness = 0.5, is_rotatable = true, is_opaque = false,
-	states = {{tiles = {"refi_piston_sticky_top.png", "refi_piston_extended.png", "refi_piston_side.png"}}},
+	states = {{tiles = {"refi_piston_sticky_top.png", "refi_piston_head_back.png", "refi_piston_head_side.png"}}},
 	draw_type = "boundingbox", bounding_box = {0, 0, 0.75, 1, 1, 0.25},
 	groups = {om_piston_head = 1, om_redstone_device = 1, om_creative_hidden = 1, ci_ignore = 1, om_material_wood = 1},
 	item_drop = {id = "default:piston", amount = 0},

@@ -49,9 +49,9 @@ public:
 			retro::Random full(seed), clipped(seed);
 			std::set<std::tuple<int,int,int>> expected, actual;
 			retro::oreVein(full,-16,-16,29,32,[&](int x,int y,int z) {
-				if (z >= 32 && z <= 63) expected.emplace(x,y,z);
+				if (z >= 32 && z <= 63 && x >= -8 && x <= -3 && y >= -9 && y <= -5) expected.emplace(x,y,z);
 			});
-			retro::oreVein(clipped,-16,-16,29,32,[&](int x,int y,int z) { actual.emplace(x,y,z); },32,63);
+			retro::oreVein(clipped,-16,-16,29,32,[&](int x,int y,int z) { actual.emplace(x,y,z); },retro::OreBounds{-8,-9,32,-3,-5,63});
 			TS_ASSERT(expected == actual);
 			TS_ASSERT_EQUALS(full.next(32),clipped.next(32));
 		}

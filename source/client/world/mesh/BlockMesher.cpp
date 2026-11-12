@@ -124,7 +124,7 @@ void BlockMesher::addBlock(s8f x, s8f y, s8f z, ChunkMeshBuildingJob &job,
 	if (blockState.block().hasGroup("group:om_piston_head")) {
 		u16 rotation = blockState.block().param().getParam(BlockParam::Rotation, blockParam) & 31;
 		BlockState shaft = blockState;
-		FloatBox box{0.375f,0.375f,0,0.25f,0.25f,0.75f};
+		FloatBox box{0.375f,0.375f,-0.25f,0.25f,0.25f,1.f};
 		shaft.boundingBox(box);
 		addBlock(x,y,z,job,shaft,box,rotation,orientMatrices[rotation]);
 	}
@@ -256,6 +256,8 @@ void BlockMesher::addBlockFace(s8f x, s8f y, s8f z, s8f f, ChunkMeshBuildingJob 
 
 	const FloatBox &boundingBox = blockState.boundingBox();
 
+	bool pistonShaft=boundingBox.sizeX<1 && blockState.block().hasGroup("group:om_piston_head");
+	if(pistonShaft && f==BlockFace::Top) return;
 	const std::string *texture = &blockState.tiles().getTextureForFace(f);
 	int chestPartner = 0;
 	const auto &tiles = blockState.tiles().textureFilenames();
@@ -306,6 +308,8 @@ void BlockMesher::addBlockFace(s8f x, s8f y, s8f z, s8f f, ChunkMeshBuildingJob 
 		     (f == 3) ? 1.f - boundingBox.x : boundingBox.x + boundingBox.sizeX;
 		V1 = (f <= 3) ? 1.f - boundingBox.z : (f == 4) ? boundingBox.y + boundingBox.sizeY : 1.f - boundingBox.y;
 	}
+
+	if(pistonShaft && f<4) { V0=0.25f; V1=1.f; }
 
 	// Prepare vertex information for VBO
 	Vertex vertices[nVertsPerFace];

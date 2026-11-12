@@ -128,3 +128,7 @@ new overworld terrain can contain a nine-block-wide mossy cobblestone room, a sh
 zombies, skeletons, and spiders spawning below y=56 have a one-in-192 chance of becoming named encounters, with at most two present in a world. they keep the original model and texture, with a faint cool tint, half again their normal health, one extra attack damage, and slightly faster movement. their name appears in chat when visible nearby. names and boosted stats survive saving; the legacy mob records retain their layouts. defeated named monsters drop two iron ingots and a treasure note alongside their normal loot.
 
 dungeon chests can also contain a treasure note. new notes record a nearby buried-cache destination in `saves/<world>/notes/note_<id>.txt`; subsequent readings retain those coordinates, and earlier notes keep their ruin destinations. reading uses minecraft coordinate labels, with vertical height labeled y. notes are not consumed and do not change the rare apple, golden apple, or disc rolls. ore and ruin changes apply to new terrain.
+
+piston presentation follows mineclonia's piston-off side artwork and piston-on/pusher boxes. the head shaft now joins the recessed base instead of leaving a quarter-block gap.
+
+ore generation clips each ellipsoid to all three chunk axes before visiting voxels, preserving the generator's random draws and placement order. a local benchmark over 256 solid chunks averaged about 281 ms before and 125 ms after across three runs without compiler load. this measures the ore pass, not overall frame time.

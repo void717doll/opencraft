@@ -54,6 +54,7 @@ class ServerWorld : public World {
 		void setCreative(bool creative) { m_creative = creative; }
 		BlockPhysics &blockPhysics() { return m_blockPhysics; }
 		void updateMobs();
+		void updateCopperOxidation();
 		void tickSpawner(int x, int y, int z);
 		void useJukebox(int x, int y, int z, ServerPlayer &player);
 		void stopJukebox(int x, int y, int z);
@@ -172,6 +173,8 @@ class ServerWorld : public World {
 
 		s32 m_seed = 0;
 		u32 m_mobTick = 0;
+		u16 m_copperAgeTicks = 0;
+		u32 m_copperRandom = 0;
 		std::size_t m_activeChunkCursor = 0;
 
 		struct ChunkSendRequest {

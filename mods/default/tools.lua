@@ -25,7 +25,12 @@
 -- =====================================================================================
 --
 
+local copper_stages = {
+	exposed_copper = {1, "Exposed Copper"}, weathered_copper = {2, "Weathered Copper"}, oxidized_copper = {3, "Oxidized Copper"},
+}
+
 function register_tool(name, material, mining_speed, harvest_capability, harvest_level, max_damage, attack_bonus, brightness)
+	local oxidation = copper_stages[material]
 	local attack_damage = 1
 	if name == "sword" then
 		attack_damage = 4 + harvest_level * 2
@@ -39,7 +44,7 @@ function register_tool(name, material, mining_speed, harvest_capability, harvest
 
 	local tool_def = {
 		id = material .. "_" .. name,
-		name = material:gsub("^%l", string.upper) .. " " .. name:gsub("^%l", string.upper),
+		name = (oxidation and oxidation[2] or material:gsub("^%l", string.upper)) .. " " .. name:gsub("^%l", string.upper),
 		tiles = material .. "_" .. name .. ".png",
 		max_stack_size = 1,
 		groups = {
@@ -48,7 +53,9 @@ function register_tool(name, material, mining_speed, harvest_capability, harvest
 			om_tool_type = name == "sword" and 1 or name == "hoe" and 3 or 2,
 			om_tool_kind = name == "axe" and 1 or name == "pickaxe" and 2 or name == "shovel" and 3 or 0,
 			om_harvest_level = harvest_level,
-			om_copper_tool = material == "copper" and 1 or 0,
+			om_copper_tool = (material == "copper" or oxidation) and 1 or 0,
+			om_copper_stage = oxidation and oxidation[1] or 0,
+			om_creative_hidden = oxidation and 1 or 0,
 			om_bronze_tool = material == "bronze" and 1 or 0,
 			om_attack_damage = attack_damage + (attack_bonus or 0),
 		},
@@ -97,7 +104,7 @@ local materials = {
 	{"iron", 6, 2, 250},
 	{"golden", 12, 0, 32},
 	{"diamond", 8, 3, 1561},
-	{"steel", 4, 3, 5000, 1, 65},
+	{"steel", 4, 3, 5000, 1},
 }
 
 for _, material in ipairs(materials) do

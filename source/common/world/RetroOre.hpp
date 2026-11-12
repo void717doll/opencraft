@@ -19,9 +19,14 @@ inline float oreSine(float angle, bool cosine = false) {
 	return table[unsigned(int(angle * 10430.378f + (cosine ? 16384.f : 0.f))) & 65535];
 }
 
+struct OreBounds {
+	int minX=std::numeric_limits<int>::min(), minY=std::numeric_limits<int>::min(), minZ=std::numeric_limits<int>::min();
+	int maxX=std::numeric_limits<int>::max(), maxY=std::numeric_limits<int>::max(), maxZ=std::numeric_limits<int>::max();
+};
+
 // WorldGenMinable's ellipsoids, with minecraft y mapped to our z axis.
 template<class Place>
-void oreVein(Random &random, int x, int y, int z, int size, Place place, int minimumZ = std::numeric_limits<int>::min(), int maximumZ = std::numeric_limits<int>::max()) {
+void oreVein(Random &random, int x, int y, int z, int size, Place place, const OreBounds &bounds = {}) {
 	float angle = random.nextFloat() * float(3.141592653589793);
 	float sine = oreSine(angle);
 	float cosine = oreSine(angle, true);
@@ -38,9 +43,13 @@ void oreVein(Random &random, int x, int y, int z, int size, Place place, int min
 		double width = random.nextDouble() * size / 16;
 		double diameter = double(oreSine(float(step) * float(3.141592653589793) / float(size)) + 1.f) * width + 1;
 		double radius = diameter / 2;
-		for (int bx = int(std::floor(cx - radius)); bx <= int(std::floor(cx + radius)); ++bx)
-			for (int bz = std::max(minimumZ, int(std::floor(cz - radius))); bz <= std::min(maximumZ, int(std::floor(cz + radius))); ++bz)
-				for (int by = int(std::floor(cy - radius)); by <= int(std::floor(cy + radius)); ++by) {
+		int minX=std::max(bounds.minX,int(std::floor(cx-radius))), maxX=std::min(bounds.maxX,int(std::floor(cx+radius)));
+		int minY=std::max(bounds.minY,int(std::floor(cy-radius))), maxY=std::min(bounds.maxY,int(std::floor(cy+radius)));
+		int minZ=std::max(bounds.minZ,int(std::floor(cz-radius))), maxZ=std::min(bounds.maxZ,int(std::floor(cz+radius)));
+		if(minX>maxX || minY>maxY || minZ>maxZ) continue;
+		for (int bx=minX;bx<=maxX;++bx)
+			for (int bz=minZ;bz<=maxZ;++bz)
+				for (int by=minY;by<=maxY;++by) {
 					double dx = (bx + 0.5 - cx) / radius, dy = (by + 0.5 - cy) / radius, dz = (bz + 0.5 - cz) / radius;
 					if (dx * dx + dz * dz + dy * dy < 1) place(bx, by, bz);
 				}

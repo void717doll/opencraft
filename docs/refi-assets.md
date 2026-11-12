@@ -55,3 +55,11 @@ tin's transparent mineral sprite is layered over the existing stone tile while b
 climbing rope uses an unchanged `skyfactory/farming/farming_hemp_rope.png` inventory sprite and the braid-like `mcimport_mods/basic_materials/basic_materials_chain_brass.png` tile on a thin vertical strand. the two supplied refi files and their hashes are recorded in the manifest.
 
 copper, bronze, and rope receive material palettes when their textures load: reddish orange copper, warm brown bronze, and natural tan rope. the same mapping covers inventory and held items, dropped items, copper ore, and worn bronze armor. stone-gray ore backgrounds, wooden handles, shading, and transparency are preserved; the copied source png files remain unchanged.
+
+steel tool textures use a charcoal palette on their gray metal pixels. wooden handles and dark outlines retain their source colors. this replaces the separate mesh-brightness adjustment so inventory, held, and dropped tools share the darker material.
+
+copper oxidation variants reuse unchanged copper-tool sprite copies with separate exposed, weathered, and oxidized material palettes. only the metal pixels gain green patina patches; handles and transparent pixels retain their original appearance.
+
+piston sides now use refi's `mesecons_piston_bottom.png`, matching mineclonia's forward-facing wood band. the head uses the supplied pusher back and left textures; its quarter-block plate and shaft extending into the shortened base follow mineclonia's node boxes, converted to the engine's vertical z axis.
+
+the cyan interior marker in refi's piston-on-front tile is mapped to dark metal at load time so it does not form a bright rim around the shaft.

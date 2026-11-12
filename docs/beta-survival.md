@@ -118,3 +118,9 @@ three string in a vertical recipe make eight climbing-rope sections. right-click
 hold space while touching rope to climb, release it to descend, or hold sneak to stay in place. climbing clears accumulated fall distance. breaking a section releases the sections below it; breaking the anchor releases the whole line. each removed section drops one reusable rope item.
 
 treasure notes without an assigned destination choose a buried cache in new overworld terrain. caches lie four blocks below dry ground and contain coal, iron, torches, and bread. each cache has a one-in-64 chance of a music disc; other caches have a one-in-three chance of worn iron or bronze tools or armor. worn equipment starts with 50–85 percent of its durability spent. caches do not contain apples or golden apples. their inventories persist and never refill during generation. earlier notes retain their saved ruin destinations.
+
+## copper oxidation
+
+all five copper tools slowly age through exposed, weathered, and oxidized stages. exposed copper has brown metal with small green patches; weathered copper is mostly green; fully oxidized copper is teal. wooden handles retain their color. fresh crafting recipes still make orange copper tools.
+
+age checks run once per active minute, with a one-in-twenty chance of advancing a tool by one stage: about twenty active minutes per stage on average. carried tools, tools in loaded storage, and dropped tools age during play. each stage is saved as an item variant, preserving durability, stack count, and tool capabilities when moved or dropped.

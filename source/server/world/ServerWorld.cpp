@@ -48,7 +48,8 @@ ServerWorld::ServerWorld(PlayerList &players, const Dimension &dimension, s32 se
 	  m_heightmap(seed, dimension.id() == 1),
 	  m_terrainGenerator(m_heightmap, dimension, seed),
 	  m_scene(players),
-	  m_seed(seed)
+	  m_seed(seed),
+	  m_copperRandom(u32(seed)^0x43555052u)
 {
 }
 
@@ -68,6 +69,7 @@ void ServerWorld::update(bool doTick) {
 		updateRailDevices();
 		updateRedstoneCircuits();
 		updatePlayerSurvival();
+		updateCopperOxidation();
 		m_scene.update();
 	}
 }

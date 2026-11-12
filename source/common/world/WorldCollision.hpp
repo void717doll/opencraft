@@ -29,7 +29,7 @@ inline DoubleBox blockBox(const BlockState &state, u16 data, int x, int y, int z
 inline bool intersectsBlock(const BlockState &state, u16 data, int x, int y, int z, const DoubleBox &body) {
 	if (state.block().hasGroup("group:om_piston_head")) {
 		BlockState shaft = state;
-		shaft.boundingBox(FloatBox{0.375f,0.375f,0,0.25f,0.25f,0.75f});
+		shaft.boundingBox(FloatBox{0.375f,0.375f,-0.25f,0.25f,0.25f,1.f});
 		return blockBox(state,data,x,y,z).intersects(body) || blockBox(shaft,data,x,y,z).intersects(body);
 	}
 	if (!state.block().hasGroup("group:om_stairs")) return blockBox(state, data, x, y, z).intersects(body);
@@ -111,7 +111,7 @@ inline std::vector<Obstacle> collectObstacles(const World &world, const DoubleBo
 					obstacles.push_back({blockBox(*state, data, x, y, z), bouncy, slippery, false, false, {x, y, z}});
 					if (state->block().hasGroup("group:om_piston_head")) {
 						BlockState shaft = *state;
-						shaft.boundingBox(FloatBox{0.375f,0.375f,0,0.25f,0.25f,0.75f});
+						shaft.boundingBox(FloatBox{0.375f,0.375f,-0.25f,0.25f,0.25f,1.f});
 						obstacles.push_back({blockBox(shaft,data,x,y,z),bouncy,slippery,false,false,{x,y,z}});
 					}
 				}

@@ -15,7 +15,7 @@ inline void applyMaterialPalette(SDL_Surface *surface,const std::string &filenam
 			u8 r,g,b,a;
 			SDL_GetRGBA(row[x],surface->format,&r,&g,&b,&a);
 			if (!a) continue;
-			auto color=materialPalette::color(kind,r,g,b);
+			auto color=materialPalette::color(kind,r,g,b,x,y);
 			row[x]=SDL_MapRGBA(surface->format,color[0],color[1],color[2],a);
 		}
 	}

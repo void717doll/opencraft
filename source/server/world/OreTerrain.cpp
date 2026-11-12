@@ -36,7 +36,8 @@ void decorateOreTerrain(ServerChunk &chunk, s32 seed) {
 					int bx = wx - chunk.x() * CHUNK_WIDTH, by = wy - chunk.y() * CHUNK_DEPTH, bz = wz - chunk.z() * CHUNK_HEIGHT;
 					if (id && bx >= 0 && bx < CHUNK_WIDTH && by >= 0 && by < CHUNK_DEPTH && bz >= 0 && bz < CHUNK_HEIGHT
 					 && chunk.getBlock(bx, by, bz) == stone) chunk.setBlockRaw(bx, by, bz, id);
-				}, chunk.z() * CHUNK_HEIGHT, (chunk.z() + 1) * CHUNK_HEIGHT - 1);
+				}, retro::OreBounds{chunk.x()*CHUNK_WIDTH,chunk.y()*CHUNK_DEPTH,chunk.z()*CHUNK_HEIGHT,
+					(chunk.x()+1)*CHUNK_WIDTH-1,(chunk.y()+1)*CHUNK_DEPTH-1,(chunk.z()+1)*CHUNK_HEIGHT-1});
 			}
 		}
 	}
