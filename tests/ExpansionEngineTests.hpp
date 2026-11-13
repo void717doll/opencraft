@@ -35,6 +35,32 @@ class ExpansionEngineTests : public CxxTest::TestSuite {
 		}
 	}
 	public:
+		void testEquivalentBlockReplacementsKeepSettledLighting() {
+			Registry definitions; Registry::setInstance(definitions); registerAir(definitions);
+			auto &stone = definitions.registerBlock<ServerBlock>("test:stone");
+			auto &brick = definitions.registerBlock<ServerBlock>("test:brick");
+			auto &glass = definitions.registerBlock<ServerBlock>("test:glass");
+			glass.getState(0).isOpaque(false); glass.getState(0).drawType(BlockDrawType::Glass);
+			auto &water = definitions.registerBlock<ServerBlock>("test:water");
+			water.getState(0).isOpaque(false); water.getState(0).drawType(BlockDrawType::Liquid);
+			PlayerList players; Dimension dimension{0, "test:world", "world"};
+			ServerWorld world(players, dimension, 42);
+			auto &chunk = world.getOrCreateChunk(0, 0, 0); chunk.setInitialized(true);
+			chunk.setBlockRaw(8, 8, 8, stone.id()); chunk.lightmap().clearPendingUpdates();
+			for (int i = 0; i < 100; ++i) chunk.setBlock(8, 8, 8, i % 2 ? stone.id() : brick.id());
+			TS_ASSERT(!chunk.lightmap().hasPendingUpdates());
+			chunk.setBlock(8, 8, 8, 0);
+			TS_ASSERT(chunk.lightmap().hasPendingUpdates());
+			chunk.lightmap().clearPendingUpdates();
+			chunk.lightmap().setLightDataRaw(8, 8, 8, 0xf7);
+			chunk.setBlock(8, 8, 8, glass.id());
+			TS_ASSERT(!chunk.lightmap().hasPendingUpdates());
+			TS_ASSERT_EQUALS(chunk.lightmap().getLightDataRaw(8, 8, 8), 0xf7);
+			chunk.setBlock(8, 8, 8, water.id());
+			TS_ASSERT(chunk.lightmap().hasPendingUpdates());
+			TS_ASSERT_EQUALS(chunk.lightmap().getTorchlight(8, 8, 8), 7);
+		}
+
 		void testCaveCeilingsAndLoadedRoofsDoNotSeedSkylight() {
 			Registry definitions; Registry::setInstance(definitions); registerAir(definitions);
 			auto &stone = definitions.registerBlock<ServerBlock>("test:stone");

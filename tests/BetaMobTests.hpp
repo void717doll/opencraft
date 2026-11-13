@@ -131,6 +131,20 @@ class BetaMobTests : public CxxTest::TestSuite {
 			TS_ASSERT_EQUALS(wool, 3);
 		}
 
+		void testUnchangedMobHeadingDoesNotResendItsRotation() {
+			Registry definitions; Registry::setInstance(definitions);
+			definitions.registerBlock<ServerBlock>(BLOCK_AIR).getState(0).isCollidable(false);
+			definitions.registerBlock<ServerBlock>("test:stone");
+			registerModel(definitions,"default:cow",BetaMobKind::Cow,{-0.45,-0.45,0,0.9,0.9,1.3},false);
+			PlayerList players; Dimension dimension{0,"test:world","world"}; ServerWorld world(players,dimension,42);
+			prepareFloor(world);
+			TS_ASSERT(world.spawnMob("default:cow",8,8,1));
+			world.updateMobs();
+			world.scene().registry().view<RotationComponent>().each([](auto &rotation) { rotation.isUpdated=false; });
+			world.updateMobs();
+			world.scene().registry().view<RotationComponent>().each([&](const auto &rotation) { TS_ASSERT(!rotation.isUpdated); });
+		}
+
 		void testSkeletonProjectileAndCreeperBlastSimulation() {
 			Registry definitions;
 			Registry::setInstance(definitions);

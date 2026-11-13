@@ -114,6 +114,17 @@ void addRail(s8f x, s8f y, s8f z, ChunkMeshBuildingJob &job, const BlockState &s
 void BlockMesher::addBlock(s8f x, s8f y, s8f z, ChunkMeshBuildingJob &job,
                            const BlockState &blockState, u16 blockParam)
 {
+	if (blockState.drawType() == BlockDrawType::Solid) {
+		bool hidden = true;
+		for (const auto &normal : faceNormals) {
+			const auto *neighbor = job.chunkData.getBlockState(x + s8f(normal.x), y + s8f(normal.y), z + s8f(normal.z));
+			if (!neighbor || !neighbor->block().id() || neighbor->drawType() != BlockDrawType::Solid || !neighbor->isOpaque()) {
+				hidden = false;
+				break;
+			}
+		}
+		if (hidden) return;
+	}
 	if (blockState.block().hasGroup("group:om_sign") && blockState.id() == 0) {
 		u16 rotation = blockState.block().param().getParam(BlockParam::Rotation, blockParam) & 3;
 		BlockState post = blockState;

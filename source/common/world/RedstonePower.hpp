@@ -82,17 +82,23 @@ inline unsigned output(const World &world, const Vector3i &point, const Vector3i
 
 inline unsigned strongPower(const World &world, const Vector3i &point, bool includeWire = true) {
 	unsigned strength = 0;
-	for (auto side : sides) strength = std::max(strength, output(world, point + side, point, true, includeWire));
+	for (auto side : sides) {
+		strength = std::max(strength, output(world, point + side, point, true, includeWire));
+		if (strength == 15) break;
+	}
 	return strength;
 }
 inline unsigned inputFrom(const World &world, const Vector3i &point, const Vector3i &neighbor, bool includeWire = true) {
 	unsigned strength = output(world, neighbor, point, false, includeWire);
-	if (solid(stateAt(world, neighbor))) strength = std::max(strength, strongPower(world, neighbor, includeWire));
+	if (strength < 15 && solid(stateAt(world, neighbor))) strength = std::max(strength, strongPower(world, neighbor, includeWire));
 	return strength;
 }
 inline unsigned power(const World &world, const Vector3i &point, bool includeWire = true) {
 	unsigned strength = 0;
-	for (auto side : sides) strength = std::max(strength, inputFrom(world, point, point + side, includeWire));
+	for (auto side : sides) {
+		strength = std::max(strength, inputFrom(world, point, point + side, includeWire));
+		if (strength == 15) break;
+	}
 	return strength;
 }
 }

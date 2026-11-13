@@ -69,6 +69,8 @@ craft an empty map and right-click to open it. new maps cover 128 by 128 blocks 
 
 worlds are stored in `saves/<world name>/map.sqlite`, with compressed chunks and player data in one database. maps and treasure-note records use subfolders beside it. the world list puts the most recently saved world first. old `.dat` worlds migrate when saved; their original file is retained as `legacy.dat` inside the world folder. that backup still occupies its original space.
 
+the [performance audit](docs/performance-audit.md) records measured fixes and the remaining bottlenecks.
+
 ## build
 
 requires git, cmake, pkg-config, a c++17 compiler, sqlite3 and zstd development libraries, and the platform development libraries needed by sdl and bgfx. run from the project directory:

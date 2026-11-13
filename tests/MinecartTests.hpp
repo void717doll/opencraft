@@ -155,6 +155,17 @@ public:
 		TS_ASSERT(position.x>5.8 && position.x<6.1); TS_ASSERT_DELTA(position.y,8.5,0.00001);
 		TS_ASSERT_DELTA(position.z,4.0625,0.00001); TS_ASSERT(cart.velocity.x<0.21);
 	}
+	void testStationaryCartDoesNotResendItsPosition() {
+		Fixture f; for (int x=2; x<14; ++x) f.track(x,8,4,1);
+		auto entity=f.cart(8.5,8.5,4.0625);
+		auto &position=f.world->scene().registry().get<PositionComponent>(entity);
+		position.isUpdated=false;
+		f.world->updateMinecarts();
+		TS_ASSERT(!position.isUpdated);
+		f.world->scene().registry().get<MinecartComponent>(entity).velocity={0.1,0,0};
+		f.world->updateMinecarts();
+		TS_ASSERT(position.isUpdated);
+	}
 	void testCartFollowsCurveIntoTheConnectedTrack() {
 		Fixture f; for(int x=2;x<7;++x) f.track(x,8,4,1);
 		f.track(7,8,4,7); for(int y=9;y<15;++y) f.track(7,y,4,0);

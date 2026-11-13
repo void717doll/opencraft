@@ -67,15 +67,16 @@ sf::Packet saveChunk(const ServerChunk &chunk) {
 	packet << u8(1) << u16(palette.size());
 	u16 index = 0;
 	for (auto &entry : palette) { entry.second = index++; packet << registry.getBlock(entry.first).stringID(); }
-	u16 metadataCount = 0;
-	for (int z = 0; z < CHUNK_HEIGHT; ++z) for (int y = 0; y < CHUNK_DEPTH; ++y) for (int x = 0; x < CHUNK_WIDTH; ++x) {
-		packet << palette.at(chunk.getBlock(x, y, z)) << chunk.getData(x, y, z);
-		if (chunk.getBlockData(x, y, z)) ++metadataCount;
-	}
-	packet << metadataCount;
 	for (int z = 0; z < CHUNK_HEIGHT; ++z) for (int y = 0; y < CHUNK_DEPTH; ++y) for (int x = 0; x < CHUNK_WIDTH; ++x)
-		if (const auto *data = chunk.getBlockData(x, y, z))
-			packet << u16((z * CHUNK_DEPTH + y) * CHUNK_WIDTH + x) << data->inventory << data->meta;
+		packet << palette.at(chunk.getBlock(x, y, z)) << chunk.getData(x, y, z);
+	std::map<u16, const BlockData *> metadata;
+	for (const auto &entry : chunk.blockData()) {
+		const auto &position = entry.first;
+		metadata.emplace(u16((position.z * CHUNK_DEPTH + position.y) * CHUNK_WIDTH + position.x), entry.second.get());
+	}
+	packet << u16(metadata.size());
+	for (const auto &entry : metadata)
+		packet << entry.first << entry.second->inventory << entry.second->meta;
 	return packet;
 }
 

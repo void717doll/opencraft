@@ -808,7 +808,8 @@ void ServerWorld::updateMobs() {
 			else if (traits.grounded && blocked && kind != Kind::Rabbit) mob.verticalSpeed = 0.42f;
 			position.x += movement.x; position.y += movement.y; position.z += movement.z;
 			position.isUpdated = position.isUpdated || !movement.isZero();
-			rotation.quat = glm::angleAxis(mob.yaw + float(M_PI / 2), glm::vec3(0, 0, 1)); rotation.isUpdated = true;
+			auto facing = glm::angleAxis(mob.yaw + float(M_PI / 2), glm::vec3(0, 0, 1));
+			if (rotation.quat != facing) { rotation.quat = facing; rotation.isUpdated = true; }
 			if ((kind == Kind::Zombie || kind == Kind::Skeleton) && mob.age % 20 == 0 && sunlit) --mob.health;
 			if (kind == Kind::Chicken && traits.size == 0) {
 				if (traits.jumpTimer) --traits.jumpTimer;

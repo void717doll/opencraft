@@ -174,14 +174,18 @@ void ServerWorld::refreshBetaDevice(const Vector3i &point) {
 	u16 rotation = u16(redstone::rotation(*this,point,*state));
 	Vector3i direction = retro::pistonDirection(rotation), head = point + direction;
 	bool powered = false;
-	for (auto side : redstone::sides)
-		if (side != direction && redstone::inputFrom(*this,point,point+side)) powered = true;
+	for (auto side : redstone::sides) {
+		if (side != direction && redstone::inputFrom(*this,point,point+side)) { powered = true; break; }
+	}
 	// beta also checks the power neighborhood one block above the base.
 	Vector3i above = point + Vector3i{0,0,1};
-	for (auto side : redstone::sides)
-		if (side != Vector3i{0,0,-1} && redstone::inputFrom(*this,above,above+side)) powered = true;
+	if (!powered) for (auto side : redstone::sides) {
+		if (side != Vector3i{0,0,-1} && redstone::inputFrom(*this,above,above+side)) { powered = true; break; }
+	}
 	bool extended = state->id() != 0;
 	if (powered == extended) return;
+	// blocked pushes retry until entities or obstructions move; settled pistons use neighbor events.
+	watchRailDevice(point);
 	auto &definitions = Registry::getInstance();
 	if (!definitions.hasBlock("default:piston_head")) return;
 	if (powered) {

@@ -442,8 +442,8 @@ void ServerWorld::updateMinecarts() {
 				watchRailDevice(detectorPoint);
 			}
 		}
+		position.isUpdated = position.isUpdated || position.x != next.x || position.y != next.y || position.z != next.z;
 		position.x=next.x; position.y=next.y; position.z=next.z;
-		position.isUpdated = true;
 		Vector3d movement = next-start;
 		double horizontal = std::hypot(movement.x,movement.y);
 		if (horizontal > 0.0001) {

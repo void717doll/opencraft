@@ -9,14 +9,31 @@ unsigned ServerWorld::redstonePower(const Vector3i &point, bool includeWire) con
 }
 
 void ServerWorld::queueRedstone(const Vector3i &point) {
+	const auto *state=redstone::stateAt(*this,point);
+	if (!state || (!redstone::source(state) && !state->block().getGroupValue("group:om_redstone_device")
+	 && state->block().stringID()!="default:tnt")) return;
 	if (m_redstonePending.emplace(point).second) m_redstoneQueue.push_back(point);
 }
 
 void ServerWorld::notifyRedstone(const Vector3i &point) {
-	queueRedstone(point);
-	for (auto side : redstone::sides) {
-		queueRedstone(point + side);
-		for (auto other : redstone::sides) queueRedstone(point + side + other);
+	static const std::array<Vector3i,25> neighbors{{
+		{0,0,0},{-1,0,0},{1,0,0},{0,-1,0},{0,1,0},{0,0,-1},{0,0,1},
+		{-2,0,0},{2,0,0},{0,-2,0},{0,2,0},{0,0,-2},{0,0,2},
+		{-1,-1,0},{-1,1,0},{1,-1,0},{1,1,0},
+		{-1,0,-1},{-1,0,1},{1,0,-1},{1,0,1},
+		{0,-1,-1},{0,-1,1},{0,1,-1},{0,1,1}
+	}};
+	for (auto offset : neighbors) queueRedstone(point + offset);
+	// quasi-power can reach a piston through a solid neighbor above its base.
+	static const std::array<Vector3i,13> pistonNeighbors{{
+		{-2,0,-1},{2,0,-1},{0,-2,-1},{0,2,-1},
+		{-1,-1,-1},{-1,1,-1},{1,-1,-1},{1,1,-1},
+		{-1,0,-2},{1,0,-2},{0,-1,-2},{0,1,-2},{0,0,-3}
+	}};
+	for (auto offset : pistonNeighbors) {
+		Vector3i piston=point+offset;
+		const auto *state=redstone::stateAt(*this,piston);
+		if (state && state->block().hasGroup("group:om_piston")) queueRedstone(piston);
 	}
 }
 
@@ -39,7 +56,6 @@ void ServerWorld::refreshRedstone(const Vector3i &point) {
 	if (!state) return;
 	unsigned kind = redstone::source(state);
 	if (state->block().hasGroup("group:om_piston") || state->block().hasGroup("group:om_note_block") || state->block().hasGroup("group:om_piston_head")) {
-		watchRailDevice(point);
 		refreshBetaDevice(point);
 		return;
 	}

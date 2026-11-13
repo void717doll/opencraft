@@ -30,12 +30,15 @@
 #include <entt/entt.hpp>
 
 #include "common/core/ISerializable.hpp"
+#include "common/core/Box.hpp"
 #include "common/network/Network.hpp"
 
 struct NetworkComponent : public ISerializable {
 	entt::entity entityID = entt::null;
 
 	bool hasSpawned = false;
+	bool hasHitbox = false;
+	DoubleBox lastHitbox;
 
 	// FIXME
 	NetworkComponent() = default;

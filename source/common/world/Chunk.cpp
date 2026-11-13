@@ -86,10 +86,20 @@ void Chunk::setBlock(int x, int y, int z, u16 type) {
 	const BlockState &blockState = block.getState(block.param().hasParam(BlockParam::State)
 		? block.param().getParam(BlockParam::State, blockParam) : 0);
 
-	m_lightmap.removeTorchlight(x, y, z);
-	m_lightmap.removeSunlight(x, y, z);
-	if (u8 emission = lightEmission(blockState))
-		m_lightmap.addTorchlight(x, y, z, emission);
+	const BlockState &previousState = *getBlockState(x, y, z);
+	if (previousState.isOpaque() != blockState.isOpaque()
+	 || previousState.isLightSource() != blockState.isLightSource()
+	 || lightEmission(previousState) != lightEmission(blockState)) {
+		m_lightmap.removeTorchlight(x, y, z);
+		if (u8 emission = lightEmission(blockState))
+			m_lightmap.addTorchlight(x, y, z, emission);
+	}
+	auto passesSunlight = [](const BlockState &state) {
+		return !state.block().id() || state.drawType() == BlockDrawType::Glass || state.drawType() == BlockDrawType::XShape;
+	};
+	if (previousState.isOpaque() != blockState.isOpaque()
+	 || (!blockState.isOpaque() && passesSunlight(previousState) != passesSunlight(blockState)))
+		m_lightmap.removeSunlight(x, y, z);
 
 	onBlockPlaced(x, y, z, block);
 	m_world.onBlockPlaced(x + m_x * width, y + m_y * depth, z + m_z * height, block);

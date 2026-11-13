@@ -137,22 +137,27 @@ void ServerChunk::sendData(const ClientInfo &client) {
 	Network::Packet packet;
 	packet << Network::Command::ChunkData;
 	packet << m_x << m_y << m_z;
-	std::vector<Vector3i> metadata;
-	for (u16 z = 0 ; z < CHUNK_HEIGHT ; ++z) {
-		for (u16 y = 0 ; y < CHUNK_DEPTH ; ++y) {
-			for (u16 x = 0 ; x < CHUNK_WIDTH ; ++x) {
-				packet << data(x, y, z);
-				packet << m_lightmap.getLightDataRaw(x, y, z);
-
-				if (getBlockData(x, y, z)) metadata.emplace_back(x, y, z);
+	std::array<u8, CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT * 5> cells;
+	std::size_t offset = 0;
+	for (u16 z = 0; z < CHUNK_HEIGHT; ++z) {
+		for (u16 y = 0; y < CHUNK_DEPTH; ++y) {
+			for (u16 x = 0; x < CHUNK_WIDTH; ++x) {
+				u32 value = data(x, y, z);
+				// block words use the same network byte order as sf::Packet.
+				cells[offset++] = u8(value >> 24);
+				cells[offset++] = u8(value >> 16);
+				cells[offset++] = u8(value >> 8);
+				cells[offset++] = u8(value);
+				cells[offset++] = m_lightmap.getLightDataRaw(x, y, z);
 			}
 		}
 	}
-
+	packet.append(cells.data(), cells.size());
 	client.send(packet);
 	// the receiving chunk must exist before its metadata packets arrive.
-	for (const auto &position : metadata) {
-		BlockData *data = getBlockData(position.x, position.y, position.z);
+	for (const auto &entry : m_blockData) {
+		const auto &position = entry.first;
+		const BlockData *data = entry.second.get();
 		s32 x = position.x + m_x * CHUNK_WIDTH;
 		s32 y = position.y + m_y * CHUNK_DEPTH;
 		s32 z = position.z + m_z * CHUNK_HEIGHT;

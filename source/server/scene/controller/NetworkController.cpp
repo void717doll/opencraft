@@ -26,6 +26,10 @@
  */
 #include "common/network/Network.hpp"
 #include "common/scene/component/NetworkComponent.hpp"
+#include "common/scene/component/AnimationComponent.hpp"
+#include "common/scene/component/DrawableDef.hpp"
+#include "common/scene/component/PositionComponent.hpp"
+#include "common/scene/component/RotationComponent.hpp"
 #include "server/network/Server.hpp"
 #include "server/network/ServerCommandHandler.hpp"
 #include "server/scene/controller/NetworkController.hpp"
@@ -39,13 +43,28 @@ void NetworkController::update(entt::registry &registry) {
 			network.hasSpawned = true;
 		}
 
-		registry.visit(entity, [&] (const auto &component_type) {
-			const auto &type = entt::resolve(component_type);
-			const auto &component = type.func("get"_hs).invoke({}, std::ref(registry), entity);
-			Network::Packet packet = type.func("serialize"_hs).invoke({}, entity, component, true).template cast<Network::Packet>();
-			if (packet.getDataSize())
+		auto send = [&](auto *component) {
+			if (!component || !component->isUpdated) return;
+			Network::Packet packet;
+			packet << component->packetType << entity << *component;
+			m_server->server().sendToAllClients(packet);
+			component->isUpdated = false;
+		};
+		send(registry.try_get<PositionComponent>(entity));
+		send(registry.try_get<RotationComponent>(entity));
+		send(registry.try_get<AnimationComponent>(entity));
+		send(registry.try_get<DrawableDef>(entity));
+		if (const auto *box = registry.try_get<DoubleBox>(entity)) {
+			const auto &last = network.lastHitbox;
+			if (!network.hasHitbox || box->x != last.x || box->y != last.y || box->z != last.z
+			 || box->sizeX != last.sizeX || box->sizeY != last.sizeY || box->sizeZ != last.sizeZ) {
+				Network::Packet packet;
+				packet << Network::Command::EntityHitbox << entity << *box;
 				m_server->server().sendToAllClients(packet);
-		});
+				network.lastHitbox = *box;
+				network.hasHitbox = true;
+			}
+		}
 	});
 }
 

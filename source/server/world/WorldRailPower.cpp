@@ -79,12 +79,15 @@ void ServerWorld::updateRailDevices() {
 		 && !state->block().getGroupValue("group:om_redstone_device"))) {
 			m_railDevices.erase(point); m_torchSwitches.erase(point); continue;
 		}
-		m_railDeviceQueue.push_back(point);
 		u16 next=state->id();
-		if (source==1 || source==5 || source==6 || state->block().getGroupValue("group:om_redstone_device")) {
+		bool device=state->block().getGroupValue("group:om_redstone_device")!=0;
+		if (source==1 || source==5 || source==6 || device) {
+			if (device) m_railDevices.erase(point);
+			else m_railDeviceQueue.push_back(point);
 			refreshRedstone(point);
 			continue;
 		} else {
+			m_railDeviceQueue.push_back(point);
 			double height=detector && (state->id()&7)>=2 ? 1.25 : 0.25;
 			DoubleBox trigger{point.x+0.125,point.y+0.125,double(point.z),0.75,0.75,height};
 			bool active=false;
