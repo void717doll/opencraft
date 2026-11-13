@@ -125,7 +125,7 @@ ChunkMeshBuildingJob *ChunkMeshBuilder::buildChunkMesh(ChunkMeshBuildingJob *job
 				const BlockState &blockState = ChunkData::getBlockState(blockID, blockParam);
 
 				if (blockState.drawType() == BlockDrawType::XShape)
-					XShapeMesher::addCross(x, y, z, *job, blockState);
+					XShapeMesher::addCross(x, y, z, *job, blockState, blockParam);
 				else if (blockState.drawType() == BlockDrawType::Campfire)
 					CampfireMesher::addBlock(x, y, z, *job, blockState);
 				else

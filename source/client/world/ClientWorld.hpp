@@ -28,6 +28,7 @@
 #define CLIENTWORLD_HPP_
 
 #include <unordered_map>
+#include <unordered_set>
 
 #include "common/network/Network.hpp"
 #include "common/world/World.hpp"
@@ -61,6 +62,9 @@ class ClientWorld : public World, public Drawable {
 
 		void changeDimension(u16 dimensionID);
 
+		void predictBlockDig(const Vector3i &position);
+		bool isBlockDigPending(const Vector3i &position) const { return m_pendingDigs.count(position) != 0; }
+		void receiveBlockUpdate(const Vector3i &position, u32 block);
 		void receiveChunkData(Network::Packet &packet);
 		void removeChunk(const Vector3i &chunkPos);
 
@@ -92,6 +96,7 @@ class ClientWorld : public World, public Drawable {
 		ClientScene m_scene{this};
 
 		ChunkMap m_chunks;
+		std::unordered_set<Vector3i> m_pendingDigs;
 
 		TextureAtlas &m_textureAtlas;
 

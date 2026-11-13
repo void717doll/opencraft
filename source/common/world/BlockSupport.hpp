@@ -12,12 +12,17 @@ inline const BlockState *loadedSupport(const World &world, const Vector3i &pos) 
 	return chunk && chunk->isInitialized() ? world.getBlockState(pos.x, pos.y, pos.z) : nullptr;
 }
 
+inline bool isReplaceableBlock(const BlockState &state) {
+	return !state.block().id() || state.drawType() == BlockDrawType::Liquid
+		|| state.block().hasGroup("group:om_replaceable");
+}
+
 inline bool resolveSlabPlacement(const World &world, Vector3i &pos, const Block &block) {
 	if (!block.hasGroup("group:om_slab")) return false;
 	const auto *target = loadedSupport(world, pos);
 	if (!target) return false;
 	if (target->block().id() == block.id() && target->id() == 0) return true;
-	if (target->block().id() && target->drawType() != BlockDrawType::Liquid && target->drawType() != BlockDrawType::XShape)
+	if (!isReplaceableBlock(*target))
 		return false;
 	const auto *below = loadedSupport(world, pos + Vector3i{0, 0, -1});
 	if (!below || below->block().id() != block.id() || below->id() != 0) return false;
@@ -78,6 +83,10 @@ inline bool blockHasSupport(const World &world, const Vector3i &pos, const Block
 		const auto &box = support->boundingBox();
 		return box.x == 0 && box.y == 0 && box.z == 0 && box.sizeX == 1 && box.sizeY == 1 && box.sizeZ == 1;
 	}
+	if (block.hasGroup("group:om_sapling") || block.hasGroup("group:om_soil_plant")) {
+		const auto *floor = loadedSupport(world, pos + Vector3i{0,0,-1});
+		return floor && floor->block().hasGroup("group:om_material_dirt") && hasSolidTop(world, pos + Vector3i{0,0,-1});
+	}
 	if (block.hasGroup("group:om_chest")) return chest::canPlace(world, pos);
 	if (block.hasGroup("group:fence")) {
 		const auto *floor = loadedSupport(world, pos + Vector3i{0, 0, -1});
@@ -117,6 +126,17 @@ inline bool blockHasSupport(const World &world, const Vector3i &pos, const Block
 		offset = {int(std::round(direction.x)), int(std::round(direction.y)), int(std::round(direction.z))};
 	}
 	const auto *support = loadedSupport(world, pos + offset);
+	if (block.hasGroup("group:om_amethyst_cluster")) {
+		if (!support || !support->isCollidable() || support->block().hasGroup("group:fence")
+		 || support->block().hasGroup("group:om_stairs")) return false;
+		const auto box = collision::blockBox(*support, world.getData(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z), 0, 0, 0);
+		if (offset.x) return box.y == 0 && box.z == 0 && box.sizeY == 1 && box.sizeZ == 1
+			&& (offset.x > 0 ? box.x == 0 : box.x + box.sizeX == 1);
+		if (offset.y) return box.x == 0 && box.z == 0 && box.sizeX == 1 && box.sizeZ == 1
+			&& (offset.y > 0 ? box.y == 0 : box.y + box.sizeY == 1);
+		return box.x == 0 && box.y == 0 && box.sizeX == 1 && box.sizeY == 1
+			&& (offset.z > 0 ? box.z == 0 : box.z + box.sizeZ == 1);
+	}
 	if (block.hasGroup("group:om_rope"))
 		return support && ((support->isCollidable() && support->isOpaque()) || support->block().hasGroup("group:om_rope"));
 	return support && (support->isCollidable() || (attached == 4

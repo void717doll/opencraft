@@ -124,3 +124,15 @@ treasure notes without an assigned destination choose a buried cache in new over
 all five copper tools slowly age through exposed, weathered, and oxidized stages. exposed copper has brown metal with small green patches; weathered copper is mostly green; fully oxidized copper is teal. wooden handles retain their color. fresh crafting recipes still make orange copper tools.
 
 age checks run once per active minute, with a one-in-twenty chance of advancing a tool by one stage: about twenty active minutes per stage on average. carried tools, tools in loaded storage, and dropped tools age during play. each stage is saved as an item variant, preserving durability, stack count, and tool capabilities when moved or dropped.
+
+## trees, biomes, and amethyst
+
+jungle, acacia, and dark oak have their own logs, planks, leaves, and saplings. logs craft into four planks and smelt into charcoal. leaves can drop the matching sapling; shears collect the leaves. jungle saplings are rarer than the other tree drops. bone meal grows the new saplings too. acacia has a branching flat crown, jungle grows taller, and dark oak has a broad crown and a thick trunk.
+
+jungle, acacia savanna, birch forest, dark forest, and cherry grove regions change surface vegetation. beta terrain density, climate thresholds, cave heights, and the land shape stay unchanged. newly generated chunks contain the additions; existing saved blocks are preserved. new variant crowns stay within a generated chunk, so placement thins near chunk edges.
+
+amethyst patches occur on existing cave surfaces between y=8 and y=48. budding amethyst grows small, medium, and large buds into clusters on any of its six faces. a cluster mined with a pickaxe yields four shards; four shards craft an amethyst block. budding blocks and immature buds do not drop themselves. clusters require a full supporting face; stairs and fences cannot anchor them.
+
+grass, ferns, flowers, and saplings allow walking through them. grass and ferns can be replaced by placed blocks; flowers, saplings, and amethyst are preserved until removed. soil plants drop when their ground is removed or replaced with unsuitable support. flowing water washes ordinary plants away with their drops and leaves amethyst in place.
+
+block breaking keeps a local removal pending until the authoritative block update arrives. queued snapshots cannot restore that block during the wait; a rejected break restores the actual block. identical snapshots skip remeshing, and server movement validation now retains the grounded step path used by the client.

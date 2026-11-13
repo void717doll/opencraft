@@ -7797,6 +7797,336 @@
         16,
         16
       ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_jungle_log.png",
+      "source": "textures/default_mcl_core/trees/default_jungletree.png",
+      "operation": "copy",
+      "source_sha256": "d77721de009ea1b5edece1a08f1c94977d039f5f3d63cb80562c978ccba74294",
+      "output_sha256": "d77721de009ea1b5edece1a08f1c94977d039f5f3d63cb80562c978ccba74294",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_jungle_log_top.png",
+      "source": "textures/default_mcl_core/trees/default_jungletree_top.png",
+      "operation": "copy",
+      "source_sha256": "2b1de4a98b402e5bd7e969659caf345b8cd93f2d04df73463a46b995a8dcd677",
+      "output_sha256": "2b1de4a98b402e5bd7e969659caf345b8cd93f2d04df73463a46b995a8dcd677",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_jungle_planks.png",
+      "source": "textures/default_mcl_core/trees/default_junglewood.png",
+      "operation": "copy",
+      "source_sha256": "a04317924d181169afddbb9385aef561ea079e7b1284081d81aed39b1f88291b",
+      "output_sha256": "a04317924d181169afddbb9385aef561ea079e7b1284081d81aed39b1f88291b",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_jungle_leaves.png",
+      "source": "textures/default_mcl_core/trees/default_jungleleaves.png",
+      "operation": "copy",
+      "source_sha256": "4ab5bf66fa1032d14c15f567b6ffa1679e21e843a9906f7847ac2cddfd016127",
+      "output_sha256": "4ab5bf66fa1032d14c15f567b6ffa1679e21e843a9906f7847ac2cddfd016127",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_jungle_sapling.png",
+      "source": "textures/default_mcl_core/trees/default_junglesapling.png",
+      "operation": "copy",
+      "source_sha256": "7e2f08d89016f98def119427b8b2eb736532e805616e09ea9d9ec396396bd789",
+      "output_sha256": "7e2f08d89016f98def119427b8b2eb736532e805616e09ea9d9ec396396bd789",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_acacia_log.png",
+      "source": "textures/default_mcl_core/trees/default_acacia_tree.png",
+      "operation": "copy",
+      "source_sha256": "e50502a1e76ef88273d0d59e47b7ba2be13f58d6f0072ec83327c15d6a7555e7",
+      "output_sha256": "e50502a1e76ef88273d0d59e47b7ba2be13f58d6f0072ec83327c15d6a7555e7",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_acacia_log_top.png",
+      "source": "textures/default_mcl_core/trees/default_acacia_tree_top.png",
+      "operation": "copy",
+      "source_sha256": "4dc18d3dfc9cd74be59770c71c50d4613b0cd0ea0aa659f18067c84d7e8d8d0f",
+      "output_sha256": "4dc18d3dfc9cd74be59770c71c50d4613b0cd0ea0aa659f18067c84d7e8d8d0f",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_acacia_planks.png",
+      "source": "textures/default_mcl_core/trees/default_acacia_wood.png",
+      "operation": "copy",
+      "source_sha256": "b18760041828116a08f10f44eb8e054ce625dca3b3a7939459518bb3786bb063",
+      "output_sha256": "b18760041828116a08f10f44eb8e054ce625dca3b3a7939459518bb3786bb063",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_acacia_leaves.png",
+      "source": "textures/default_mcl_core/trees/default_acacia_leaves.png",
+      "operation": "copy",
+      "source_sha256": "00422019f89e094efcd109a771c45aa5ae4ac9e20a3a1332f2552e2ef0c44ddb",
+      "output_sha256": "00422019f89e094efcd109a771c45aa5ae4ac9e20a3a1332f2552e2ef0c44ddb",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_acacia_sapling.png",
+      "source": "textures/default_mcl_core/trees/default_acacia_sapling.png",
+      "operation": "copy",
+      "source_sha256": "e59be076e8bab404d69b66c346067933ad07b4c4dfe419f5306b1b89cf3d531a",
+      "output_sha256": "e59be076e8bab404d69b66c346067933ad07b4c4dfe419f5306b1b89cf3d531a",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_dark_oak_log.png",
+      "source": "textures/default_mcl_core/trees/mcl_core_log_big_oak.png",
+      "operation": "copy",
+      "source_sha256": "75a8fdb30af714e747f66914cfb9ba8be792069ce7b21aec2e4c6c3608097264",
+      "output_sha256": "75a8fdb30af714e747f66914cfb9ba8be792069ce7b21aec2e4c6c3608097264",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_dark_oak_log_top.png",
+      "source": "textures/default_mcl_core/trees/mcl_core_log_big_oak_top.png",
+      "operation": "copy",
+      "source_sha256": "ba1e4287e4aa48c19fa2ca386dcd37d2c7e47c31f62694c2e3edaee0b49b0e50",
+      "output_sha256": "ba1e4287e4aa48c19fa2ca386dcd37d2c7e47c31f62694c2e3edaee0b49b0e50",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_dark_oak_planks.png",
+      "source": "textures/default_mcl_core/trees/mcl_core_planks_big_oak.png",
+      "operation": "copy",
+      "source_sha256": "0f885fcf5ee605a582bd742ae8df640920f35bf773ad5746b87c0a005951af00",
+      "output_sha256": "0f885fcf5ee605a582bd742ae8df640920f35bf773ad5746b87c0a005951af00",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_dark_oak_leaves.png",
+      "source": "textures/default_mcl_core/trees/mcl_core_leaves_big_oak.png",
+      "operation": "copy",
+      "source_sha256": "3be31b3815e9765171d4b4c70cc6a3b08bcd0a391ed933f2cefef1c7ad1ebcc9",
+      "output_sha256": "3be31b3815e9765171d4b4c70cc6a3b08bcd0a391ed933f2cefef1c7ad1ebcc9",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_dark_oak_sapling.png",
+      "source": "textures/default_mcl_core/trees/mcl_core_sapling_big_oak.png",
+      "operation": "copy",
+      "source_sha256": "a2ff64b6f3089dec3ba2163fcd5c5ba2e4f60fe1cc0698666a00e921eda61fc4",
+      "output_sha256": "a2ff64b6f3089dec3ba2163fcd5c5ba2e4f60fe1cc0698666a00e921eda61fc4",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_amethyst_block.png",
+      "source": "textures/mcl_amethyst/amethyst_block.png",
+      "operation": "copy",
+      "source_sha256": "bd0e38896e6e53ef4ee7eef8826184381d3c4539ee0d70764644920ff6bbd107",
+      "output_sha256": "bd0e38896e6e53ef4ee7eef8826184381d3c4539ee0d70764644920ff6bbd107",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_budding_amethyst.png",
+      "source": "textures/mcl_amethyst/budding_amethyst.png",
+      "operation": "copy",
+      "source_sha256": "c572ef3c639ca9f91b072e37ddf9152bb0126fe1a6e2d23732b480d01ca457f6",
+      "output_sha256": "c572ef3c639ca9f91b072e37ddf9152bb0126fe1a6e2d23732b480d01ca457f6",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_small_amethyst_bud.png",
+      "source": "textures/mcl_amethyst/small_amethyst_bud.png",
+      "operation": "copy",
+      "source_sha256": "f6cb200a8b75c03ba9d4ffcc1550e158baa779847ff3f89b8e5f15e107fa4652",
+      "output_sha256": "f6cb200a8b75c03ba9d4ffcc1550e158baa779847ff3f89b8e5f15e107fa4652",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_medium_amethyst_bud.png",
+      "source": "textures/mcl_amethyst/medium_amethyst_bud.png",
+      "operation": "copy",
+      "source_sha256": "52bcd499e2d4afec0d69bf5ef56fa6e405d8c7234d89035cb20fe80f4461f2e3",
+      "output_sha256": "52bcd499e2d4afec0d69bf5ef56fa6e405d8c7234d89035cb20fe80f4461f2e3",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_large_amethyst_bud.png",
+      "source": "textures/mcl_amethyst/large_amethyst_bud.png",
+      "operation": "copy",
+      "source_sha256": "c42ca718ed466daf33310576c547f1125194d6ccbfa02fee3a607657eb3d31f7",
+      "output_sha256": "c42ca718ed466daf33310576c547f1125194d6ccbfa02fee3a607657eb3d31f7",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/blocks/refi_amethyst_cluster.png",
+      "source": "textures/mcl_amethyst/amethyst_cluster.png",
+      "operation": "copy",
+      "source_sha256": "1904f1eb764f35f6fd20ad8d79f6de3cc69d03681e427a190fe43de94a23b4c7",
+      "output_sha256": "1904f1eb764f35f6fd20ad8d79f6de3cc69d03681e427a190fe43de94a23b4c7",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
+    },
+    {
+      "destination": "mods/default/textures/items/refi_amethyst_shard.png",
+      "source": "textures/mcl_amethyst/amethyst_shard.png",
+      "operation": "copy",
+      "source_sha256": "677a9cfedcfc52b5578461a11eb5a582ed78df5485cb6d91a7748d60e819176a",
+      "output_sha256": "677a9cfedcfc52b5578461a11eb5a582ed78df5485cb6d91a7748d60e819176a",
+      "source_size": [
+        16,
+        16
+      ],
+      "output_size": [
+        16,
+        16
+      ]
     }
   ],
   "unchanged_engine_ui": [

@@ -159,7 +159,7 @@ bool ServerWorld::moveSurvivalPlayer(ServerPlayer &player, double x, double y, d
 	box.move(player.x(), player.y(), player.z());
 	auto previousEnvironment = playerEnvironment(*this, box);
 	if (!previousEnvironment.loaded) { player.survival().fallDistance = 0; return false; }
-	Vector3d allowed = player.isNoclip() ? requested : retro::movePlayer(*this, box, requested, false, false);
+	Vector3d allowed = player.isNoclip() ? requested : retro::movePlayer(*this, box, requested, previousEnvironment.grounded, false);
 	if ((allowed - requested).length() > 0.002) return false;
 	box = player.hitbox(); box.move(x, y, z);
 	PlayerEnvironment environment = playerEnvironment(*this, box);

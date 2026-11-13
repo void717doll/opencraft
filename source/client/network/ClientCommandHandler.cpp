@@ -326,11 +326,7 @@ void ClientCommandHandler::setupCallbacks() {
 		s32 x, y, z;
 		u32 block;
 		if (!(packet >> x >> y >> z >> block)) return;
-		const auto *previous = m_world.getBlockState(x, y, z);
-		if (previous && previous->block().id() == u16(block) && previous->block().hasGroup("group:om_slab"))
-			m_world.setBlockState(x, y, z, previous->block().param().getParam(BlockParam::State, u16(block >> 16)));
-		m_world.setBlock(x, y, z, u16(block & 0xffff));
-		m_world.setData(x, y, z, u16((block >> 16) & 0xffff));
+		m_world.receiveBlockUpdate({x, y, z}, block);
 	});
 
 	m_client.setCommandCallback(Network::Command::PlayerInvUpdate, [this](Network::Packet &packet) {
@@ -419,7 +415,7 @@ void ClientCommandHandler::setupCallbacks() {
 
 	m_client.setCommandCallback(Network::Command::BlockInvUpdate, [this](Network::Packet &packet) {
 		Vector3<s32> pos;
-		packet >> pos.x >> pos.y >> pos.z;
+		if (!(packet >> pos.x >> pos.y >> pos.z) || m_world.isBlockDigPending(pos)) return;
 
 		BlockData *data = m_world.getBlockData(pos.x, pos.y, pos.z);
 		if (!data)
@@ -431,7 +427,7 @@ void ClientCommandHandler::setupCallbacks() {
 
 	m_client.setCommandCallback(Network::Command::BlockDataUpdate, [this](Network::Packet &packet) {
 		Vector3<s32> pos;
-		packet >> pos.x >> pos.y >> pos.z;
+		if (!(packet >> pos.x >> pos.y >> pos.z) || m_world.isBlockDigPending(pos)) return;
 
 		Chunk *chunk = m_world.getChunkAtBlockPos(pos.x, pos.y, pos.z);
 		if (chunk) {

@@ -30,6 +30,7 @@
 #include "common/world/Dimension.hpp"
 #include "server/world/ServerChunk.hpp"
 #include "server/world/ExpansionTerrain.hpp"
+#include "server/world/AmethystTerrain.hpp"
 #include "server/world/DungeonTerrain.hpp"
 #include "server/world/TerrainGenerator.hpp"
 #include "server/world/MineshaftTerrain.hpp"
@@ -37,6 +38,7 @@
 #include "server/world/OreTerrain.hpp"
 #include "server/world/RuinsTerrain.hpp"
 #include "common/world/BetaTreeShape.hpp"
+#include "common/world/TreeVariantShape.hpp"
 
 #include <array>
 
@@ -58,6 +60,7 @@ void TerrainGenerator::generate(ServerChunk &chunk) {
 	if (m_dimensionID == 0) decorateMineshaftTerrain(chunk, m_heightmap, m_seed, m_mineshafts);
 	if (m_dimensionID == 0) decorateRuinsTerrain(chunk, m_heightmap, m_seed);
 	if (m_dimensionID == 0) decorateCacheTerrain(chunk, m_heightmap, m_seed);
+	if (m_dimensionID == 0) decorateAmethyst(chunk, m_heightmap, m_seed);
 }
 
 void TerrainGenerator::fastNoiseGeneration(ServerChunk &chunk) {
@@ -72,7 +75,7 @@ void TerrainGenerator::fastNoiseGeneration(ServerChunk &chunk) {
 
 	for(s8 y = 0 ; y < CHUNK_DEPTH ; y++) {
 		for(s8 x = 0 ; x < CHUNK_WIDTH ; x++) {
-			u16 biomeIndex = m_dimensionID == 0 ? m_biomeSampler.getBetaBiomeIndex(heightmap.biomeAt(x, y))
+			u16 biomeIndex = m_dimensionID == 0 ? m_biomeSampler.getDecorationBiomeIndex(heightmap.biomeAt(x, y), x + chunk.x() * CHUNK_WIDTH, y + chunk.y() * CHUNK_DEPTH)
 				: m_biomeSampler.getBiomeIndexAt(x + chunk.x() * CHUNK_WIDTH, y + chunk.y() * CHUNK_DEPTH);
 			const Biome &biome = Registry::getInstance().getBiome(biomeIndex);
 
@@ -141,8 +144,9 @@ inline bool TerrainGenerator::tryPlaceTree(ServerChunk &chunk, int x, int y, int
 				continue;
 
 			auto &definitions = Registry::getInstance();
-			bool spruce = biome.stringID() == "default:taiga";
-			bool birch = biome.stringID() == "default:forest" && rand.get(0, 4) == 0;
+			const Tree &selected = definitions.getTree(treePlacement.treeID);
+			bool spruce = selected.stringID() == "default:spruce" || biome.stringID() == "default:taiga";
+			bool birch = selected.stringID() == "default:birch" || (biome.stringID() == "default:forest" && rand.get(0, 4) == 0);
 			if ((spruce || birch) && definitions.hasTree(spruce ? "default:spruce" : "default:birch")) {
 				const auto &tree = definitions.getTreeFromStringID(spruce ? "default:spruce" : "default:birch");
 				retro::Random random(rand.get(0, 0x7fffffff));
@@ -160,8 +164,29 @@ inline bool TerrainGenerator::tryPlaceTree(ServerChunk &chunk, int x, int y, int
 			}
 			const Tree &tree = definitions.getTree(treePlacement.treeID);
 
-			// Trunk
 			int h = rand.get(tree.trunkMinHeight(), tree.trunkMaxHeight());
+			if (retro::hasVariantTreeShape(tree.stringID())) {
+				retro::Random random(rand.get(0, 0x7fffffff));
+				auto cells = retro::variantTreeShape(random, tree.stringID(), h);
+				const auto &terrain = m_heightmap.getOrCreateChunk(chunk.x(), chunk.y());
+				for (const auto &cell : cells) {
+					auto p = cell.position + Vector3i{x, y, z};
+					// shortcut: new crowns stay inside their chunk; use neighboring-origin replay for edge-spanning trees.
+					if (p.x < 0 || p.x >= CHUNK_WIDTH || p.y < 0 || p.y >= CHUNK_DEPTH || p.z < 0 || p.z >= CHUNK_HEIGHT) return false;
+					// later columns have not written their hillside blocks yet.
+					if (terrain.blockAt(p.x, p.y, p.z + chunk.z() * CHUNK_HEIGHT)) return false;
+					u16 old = chunk.getBlock(p.x, p.y, p.z);
+					if (old && definitions.getBlock(old).getState(0).drawType() != BlockDrawType::Leaves) return false;
+					if (cell.log && !cell.position.z && terrain.blockAt(p.x, p.y, p.z - 1 + chunk.z() * CHUNK_HEIGHT) != 2) return false;
+				}
+				for (const auto &cell : cells) {
+					auto p = cell.position + Vector3i{x, y, z};
+					chunk.setBlockRaw(p.x, p.y, p.z, cell.log ? tree.getLogBlockID() : tree.getLeavesBlockID());
+				}
+				return true;
+			}
+
+			// Trunk
 			for (int i = 0; i < h; i++) {
 				const auto &existing = Registry::getInstance().getBlock(chunk.getBlock(x, y, z + i)).stringID();
 				if (existing != "default:cherry_wood" && existing != "default:cherry_leaves")

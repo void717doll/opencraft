@@ -59,6 +59,7 @@ set(SOURCE_FILES
 	world/WorldFauna.cpp
 	world/WorldMinecarts.cpp
 	world/WorldTnt.cpp
+	world/AmethystTerrain.cpp
 	world/WorldCopper.cpp
 	world/WorldMobs.cpp
 	world/WorldItems.cpp

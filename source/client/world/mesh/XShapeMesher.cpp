@@ -32,7 +32,7 @@
 using namespace BlockGeometry;
 
 void XShapeMesher::addCross(s8f x, s8f y, s8f z, ChunkMeshBuildingJob &job,
-                            const BlockState &blockState)
+                            const BlockState &blockState, u16 blockParam)
 {
 	glm::vec3 vertexPos[nVertsPerCube]{
 		{0, 0, 0},
@@ -48,6 +48,12 @@ void XShapeMesher::addCross(s8f x, s8f y, s8f z, ChunkMeshBuildingJob &job,
 	if (blockState.block().getGroupValue("group:om_coral_plant")) {
 		float height = blockState.block().getGroupValue("group:om_coral_fan") ? 0.4f : 0.75f;
 		for (auto &point : vertexPos) point.z *= height;
+	}
+
+	if (blockState.block().hasGroup("group:om_amethyst_cluster")) {
+		u16 rotation = blockState.block().param().getParam(BlockParam::Rotation, blockParam) & 31;
+		for (auto &point : vertexPos)
+			point = orientMatrices[rotation] * (point - glm::vec3{0.5f}) + glm::vec3{0.5f};
 	}
 
 	const glm::vec3 *const faceVertices[nCrossFaces][nVertsPerFace]{

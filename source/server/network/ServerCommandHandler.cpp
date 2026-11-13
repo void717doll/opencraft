@@ -642,8 +642,7 @@ void ServerCommandHandler::setupCallbacks() {
 					valid = blockHasSupport(world, {x, y, z}, state, data)
 						&& (!state.isCollidable() || !collision::blockBox(state, data, x, y, z).intersects(playerBox));
 				}
-				valid = valid && (merged || !previous->block().id() || previous->drawType() == BlockDrawType::Liquid
-					|| previous->drawType() == BlockDrawType::XShape)
+				valid = valid && (merged || isReplaceableBlock(*previous))
 					&& definition.placementConstraints().check(world, {x, y, z});
 			}
 			if (valid && blocks[id]->stringID() == "default:bed") {
@@ -727,9 +726,20 @@ void ServerCommandHandler::setupCallbacks() {
 
 			ServerWorld &world = getWorldForClient(client.id);
 			const BlockState *blockState = world.getBlockState(x, y, z);
-			if (!packet || !blockState || !canReachBlock(world, *player, x, y, z)
+			if (!packet) return;
+			if (!blockState || !canReachBlock(world, *player, x, y, z)
 			 || !blockState->block().id() || blockState->drawType() == BlockDrawType::Liquid
-			 || (!player->isCreative() && (!std::isfinite(blockState->hardness()) || blockState->hardness() < 0))) return;
+			 || (!player->isCreative() && (!std::isfinite(blockState->hardness()) || blockState->hardness() < 0))) {
+				Network::Packet correction;
+				u32 block = u32(world.getBlock(x, y, z)) | (u32(world.getData(x, y, z)) << 16);
+				correction << Network::Command::BlockUpdate << x << y << z << block;
+				client.send(correction);
+				if (const auto *data = world.getBlockData(x, y, z)) {
+					sendBlockDataUpdate(x, y, z, data, &client);
+					sendBlockInvUpdate(x, y, z, data->inventory, &client);
+				}
+				return;
+			}
 			++player->statistics().items[blockState->block().stringID()].mined;
 			world.setBlock(x, y, z, 0);
 

@@ -13,6 +13,7 @@ choose survival to mine, craft, farm, and fight mobs, or creative to build with 
 - tools wear out, correct tool tiers control drops, and equipment keeps its damage through inventory moves and saves. copper comes between stone and iron. dark steel tools have 5,000 durability and stone-tool mining speed.
 - armor appears on the player model. leather adds fall protection, gold adds fire protection, and chainmail adds general damage protection.
 - material sounds cover footsteps, digging, breaking, placement, and item pickups.
+- pending block breaks stay removed until the server replies; older chunk snapshots no longer restore them. grass and ferns can be replaced while flowers and saplings keep their blocks.
 
 ## additions
 
@@ -24,7 +25,9 @@ choose survival to mine, craft, farm, and fight mobs, or creative to build with 
 - potatoes, tomatoes, barley, extra food recipes, bone meal, mulch, fertilizer, beehives, honey, and wax.
 - ocelots and bats, working buckets, beds, clocks, minecarts, powered rails, and detector rails.
 - dungeon rooms with loot chests and mob spawners, plus jukeboxes with eight mineclonia music tracks.
-- ravines, abandoned mineshafts, coral reefs, nether brick ruins, and birch and spruce trees.
+- ravines, abandoned mineshafts, coral reefs, nether brick ruins, and birch, spruce, jungle, acacia, and dark oak trees.
+- jungle, acacia savanna, birch forest, dark forest, and cherry grove regions over the existing beta terrain.
+- natural amethyst patches, growing buds and clusters, collectible shards, and craftable amethyst blocks.
 - connected beta-style ore pockets, including larger coal veins and underground dirt and gravel. copper remains more common than iron.
 - rare named cave monsters, mossy underground ruins, and treasure notes leading to buried caches. caches contain supplies and can hold rare discs or worn equipment. right-click a note to read its coordinates; earlier notes keep their ruin destinations. new ore pockets, ruins, and caches appear in newly generated terrain.
 - climbing rope that lowers in eight-block batches, up to 32 blocks per hanging line.

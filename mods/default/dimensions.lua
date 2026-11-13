@@ -33,6 +33,7 @@ mod:dimension {
 		"default:rainforest", "default:swampland", "default:seasonal_forest", "default:forest",
 		"default:savanna", "default:shrubland", "default:taiga", "default:desert",
 		"default:plains", "default:tundra", "default:ice_desert",
+		"default:jungle", "default:acacia_savanna", "default:birch_forest", "default:dark_forest", "default:cherry_grove",
 	},
 
 	sky = "default:sky_overworld",

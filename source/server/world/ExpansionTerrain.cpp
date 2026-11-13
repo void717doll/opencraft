@@ -1,5 +1,6 @@
 #include "common/world/WorldBounds.hpp"
 #include "common/world/BetaTreeShape.hpp"
+#include "common/world/TreeVariantShape.hpp"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -287,9 +288,10 @@ bool ServerWorld::growTree(int x, int y, int z, const std::string &treeID) {
 	if (!tree.trunkMinHeight() || tree.trunkMaxHeight() < tree.trunkMinHeight() || tree.trunkMaxHeight() > 16) return false;
 	int height = tree.trunkMinHeight() + int(featureHash(m_seed, x, y, z, 0x5341504c494e47ULL) % (tree.trunkMaxHeight() - tree.trunkMinHeight() + 1));
 	if (z < 1 || z + height + 2 >= worldBounds::height) return false;
-	if (treeID == "default:birch" || treeID == "default:spruce") {
+	if (treeID == "default:birch" || treeID == "default:spruce" || retro::hasVariantTreeShape(treeID)) {
 		retro::Random random(featureHash(m_seed, x, y, z, 0x4245544154524545ULL));
-		auto cells = retro::betaTreeShape(random, treeID == "default:spruce");
+		auto cells = retro::hasVariantTreeShape(treeID) ? retro::variantTreeShape(random, treeID, height)
+			: retro::betaTreeShape(random, treeID == "default:spruce");
 		for (const auto &cell : cells) {
 			auto p = cell.position + Vector3i{x, y, z};
 			const auto *chunk = getChunkAtBlockPos(p.x, p.y, p.z);

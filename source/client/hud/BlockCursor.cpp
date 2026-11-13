@@ -202,7 +202,7 @@ void BlockCursor::update(const Hotbar &hotbar) {
 				if ((float)ticks > (float)m_animationStart + timeToBreak * 1000.f) {
 					if (auto *sound = SoundManager::instance())
 						sound->playBlock(*m_currentBlock, BlockSound::Dug, {m_selectedBlock.x + 0.5, m_selectedBlock.y + 0.5, m_selectedBlock.z + 0.5});
-					m_world.setBlock(m_selectedBlock.x, m_selectedBlock.y, m_selectedBlock.z, 0);
+					m_world.predictBlockDig({m_selectedBlock.x, m_selectedBlock.y, m_selectedBlock.z});
 					m_animationStart = ticks + 250;
 
 					m_client.sendPlayerDigBlock(m_selectedBlock);
@@ -271,7 +271,7 @@ void BlockCursor::activateBlock(const Hotbar &hotbar) {
 
 		const BlockState *blockState = m_world.getBlockState(x, y, z);
 
-		if (blockState->drawType() != BlockDrawType::XShape) {
+		if (!isReplaceableBlock(*blockState)) {
 			// FIXME: Document where these face numbers come from
 			if (face == 0) ++x;
 			if (face == 3) --x;
@@ -288,11 +288,16 @@ void BlockCursor::activateBlock(const Hotbar &hotbar) {
 		bool merged = resolveSlabPlacement(m_world, destination, newBlock);
 		x = destination.x; y = destination.y; z = destination.z;
 		blockState = m_world.getBlockState(x, y, z);
-		if (blockState && (merged || !blockState->block().id() || blockState->drawType() == BlockDrawType::Liquid || blockState->drawType() == BlockDrawType::XShape)) {
+		if (blockState && (merged || isReplaceableBlock(*blockState))) {
 			int mount = -1;
 			if (newBlock.hasGroup("group:om_torch") || newBlock.hasGroup("group:om_wall_switch")) {
 				mount = torchRotationForFace(face);
 				if (mount < 0) return;
+			}
+			if (newBlock.hasGroup("group:om_amethyst_cluster")) {
+				if (face < 0 || face > 5) return;
+				static constexpr int rotations[] = {20, 8, 0, 16, 12, 4};
+				mount = rotations[face];
 			}
 			u16 decorationState = 0;
 			if (newBlock.hasGroup("group:om_sign")) {

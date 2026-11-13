@@ -8,7 +8,7 @@ for _, plant in ipairs({{"fern", "Fern"}, {"rose", "Rose"}, {"mushroom_brown", "
 		draw_type = "xshape",
 		is_opaque = false,
 		is_collidable = false,
-		groups = {attached_node = 3},
+		groups = {attached_node = 3, om_soil_plant = (plant[1] == "fern" or plant[1] == "rose") and 1 or nil, om_replaceable = plant[1] == "fern" and 1 or nil},
 	}
 end
 

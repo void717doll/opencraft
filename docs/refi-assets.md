@@ -63,3 +63,5 @@ copper oxidation variants reuse unchanged copper-tool sprite copies with separat
 piston sides now use refi's `mesecons_piston_bottom.png`, matching mineclonia's forward-facing wood band. the head uses the supplied pusher back and left textures; its quarter-block plate and shaft extending into the shortened base follow mineclonia's node boxes, converted to the engine's vertical z axis.
 
 the cyan interior marker in refi's piston-on-front tile is mapped to dark metal at load time so it does not form a bright rim around the shaft.
+
+15 unchanged refi tree textures cover jungle, acacia, and dark oak logs, planks, leaves, and saplings from `textures/default_mcl_core/trees`. seven unchanged amethyst textures come from `textures/mcl_amethyst`. all 22 source paths, dimensions, and sha256 hashes are recorded in the manifest under MysticTempest's cc by-sa 4.0 credit. mineclonia's tree registrations, plant support rules, and amethyst growth and attachment behavior were used as references; the existing beta terrain generator remains in use.

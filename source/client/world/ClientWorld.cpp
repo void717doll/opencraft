@@ -26,6 +26,7 @@
  */
 #include <algorithm> // std::max
 #include <unordered_set>
+#include <bitset>
 
 #include "common/core/EventHandler.hpp"
 #include "common/core/Registry.hpp"
@@ -136,11 +137,13 @@ void ClientWorld::clear() {
 	m_chunksToMesh.clear();
 	m_chunksToRemove.clear();
 	m_chunks.clear();
+	m_pendingDigs.clear();
 	m_scene.registry().clear();
 	m_scene.particles().clear();
 }
 
 void ClientWorld::changeDimension(u16 dimensionID) {
+	m_pendingDigs.clear();
 	World::clearUpdateQueues();
 
 	const Dimension &dimension = Registry::getInstance().getDimension(dimensionID);
@@ -148,6 +151,20 @@ void ClientWorld::changeDimension(u16 dimensionID) {
 
 	const Sky &sky = Registry::getInstance().getSkyFromStringID(dimension.sky());
 	m_sky = &sky;
+}
+
+void ClientWorld::predictBlockDig(const Vector3i &position) {
+	m_pendingDigs.emplace(position);
+	setBlock(position.x, position.y, position.z, 0);
+}
+
+void ClientWorld::receiveBlockUpdate(const Vector3i &position, u32 block) {
+	m_pendingDigs.erase(position);
+	const auto *previous = getBlockState(position.x, position.y, position.z);
+	if (previous && previous->block().id() == u16(block) && previous->block().hasGroup("group:om_slab"))
+		setBlockState(position.x, position.y, position.z, previous->block().param().getParam(BlockParam::State, u16(block >> 16)));
+	setBlock(position.x, position.y, position.z, u16(block));
+	setData(position.x, position.y, position.z, u16(block >> 16));
 }
 
 void ClientWorld::receiveChunkData(Network::Packet &packet) {
@@ -168,8 +185,14 @@ void ClientWorld::receiveChunkData(Network::Packet &packet) {
 	linkChunkNeighbours(chunk);
 	chunk->lightmap().clearPendingUpdates();
 
-	// Receive chunk data
-	// bool hasUpdatedChunk = false;
+	bool changed = !chunk->isInitialized();
+	std::bitset<CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT> pendingDigs;
+	for (const auto &position : m_pendingDigs) {
+		if (getChunkAtBlockPos(position.x, position.y, position.z) != chunk) continue;
+		unsigned index = ((position.z & (CHUNK_HEIGHT - 1)) * CHUNK_DEPTH + (position.y & (CHUNK_DEPTH - 1))) * CHUNK_WIDTH
+			+ (position.x & (CHUNK_WIDTH - 1));
+		pendingDigs.set(index);
+	}
 	for (u8 z = 0 ; z < CHUNK_HEIGHT ; ++z) {
 		for (u8 y = 0 ; y < CHUNK_DEPTH ; ++y) {
 			for (u8 x = 0 ; x < CHUNK_WIDTH ; ++x) {
@@ -178,22 +201,18 @@ void ClientWorld::receiveChunkData(Network::Packet &packet) {
 
 				packet >> block >> light;
 
-				chunk->setDataRaw(x, y, z, block);
-				chunk->lightmap().setLightDataRaw(x, y, z, light);
-
-				// bool updatedBlock = chunk->setBlockRaw(x, y, z, block & 0xffff);
-				// bool updatedData = chunk->setData(x, y, z, block >> 16);
-				// bool updatedLight = chunk->lightmap().setLightData(x, y, z, light);
-				// if (updatedBlock || updatedData || updatedLight)
-				// 	hasUpdatedChunk = true;
+				// snapshots queued before the dig must not restore its predicted collision.
+				if (pendingDigs[(z * CHUNK_DEPTH + y) * CHUNK_WIDTH + x])
+					block = 0;
+				if (chunk->data(x, y, z) != block) { chunk->setDataRaw(x, y, z, block); changed = true; }
+				if (chunk->lightmap().getLightDataRaw(x, y, z) != light) {
+					chunk->lightmap().setLightDataRaw(x, y, z, light); changed = true;
+				}
 			}
 		}
 	}
 
-	addChunkToUpdate(chunk);
-
-	// if (!hasUpdatedChunk)
-	// 	logWarning() << "Received chunk at" << cx << cy << cz << "without any updates";
+	if (changed) addChunkToUpdate(chunk);
 
 	++chunk->debugTimesReceived;
 
@@ -243,6 +262,10 @@ void ClientWorld::removeChunk(const Vector3i &chunkPos) {
 	if (m_eventHandler)
 		m_eventHandler->emplaceEvent<ChunkRemovedEvent>(Vector3i{it->second->x(), it->second->y(), it->second->z()});
 
+	for (auto pending = m_pendingDigs.begin(); pending != m_pendingDigs.end();) {
+		if (getChunkAtBlockPos(pending->x, pending->y, pending->z) == it->second.get()) pending = m_pendingDigs.erase(pending);
+		else ++pending;
+	}
 	removeChunkFromQueues(it->second.get());
 	m_chunkMeshBuilder.remove(chunkPos);
 	m_chunks.erase(it);

@@ -50,7 +50,7 @@ void TerrainBiomeSampler::setSeed(s32 seed) {
 u16 TerrainBiomeSampler::getBiomeIndexAt(s32 x, s32 y) {
 	if (m_dimension.id() == 0) {
 		auto climate = m_climate.sample(x, y, 1, 1);
-		return getBetaBiomeIndex(climate.biomes[0]);
+		return getDecorationBiomeIndex(climate.biomes[0], x, y);
 	}
 	// TODO with a lot of biomes, perhaps we want an R-Tree or similar, instead of a long loop.
 	// Should also finish solving for analytic blending, or find completely separate solution such as isotropically-modified genlayer
@@ -84,4 +84,22 @@ u16 TerrainBiomeSampler::getBetaBiomeIndex(retro::Biome biome) const {
 		if (allowed == id) return Registry::getInstance().getBiomeFromStringID(id).id();
 	}
 	return m_dimension.biomes().empty() ? 0 : Registry::getInstance().getBiomeFromStringID(m_dimension.biomes().front()).id();
+}
+
+u16 TerrainBiomeSampler::getDecorationBiomeIndex(retro::Biome biome, s32 x, s32 y) const {
+	const char *variant = nullptr;
+	float region = 0;
+	if (biome == retro::Biome::Forest || biome == retro::Biome::SeasonalForest)
+		region = m_paramNoises[0].GetNoise<float>(float(x), float(y));
+	if (biome == retro::Biome::Rainforest) variant = "default:jungle";
+	else if (biome == retro::Biome::Savanna) variant = "default:acacia_savanna";
+	else if (biome == retro::Biome::Forest) {
+		if (region < -0.12f) variant = "default:birch_forest";
+		else if (region > 0.18f) variant = "default:dark_forest";
+	}
+	else if (biome == retro::Biome::SeasonalForest)
+		variant = region < 0 ? "default:cherry_grove" : "default:dark_forest";
+	if (variant) for (const auto &allowed : m_dimension.biomes())
+		if (allowed == variant) return Registry::getInstance().getBiomeFromStringID(variant).id();
+	return getBetaBiomeIndex(biome);
 }

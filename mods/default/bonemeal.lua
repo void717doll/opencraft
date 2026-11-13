@@ -4,7 +4,8 @@ function farming.fertilize(pos, world, strength)
 	if state then
 		local name = state:block():string_id()
 		local tree = name == "default:sapling" and "oak" or name:match("^default:(.+)_sapling$")
-		if tree == "oak" or tree == "cherry" or tree == "birch" or tree == "spruce" then
+		if tree == "oak" or tree == "cherry" or tree == "birch" or tree == "spruce"
+		 or tree == "jungle" or tree == "acacia" or tree == "dark_oak" then
 			return world:grow_tree(pos.x, pos.y, pos.z, "default:" .. tree)
 		end
 	end

@@ -174,7 +174,7 @@ mod:block {
 
 mod:block {
 	id = "dandelion",
-	groups = {attached_node = 3},
+	groups = {attached_node = 3, om_soil_plant = 1},
 	name = "Dandelion",
 	tiles = "dandelion.png",
 	hardness = 0,
@@ -184,7 +184,7 @@ mod:block {
 
 mod:block {
 	id = "tallgrass",
-	groups = {attached_node = 3},
+	groups = {attached_node = 3, om_soil_plant = 1, om_replaceable = 1},
 	name = "Grass",
 	tiles = "grass.png",
 	color_multiplier = {129, 191, 91, 255},

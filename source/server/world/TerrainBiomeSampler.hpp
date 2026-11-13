@@ -42,6 +42,7 @@ class TerrainBiomeSampler {
 
 		u16 getBiomeIndexAt(s32 x, s32 y);
 		u16 getBetaBiomeIndex(retro::Biome biome) const;
+		u16 getDecorationBiomeIndex(retro::Biome biome, s32 x, s32 y) const;
 		void setSeed(s32 seed);
 
 		// std::vector<WeightedIndex> getWeightedBiomeIndicesAt(double x, double y);

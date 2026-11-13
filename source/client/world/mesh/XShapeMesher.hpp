@@ -35,7 +35,7 @@ class BlockState;
 class XShapeMesher {
 	public:
 		static void addCross(s8f x, s8f y, s8f z, ChunkMeshBuildingJob &job,
-		                     const BlockState &blockState);
+		                     const BlockState &blockState, u16 blockParam = 0);
 };
 
 #endif // XSHAPEMESHER_HPP_

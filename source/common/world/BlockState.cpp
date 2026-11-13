@@ -71,8 +71,9 @@ std::vector<ItemStack> BlockState::getItemDrops(const Item *tool) const {
 		if (Random::get(1, 20) != 1) return {};
 		drop = "default:sapling"; amount = 1;
 	}
-	else if (id == "default:cherry_leaves" || id == "default:birch_leaves" || id == "default:spruce_leaves") {
-		if (Random::get(1, 20) != 1) return {};
+	else if (id == "default:cherry_leaves" || id == "default:birch_leaves" || id == "default:spruce_leaves"
+	 || id == "default:jungle_leaves" || id == "default:acacia_leaves" || id == "default:dark_oak_leaves") {
+		if (Random::get(1, id == "default:jungle_leaves" ? 40 : 20) != 1) return {};
 		drop = id.substr(0, id.size() - 7) + "_sapling"; amount = 1;
 	}
 	else if (id == "default:deadbush") return {};

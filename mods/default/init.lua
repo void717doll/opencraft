@@ -80,3 +80,7 @@ dofile("exploration.lua")
 dofile("bronze.lua")
 dofile("rope.lua")
 dofile("copper_oxidation.lua")
+
+dofile("tree_variants.lua")
+dofile("amethyst.lua")
+dofile("tree_biomes.lua")
