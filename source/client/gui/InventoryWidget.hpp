@@ -43,6 +43,7 @@ class InventoryWidget : public AbstractInventoryWidget {
 		void init(Inventory &inventory, u16 offset = 0, u16 size = 0);
 
 		void scroll(float scrolling);
+		float scrolling() const { return m_scrolling; }
 
 		void onEvent(const SDL_Event &event) override;
 

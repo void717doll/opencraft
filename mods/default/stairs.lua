@@ -1,5 +1,5 @@
 local stairs = {
-	{"oak_stairs", "Oak Wood Stairs", "oak_planks", "group:default_planks", "wood", 0},
+	{"oak_stairs", "Oak Wood Stairs", "oak_planks", "default:oak_planks", "wood", 0},
 	{"cobblestone_stairs", "Cobblestone Stairs", "cobblestone", "default:cobblestone", "stone", Capability.Pickaxe},
 }
 

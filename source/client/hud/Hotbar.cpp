@@ -115,7 +115,7 @@ void Hotbar::updateItemName() {
 		u16 remaining = maximum - std::min(stack.damage(), maximum);
 		m_durability.setString(std::to_string(remaining) + " / " + std::to_string(maximum));
 		m_durability.updateVertexBuffer();
-		m_durability.setPosition(std::floor((width() - m_durability.getSize().x) / 2.f), -22.f);
+		m_durability.setPosition(std::floor((width() - m_durability.getSize().x) / 2.f), m_player.isCreative() ? -22.f : -30.f);
 	}
 
 	m_itemNameVisible = !id.empty() && now < m_itemNameUntil;
@@ -124,7 +124,7 @@ void Hotbar::updateItemName() {
 		m_itemName.setShadowColor(Color(0.25f, 0.25f, 0.25f, alpha));
 		m_itemName.setColor(Color(1, 1, 1, alpha));
 		m_itemName.updateVertexBuffer();
-		m_itemName.setPosition(std::floor((width() - m_itemName.getSize().x) / 2.f), m_durabilityVisible ? -33.f : -22.f);
+		m_itemName.setPosition(std::floor((width() - m_itemName.getSize().x) / 2.f), (m_durabilityVisible ? -33.f : -22.f) - (m_player.isCreative() ? 0.f : 8.f));
 	}
 }
 

@@ -97,8 +97,10 @@ u16 TerrainBiomeSampler::getDecorationBiomeIndex(retro::Biome biome, s32 x, s32 
 		if (region < -0.12f) variant = "default:birch_forest";
 		else if (region > 0.18f) variant = "default:dark_forest";
 	}
-	else if (biome == retro::Biome::SeasonalForest)
-		variant = region < 0 ? "default:cherry_grove" : "default:dark_forest";
+	else if (biome == retro::Biome::SeasonalForest) {
+		if (region < -0.75f) variant = "default:cherry_grove";
+		else if (region >= 0) variant = "default:dark_forest";
+	}
 	if (variant) for (const auto &allowed : m_dimension.biomes())
 		if (allowed == variant) return Registry::getInstance().getBiomeFromStringID(variant).id();
 	return getBetaBiomeIndex(biome);

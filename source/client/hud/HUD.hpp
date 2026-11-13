@@ -86,8 +86,11 @@ class HUD : public Transformable, public Drawable {
 
 		Text m_fpsText;
 		Text m_coordinatesText;
-		Text m_scoreLabel;
-		Text m_scoreValue;
+		Image m_experienceEmpty;
+		Image m_experienceFilled;
+		Text m_experienceLevel;
+		s32 m_experienceScore=-1;
+		unsigned m_experiencePixels=0;
 		Text m_hitText;
 		Text m_chatText;
 		RectangleShape m_chatBackground;

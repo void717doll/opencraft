@@ -30,6 +30,7 @@ public:
 		WorldController worlds(registry); ServerModLoader loader(scripts,worlds); loader.loadMods();
 		const auto &dimension=registry.dimensions().front();
 		std::set<std::string> variants;
+		unsigned seasonal=0,cherry=0;
 		for (int seed:{0,42,-99}) {
 			TerrainBiomeSampler sampler(dimension,seed);
 			for (int x=-4096; x<=4096; x+=256) for (int y=-4096; y<=4096; y+=256) {
@@ -37,6 +38,7 @@ public:
 					const auto &original=registry.getBiome(sampler.getBetaBiomeIndex(base));
 					const auto &decorated=registry.getBiome(sampler.getDecorationBiomeIndex(base,x,y));
 					variants.insert(decorated.stringID());
+					if(base==retro::Biome::SeasonalForest) {++seasonal;if(decorated.stringID()=="default:cherry_grove")++cherry;}
 					TS_ASSERT_EQUALS(original.getTopBlockID(),decorated.getTopBlockID());
 					TS_ASSERT_EQUALS(original.getGroundBlockID(),decorated.getGroundBlockID());
 					TS_ASSERT_EQUALS(original.getDeepBlockID(),decorated.getDeepBlockID());
@@ -52,6 +54,8 @@ public:
 				TS_ASSERT(original==chunk.blocks());
 			}
 		}
+		TS_ASSERT(cherry>0 && cherry*50<seasonal);
+		TS_ASSERT(registry.getBiomeFromStringID("default:cherry_grove").getTrees().front().probability<0.005);
 		for (const char *id:{"default:jungle","default:acacia_savanna","default:birch_forest","default:dark_forest","default:cherry_grove"})
 			TS_ASSERT(variants.count(id));
 	}

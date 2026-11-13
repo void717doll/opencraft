@@ -3,7 +3,7 @@ for _, biome in ipairs({
 	{"acacia_savanna", "Acacia Savanna", "acacia", 0.025, "tallgrass", 0.15},
 	{"birch_forest", "Birch Forest", "birch", 0.035, "tallgrass", 0.12},
 	{"dark_forest", "Dark Forest", "dark_oak", 0.065, "fern", 0.15},
-	{"cherry_grove", "Cherry Grove", "cherry", 0.035, "rose", 0.06},
+	{"cherry_grove", "Cherry Grove", "cherry", 0.0035, "rose", 0.06},
 }) do
 	mod:biome {
 		id = biome[1], name = biome[2],

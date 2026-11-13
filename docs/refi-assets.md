@@ -65,3 +65,5 @@ piston sides now use refi's `mesecons_piston_bottom.png`, matching mineclonia's 
 the cyan interior marker in refi's piston-on-front tile is mapped to dark metal at load time so it does not form a bright rim around the shaft.
 
 15 unchanged refi tree textures cover jungle, acacia, and dark oak logs, planks, leaves, and saplings from `textures/default_mcl_core/trees`. seven unchanged amethyst textures come from `textures/mcl_amethyst`. all 22 source paths, dimensions, and sha256 hashes are recorded in the manifest under MysticTempest's cc by-sa 4.0 credit. mineclonia's tree registrations, plant support rules, and amethyst growth and attachment behavior were used as references; the existing beta terrain generator remains in use.
+
+the experience bar and background are unchanged copies from `textures/HUD`, rotated when drawn. the source paths and checksums are in the manifest. slabs and stairs reuse their parent block textures.

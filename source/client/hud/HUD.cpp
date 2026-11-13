@@ -25,6 +25,7 @@
  * =====================================================================================
  */
 #include <glm/gtc/matrix_transform.hpp>
+#include "common/world/Experience.hpp"
 
 #include "common/core/GameClock.hpp"
 #include "common/core/GameTime.hpp"
@@ -50,6 +51,10 @@ HUD::HUD(ClientPlayer &player, ClientWorld &world, ClientCommandHandler &client)
 	m_shader.loadFromFile("basic");
 	m_spyglassTexture.loadFromFile("mods/default/textures/items/refi_spyglass_scope.png");
 	m_spyglassScope.load(m_spyglassTexture);
+	m_experienceEmpty.load("texture-experience_empty");
+	m_experienceFilled.load("texture-experience_full");
+	m_experienceEmpty.setRotation(-90);
+	m_experienceFilled.setRotation(-90);
 
 	setup();
 }
@@ -68,13 +73,12 @@ void HUD::setup() {
 	m_armor.setPosition(m_hotbar.getPosition().x + m_hotbar.width() - 81.f, m_hearts.getPosition().y);
 
 	m_fpsText.setPosition(Config::screenWidth / getScale().x - 36.f, 2.f);
-	m_scoreLabel.setString("Score: ");
-	m_scoreLabel.updateVertexBuffer();
-	m_scoreLabel.setPosition(2, 2);
-	m_scoreValue.setColor(Color::fromRGBA32(255, 255, 85));
-	m_scoreValue.setPosition(2.f + m_scoreLabel.getSize().x, 2);
-	m_coordinatesText.setPosition(2, 12);
-	m_debugOverlay.setPosition(0, Config::isCoordinatesVisible ? 24 : 12);
+	m_experienceEmpty.setPosition(m_hotbar.getPosition().x,m_hotbar.getPosition().y-2);
+	m_experienceFilled.setPosition(m_hotbar.getPosition().x,m_hotbar.getPosition().y-2);
+	m_experienceScore=-1;
+	m_experienceLevel.setColor(Color::fromRGBA32(128,255,32));
+	m_coordinatesText.setPosition(2,2);
+	m_debugOverlay.setPosition(0,Config::isCoordinatesVisible ? 12 : 2);
 
 	m_chatText.setMaxLineLength(u32(std::max(1.f, Config::screenWidth / getScale().x - 8)));
 	m_crosshair.setup();
@@ -114,13 +118,26 @@ void HUD::onGuiScaleChanged(const GuiScaleChangedEvent &event) {
 void HUD::update() {
 	m_paperMap.update(m_player, m_world);
 	m_world.textureAtlas().updateCompass(GameTime::getTicks(), m_player.dimension(), m_player.x(), m_player.y(), m_player.cameraYaw());
-	m_scoreValue.setString(std::to_string(m_player.score()));
+	if (m_experienceScore!=m_player.score()) {
+		m_experienceScore=m_player.score();
+		auto xp=experience::progress(m_experienceScore);
+		m_experiencePixels=unsigned(182ULL*xp.points/xp.capacity);
+		m_experienceFilled.setClipRect(0,0,5,u16(m_experiencePixels));
+		m_experienceLevel.setString(xp.level ? std::to_string(xp.level) : "");
+		m_experienceLevel.updateVertexBuffer();
+		m_experienceLevel.setPosition(m_hotbar.getPosition().x+(m_hotbar.width()-m_experienceLevel.getSize().x)/2.f,m_hotbar.getPosition().y-20);
+	}
+	float statsY=m_hotbar.getPosition().y-hearts::hotbarOffset-(m_player.isCreative() ? 0.f : 8.f);
+	if (m_hearts.getPosition().y!=statsY) {
+		m_hearts.setPosition(m_hearts.getPosition().x,statsY);
+		m_armor.setPosition(m_armor.getPosition().x,statsY);
+	}
 	if (Config::isCoordinatesVisible) {
 		m_coordinatesText.setString("x: " + std::to_string(int(std::floor(m_player.x())))
 			+ "  y: " + std::to_string(int(std::floor(m_player.z())))
 			+ "  z: " + std::to_string(int(std::floor(m_player.y()))));
 	}
-	m_debugOverlay.setPosition(0, Config::isCoordinatesVisible ? 24 : 12);
+	m_debugOverlay.setPosition(0, Config::isCoordinatesVisible ? 12 : 2);
 	u64 now = GameClock::getInstance().getTicks();
 	m_hitVisible = now < m_player.hitUntil();
 	if (m_hitVisible) {
@@ -203,14 +220,18 @@ void HUD::draw(RenderTarget &target, RenderStates states) const {
 		target.draw(m_hotbar, states);
 
 	if (Config::isHotbarVisible) {
-		if (!m_player.isCreative()) target.draw(m_hearts, states);
+		if (!m_player.isCreative()) {
+			target.draw(m_hearts, states);
+			target.draw(m_experienceEmpty, states);
+			if (m_experiencePixels) target.draw(m_experienceFilled, states);
+			target.draw(m_experienceLevel, states);
+		}
 		target.draw(m_armor, states);
 	}
 
 	if (Config::isFpsCounterEnabled)
 		target.draw(m_fpsText, states);
-	target.draw(m_scoreLabel, states);
-	target.draw(m_scoreValue, states);
+
 	if (Config::isCoordinatesVisible) target.draw(m_coordinatesText, states);
 	if (m_hitVisible) target.draw(m_hitText, states);
 	if (m_chatVisible) {

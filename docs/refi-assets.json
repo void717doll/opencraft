@@ -8127,6 +8127,36 @@
         16,
         16
       ]
+    },
+    {
+      "destination": "resources/textures/experience_bar.png",
+      "source": "textures/HUD/experience_bar.png",
+      "operation": "copy",
+      "source_sha256": "78a16515057afcbba080e66bf851ed98137d127162d3c5cb74d597fe7ae4827e",
+      "output_sha256": "78a16515057afcbba080e66bf851ed98137d127162d3c5cb74d597fe7ae4827e",
+      "source_size": [
+        5,
+        182
+      ],
+      "output_size": [
+        5,
+        182
+      ]
+    },
+    {
+      "destination": "resources/textures/experience_bar_background.png",
+      "source": "textures/HUD/experience_bar_background.png",
+      "operation": "copy",
+      "source_sha256": "92f3f490455d7ad9e97654124dd9ab0d8cf4a7707a94315b1ee7108fc9ec1789",
+      "output_sha256": "92f3f490455d7ad9e97654124dd9ab0d8cf4a7707a94315b1ee7108fc9ec1789",
+      "source_size": [
+        5,
+        182
+      ],
+      "output_size": [
+        5,
+        182
+      ]
     }
   ],
   "unchanged_engine_ui": [

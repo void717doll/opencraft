@@ -26,6 +26,8 @@
  * =====================================================================================
  */
 #include "common/world/BlockSupport.hpp"
+#include "common/world/Experience.hpp"
+#include <random.hpp>
 #include "common/core/GameTime.hpp"
 #include "common/core/Registry.hpp"
 #include "common/core/Utils.hpp"
@@ -741,6 +743,15 @@ void ServerCommandHandler::setupCallbacks() {
 				return;
 			}
 			++player->statistics().items[blockState->block().stringID()].mined;
+			if (!player->isCreative()) {
+				ItemStack held;
+				if (player->heldItemSlot()>=0 && player->heldItemSlot()<player->inventory().width()) held=player->heldItemStack();
+				if (retro::canHarvest(*blockState,held.item())) {
+					u32 roll=effolkronium::random_static::get<u32>(0,1000000);
+					unsigned points=experience::oreReward(blockState->block().stringID(),roll);
+					if (points) { player->setScore(experience::add(player->score(),points)); sendPlayerScore(client.id); }
+				}
+			}
 			world.setBlock(x, y, z, 0);
 
 			if (!player->isCreative()) m_scriptEngine.luaCore().onEvent(LuaEventType::BlockDigged, glm::ivec3{x, y, z}, *blockState, *player, world, client, *this);

@@ -191,7 +191,7 @@ void decorateCherryTrees(ServerChunk &chunk, Heightmap &heightmap, s32 seed) {
 	for (int cy = cellAt(originY, 64) - 1; cy <= cellAt(originY + CHUNK_DEPTH - 1, 64) + 1; ++cy) {
 		for (int cx = cellAt(originX, 64) - 1; cx <= cellAt(originX + CHUNK_WIDTH - 1, 64) + 1; ++cx) {
 			auto hash = featureHash(seed, cx, cy, 0, 0x434845525259ULL);
-			if (hash % 4 != 0) continue;
+			if (hash % 512 != 0) continue;
 			int centerX = cx * 64 + 16 + int((hash >> 8) & 31);
 			int centerY = cy * 64 + 16 + int((hash >> 16) & 31);
 			for (int member = 0; member < 3; ++member) {

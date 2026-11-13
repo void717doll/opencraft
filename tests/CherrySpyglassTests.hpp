@@ -90,7 +90,7 @@ public:
 	void testCherryGrovesReplayAcrossChunkOrderWithoutChangingBaseTerrain() {
 		Registry registry; definitions(registry); PlayerList players;
 		Dimension dimension(0, "test:surface", "surface"); ServerWorld forward(players, dimension, 42), backward(players, dimension, 42);
-		const Vector2i groves[] = {{-167,-145},{-112,-147},{-110,-105},{-82,-36},{25,-17},{40,45},{-167,157},{-30,151},{94,170}};
+		const Vector2i groves[] = {{2984,-3549},{-1826,-1191},{-3298,814},{-3426,996},{-284,2286},{852,2479},{2274,2583},{-852,3793}};
 		retro::Climate climate(42); Vector2i chosen; bool found = false;
 		for (auto grove : groves) {
 			auto biome = climate.sample(grove.x,grove.y+3,1,1).biomes[0];

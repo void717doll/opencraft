@@ -14,6 +14,7 @@ choose survival to mine, craft, farm, and fight mobs, or creative to build with 
 - armor appears on the player model. leather adds fall protection, gold adds fire protection, and chainmail adds general damage protection.
 - material sounds cover footsteps, digging, breaking, placement, and item pickups.
 - pending block breaks stay removed until the server replies; older chunk snapshots no longer restore them. grass and ferns can be replaced while flowers and saplings keep their blocks.
+- the creative scrollbar follows mouse-wheel scrolling and search resets, with dragging clamped to its track.
 
 ## additions
 
@@ -26,8 +27,9 @@ choose survival to mine, craft, farm, and fight mobs, or creative to build with 
 - ocelots and bats, working buckets, beds, clocks, minecarts, powered rails, and detector rails.
 - dungeon rooms with loot chests and mob spawners, plus jukeboxes with eight mineclonia music tracks.
 - ravines, abandoned mineshafts, coral reefs, nether brick ruins, and birch, spruce, jungle, acacia, and dark oak trees.
-- jungle, acacia savanna, birch forest, dark forest, and cherry grove regions over the existing beta terrain.
+- jungle, acacia savanna, birch forest, dark forest, and very rare cherry grove regions over the existing beta terrain.
 - natural amethyst patches, growing buds and clusters, collectible shards, and craftable amethyst blocks.
+- matching wood and amethyst slabs and stairs, plus experience levels earned from survival kills and ore mining.
 - connected beta-style ore pockets, including larger coal veins and underground dirt and gravel. copper remains more common than iron.
 - rare named cave monsters, mossy underground ruins, and treasure notes leading to buried caches. caches contain supplies and can hold rare discs or worn equipment. right-click a note to read its coordinates; earlier notes keep their ruin destinations. new ore pockets, ruins, and caches appear in newly generated terrain.
 - climbing rope that lowers in eight-block batches, up to 32 blocks per hanging line.

@@ -22,7 +22,7 @@ function show_creative_inventory(key_id, client)
 		texture = mod:path() .. "/textures/gui/tabs.png",
 		clip = {x = 232, y = 0, width = 12, height = 15},
 		clip_selected = {x = 244, y = 0, width = 12, height = 15},
-		widget = "inv_catalog", min_y = 0, max_y = 95,
+		widget = "inv_catalog", min_y = 0, max_y = 75,
 	}
 	gui:inventory {
 		name = "inv_hotbar", pos = {x = 8, y = 111},

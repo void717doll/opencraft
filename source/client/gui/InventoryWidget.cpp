@@ -49,13 +49,13 @@ void InventoryWidget::init(Inventory &inventory, u16 offset, u16 size) {
 
 void InventoryWidget::scroll(float scrolling) {
 	m_scrolling = std::clamp(scrolling, 0.f, 1.f);
-	scrolling = m_scrolling;
 	if (m_itemWidgets.size() < m_size)
 		return;
 
 	int rows = (m_searchResultCount + m_inventoryWidth - 1) / m_inventoryWidth;
 	int extraRows = std::max(0, rows - int(m_size / m_inventoryWidth));
-	u16 offset = u16(m_offset + std::round(extraRows * scrolling) * m_inventoryWidth);
+	if (!extraRows) m_scrolling = 0;
+	u16 offset = u16(m_offset + std::round(extraRows * m_scrolling) * m_inventoryWidth);
 	updateItemWidgets(offset, m_size, m_lastSearch);
 }
 

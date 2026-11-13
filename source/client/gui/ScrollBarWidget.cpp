@@ -49,14 +49,14 @@ void ScrollBarWidget::onEvent(const SDL_Event &event) {
 		if (isPointInWidget(event.button.x, event.button.y)) {
 			m_isDragging = true;
 
-			updateScrolling((u16)event.button.y);
+			updateScrolling(event.button.y);
 		}
 	}
 	else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
 		m_isDragging = false;
 	}
 	else if (event.type == SDL_MOUSEMOTION && m_isDragging) {
-		updateScrolling((u16)event.motion.y);
+		updateScrolling(event.motion.y);
 	}
 }
 
@@ -66,11 +66,17 @@ void ScrollBarWidget::draw(RenderTarget &target, RenderStates states) const {
 	target.draw(m_image, states);
 }
 
-void ScrollBarWidget::updateScrolling(u16 y) {
-	float imageY = floorf(y - getPosition().y * Config::guiScale - m_parent->getPosition().y);
-	m_image.setPosition(0, glm::clamp<float>(imageY / Config::guiScale - m_barHeight / 2, (float)m_minY, (float)m_maxY));
+void ScrollBarWidget::update() {
+	if (!m_widget) return;
+	float position=m_minY+m_widget->scrolling()*(m_maxY-m_minY);
+	if (m_image.getPosition().y!=position) m_image.setPosition(0,position);
+}
 
-	m_scrolling = m_image.getPosition().y / (m_maxY - m_minY);
-
-	m_widget->scroll(m_scrolling);
+void ScrollBarWidget::updateScrolling(int y) {
+	const auto bounds=getGlobalBounds();
+	float localY=(float(y)-bounds.y)*float(m_height)/bounds.sizeY;
+	float range=float(m_maxY-m_minY);
+	float fraction=range>0 ? (localY-m_barHeight/2.f-m_minY)/range : 0;
+	m_widget->scroll(fraction);
+	update();
 }

@@ -66,6 +66,9 @@ class BetaMobTests : public CxxTest::TestSuite {
 			TS_ASSERT(packet); TS_ASSERT(command == Network::Command::EntityHurt);
 			TS_ASSERT(id == target); TS_ASSERT_EQUALS(damage, 1);
 			TS_ASSERT_EQUALS(x, 10); TS_ASSERT_EQUALS(y, 8); TS_ASSERT_DELTA(z, 2.8, 0.0001);
+			TS_ASSERT_EQUALS(player->score(),5);
+			TS_ASSERT(session->receiveOnClient(packet)); s32 experiencePoints=0; packet >> command >> experiencePoints;
+			TS_ASSERT(command==Network::Command::PlayerScore); TS_ASSERT_EQUALS(experiencePoints,5);
 			TS_ASSERT(world.attackMob(*player));
 			TS_ASSERT(!session->receiveOnClient(packet));
 			player->setHealth(0); TS_ASSERT(!world.attackMob(*player));

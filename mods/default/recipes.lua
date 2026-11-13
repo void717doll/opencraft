@@ -642,7 +642,7 @@ mod:crafting_recipe {
 	pattern = {
 		"###",
 	},
-	keys = {["#"] = "group:default_planks"}
+	keys = {["#"] = "default:oak_planks"}
 }
 
 -- Bread

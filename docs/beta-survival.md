@@ -41,7 +41,7 @@ undamaged stacks retain their original serialized bytes. a damaged stack writes 
 
 death drops the inventory once and leaves health at zero. the death screen shows `you died!`, the score, and respawn/title-menu buttons. respawning returns to the overworld with full health and a new life score. dead players cannot move, attack, or collect drops. closing an inventory returns carried items and temporary crafting ingredients; overflow and items carried at death drop into the world. player-owned items bypass the ambient-loot cap so the cap cannot silently destroy them.
 
-the score appears at the top left as a white label and yellow value, and the death screen shows the same value. beta `EntityPlayer` starts at zero; all bundled `EntityLiving` subclasses keep `scoreValue = 0`, so the reference does not award nonzero points for mining, pickups, or ordinary mob kills. the counter follows that behavior. an optional `SCOR` save trailer preserves the current value; older saves start at zero.
+experience appears as a green bar and level above the survival hotbar. the death screen shows the raw points total. the existing `SCOR` save trailer preserves points; older saves start at zero. survival kills and qualifying ores award points using the modernmcp level progression described below.
 
 the pause menu stops world ticks and player movement. inventory and death screens leave the world running, matching the beta screen behavior. movement positions are sent after each physics tick: combining several ticks into one displacement could make the server reject valid paths off ledges and around corners.
 
@@ -136,3 +136,15 @@ amethyst patches occur on existing cave surfaces between y=8 and y=48. budding a
 grass, ferns, flowers, and saplings allow walking through them. grass and ferns can be replaced by placed blocks; flowers, saplings, and amethyst are preserved until removed. soil plants drop when their ground is removed or replaced with unsuitable support. flowing water washes ordinary plants away with their drops and leaves amethyst in place.
 
 block breaking keeps a local removal pending until the authoritative block update arrives. queued snapshots cannot restore that block during the wait; a rejected break restores the actual block. identical snapshots skip remeshing, and server movement validation now retains the grounded step path used by the client.
+
+## building shapes and experience
+
+birch, spruce, cherry, jungle, acacia, and dark oak planks make their own slabs and stairs. amethyst blocks have matching shapes too. three blocks in a row make three slabs; six blocks in either stair pattern make four stairs. matching slabs merge and drop two halves; stairs follow the existing beta rule and drop their parent block. wood shapes use axes and burn as fuel, while amethyst shapes use pickaxes. oak recipes now require oak planks.
+
+wild cherry patches are 128 times less frequent than before, and cherry groves require an extreme regional-noise value. trees inside those groves are ten times less dense. planted saplings and bone meal keep their normal growth. the change affects newly generated terrain.
+
+the previous points counter now feeds an experience bar and level number above the survival hotbar. modernmcp's level costs are used: 17 points per early level, increasing after level 15 and again after level 30. survival mob kills and properly harvested coal, diamond, redstone, lapis, and quartz ores grant experience. animals give 1–3 points, ordinary hostile mobs give 5, and slimes use their size. bats and snow golems give none. creative actions give none.
+
+experience is credited directly, without floating orbs. existing saved points carry over as the experience total; death resets it on respawn. smelting, breeding, fishing rewards, enchanting, and experience spending are not included.
+
+the creative scrollbar reads the same scroll position as its item grid. wheel scrolling moves the thumb, search resets it, and dragging stays inside the visible track.

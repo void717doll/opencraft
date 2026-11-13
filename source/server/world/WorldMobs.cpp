@@ -1,4 +1,5 @@
 #include <cmath>
+#include "common/world/Experience.hpp"
 #include <random>
 #include <unordered_set>
 
@@ -1265,11 +1266,21 @@ bool ServerWorld::attackMob(ServerPlayer &player) {
 	u16 dealt = std::min(damage, mob.health);
 	mob.health -= dealt;
 	player.statistics().general[PlayerStatistics::DamageDealt] += dealt;
-	if (dealt && !mob.health) ++player.statistics().general[PlayerStatistics::MobKills];
+	unsigned experiencePoints=0;
+	if (dealt && !mob.health) {
+		++player.statistics().general[PlayerStatistics::MobKills];
+		if (!player.isCreative() && traits.kind!=Kind::Bat && traits.kind!=Kind::SnowGolem) {
+			// xp must not advance the mob's loot stream.
+			experiencePoints=traits.kind==Kind::Slime ? std::max<unsigned>(1,traits.size)
+				: mob.hostile || traits.kind==Kind::PigZombie ? 5 : 1+(mob.randomState>>8)%3;
+			player.setScore(experience::add(player.score(),experiencePoints));
+		}
+	}
 	if (dealt && m_server) {
 		const auto &box = registry.get<DoubleBox>(selected);
 		m_server->sendEntityHurt(selected, dealt, position.x, position.y, position.z + box.sizeZ);
 	}
+	if (experiencePoints && m_server) m_server->sendPlayerScore(player.clientID());
 
 	return true;
 }

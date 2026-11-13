@@ -64,9 +64,15 @@ inline float breakTime(const BlockState &state, const Item &item) {
 			|| id == "default:birch_planks" || id == "default:birch_wood"
 			|| id == "default:spruce_planks" || id == "default:spruce_wood"
 			|| id == "default:cherry_planks" || id == "default:cherry_wood"
-			|| id == "default:bookshelf" || id == "default:chest";
+			|| id == "default:jungle_planks" || id == "default:jungle_wood"
+			|| id == "default:acacia_planks" || id == "default:acacia_wood"
+			|| id == "default:dark_oak_planks" || id == "default:dark_oak_wood"
+			|| id == "default:bookshelf" || id == "default:chest"
+			|| (state.block().hasGroup("group:om_material_wood")
+			 && (state.block().hasGroup("group:om_slab") || state.block().hasGroup("group:om_stairs")));
 		if (kind == 2) {
-			effective = state.block().hasGroup("group:om_slab");
+			effective = !state.block().hasGroup("group:om_material_wood")
+				&& (state.block().hasGroup("group:om_slab") || state.block().hasGroup("group:om_stairs"));
 			for (const char *block : {"cobblestone", "cobblestone_mossy", "stone", "sandstone", "iron_ore",
 				"iron_block", "copper_ore", "tin_ore", "coal_ore", "gold_block", "gold_ore", "diamond_ore", "diamond_block", "ice",
 				"netherrack", "lapis_ore", "lapis_block", "stone_slab", "double_stone_slab"})

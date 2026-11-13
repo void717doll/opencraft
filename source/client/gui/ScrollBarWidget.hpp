@@ -37,11 +37,12 @@ class ScrollBarWidget : public Widget {
 		void init(const Texture &texture, const FloatRect &clipRect, u16 minY, u16 maxY, InventoryWidget &widget);
 
 		void onEvent(const SDL_Event &event) override;
+		void update() override;
 
 	private:
 		void draw(RenderTarget &target, RenderStates states) const override;
 
-		void updateScrolling(u16 y);
+		void updateScrolling(int y);
 
 		Image m_image;
 
@@ -54,7 +55,6 @@ class ScrollBarWidget : public Widget {
 
 		bool m_isDragging = false;
 
-		float m_scrolling = 0;
 
 		const u16 m_barWidth = 12;
 		const u16 m_barHeight = 15;
