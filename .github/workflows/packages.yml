@@ -150,7 +150,7 @@ jobs:
             -d "$app/Contents/Frameworks" -p '@executable_path/../Frameworks/'
           codesign --force --deep --sign - "$app"
           codesign --verify --deep --strict "$app"
-          lipo -verify_arch "$ARCH" "$app/Contents/MacOS/opencraft-bin"
+          lipo "$app/Contents/MacOS/opencraft-bin" -verify_arch "$ARCH"
           ln -s /Applications build/mac/Applications
           hdiutil create -volname OpenCraft -srcfolder build/mac -ov -format UDZO "dist/opencraft-$VERSION-macos-$ARCH.dmg"
 
