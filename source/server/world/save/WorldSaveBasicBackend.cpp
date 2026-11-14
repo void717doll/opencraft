@@ -81,6 +81,7 @@ sf::Packet saveChunk(const ServerChunk &chunk) {
 }
 
 void loadChunk(sf::Packet &packet, ServerChunk &chunk, Overflow &overflow) {
+	chunk.clearBlockData();
 	u8 version = 0;
 	u16 size = 0;
 	packet >> version >> size;
@@ -122,8 +123,9 @@ void loadChunk(sf::Packet &packet, ServerChunk &chunk, Overflow &overflow) {
 void WorldSaveBasicBackend::load(const std::string &name) {
 	logInfo() << ("Loading '" + name + "'...").c_str();
 
+	for (auto &world : m_worldList) world.setChunkStorage({},{});
 	const std::string path = worldFiles::readable(name).string();
-	if (!fs::exists(path)) return;
+	if (!fs::exists(path)) { this->save(name); return; }
 	std::unique_ptr<ChunkDatabase> database;
 	Network::Packet save;
 	if (ChunkDatabase::isDatabase(path)) {
@@ -148,11 +150,17 @@ void WorldSaveBasicBackend::load(const std::string &name) {
 
 			if (!save || chunkCount > 1000000) throw std::runtime_error("invalid world header");
 			world.setSeed(seed);
-			if (database) database->readChunks(world.dimension().id(), [&](int x, int y, int z, sf::Packet &packet) {
-				auto &chunk = world.getOrCreateChunk(x, y, z);
-				loadChunk(packet, chunk, overflow);
-				world.blockPhysics().seedChunk(chunk);
-			});
+			if (database) {
+				// reload resident chunks when restoring into an existing world; unopened chunks stay on disk.
+				for (const auto &entry : world.chunks()) {
+					auto &chunk=*entry.second;
+					if (!chunk.isInitialized()) continue;
+					sf::Packet packet;
+					if (database->readChunk(world.dimension().id(),chunk.x(),chunk.y(),chunk.z(),packet)) {
+						loadChunk(packet,chunk,overflow); world.blockPhysics().seedChunk(chunk);
+					}
+				}
+			}
 
 			// logInfo() << "Loading dimension" << world.dimension().id() << "| Chunk count:" << chunkCount;
 
@@ -308,6 +316,29 @@ void WorldSaveBasicBackend::load(const std::string &name) {
 	}
 
 	m_savedPath = database ? path : "";
+	if (database) attachChunkStorage(path);
+	else this->save(name);
+}
+
+void WorldSaveBasicBackend::attachChunkStorage(const std::string &path) {
+	auto database = std::make_shared<ChunkDatabase>(path, false);
+	for (auto &world : m_worldList) {
+		u16 dimension = world.dimension().id();
+		world.setChunkStorage([database, dimension, &world](ServerChunk &chunk) {
+			sf::Packet packet;
+			if (!database->readChunk(dimension, chunk.x(), chunk.y(), chunk.z(), packet)) return false;
+			std::vector<std::pair<Vector3d, ItemStack>> overflow;
+			loadChunk(packet, chunk, overflow);
+			for (const auto &entry : overflow) world.dropWorldItem(entry.first, entry.second.stringID(), entry.second.amount(), entry.second.damage(), false);
+			return true;
+		}, [database, dimension](ServerChunk &chunk) {
+			if (!chunk.hasBeenModified()) return;
+			// inventory callbacks may change metadata without setting the block dirty.
+			if (!chunk.needsSave() && !chunk.hasBlockMetadata()) return;
+			database->writeChunk(dimension, chunk.x(), chunk.y(), chunk.z(), saveChunk(chunk));
+			chunk.setSaved();
+		});
+	}
 }
 
 void WorldSaveBasicBackend::save(const std::string &name) {
@@ -387,6 +418,7 @@ void WorldSaveBasicBackend::save(const std::string &name) {
 	}
 	for (auto *chunk : written) chunk->setSaved();
 	m_savedPath = path;
+	attachChunkStorage(path);
 
 	// logInfo() << "Saving done.";
 }

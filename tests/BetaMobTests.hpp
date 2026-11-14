@@ -51,7 +51,7 @@ class BetaMobTests : public CxxTest::TestSuite {
 			Server server; server.init(); auto session = Network::LocalSession::connect();
 			ClientInfo client{1, session}; auto *player = players.connectPlayer("tester", client);
 			TS_ASSERT(player); if (!player) return;
-			player->setPosition(8, 8, 1); player->setRotation(0, 0);
+			player->setReady(true); player->setPosition(8, 8, 1); player->setRotation(0, 0);
 			ServerCommandHandler commands(scripts, server, worlds, players, definitions);
 			auto &world = worlds.getWorld(0); world.setServer(&commands); prepareFloor(world);
 			TS_ASSERT(world.spawnMob("default:zombie", 10, 8, 1));

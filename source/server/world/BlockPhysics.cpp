@@ -110,7 +110,10 @@ void BlockPhysics::updateLeaves(const Vector3i &position) {
 	for (int z : {-5,5}) for (int y : {-5,5}) for (int x : {-5,5}) {
 		Vector3i corner = position + Vector3i{x,y,z};
 		corner.z = std::clamp(corner.z, worldBounds::minHeight, worldBounds::height-1);
-		if (!loaded(corner)) { enqueue(position); return; }
+		if (!loaded(corner)) {
+			m_waitingLeaves[{(corner.x & -CHUNK_WIDTH)/CHUNK_WIDTH, (corner.y & -CHUNK_DEPTH)/CHUNK_DEPTH, (corner.z & -CHUNK_HEIGHT)/CHUNK_HEIGHT}].emplace(position);
+			return;
+		}
 	}
 	std::vector<Vector3i> frontier{position};
 	std::array<bool,729> visited{};
@@ -162,6 +165,11 @@ void BlockPhysics::seedNode(const Vector3i &position) {
 
 void BlockPhysics::seedChunk(ServerChunk &chunk) {
 	if (!chunk.isInitialized()) return;
+	auto waiting = m_waitingLeaves.find({chunk.x(), chunk.y(), chunk.z()});
+	if (waiting != m_waitingLeaves.end()) {
+		for (const auto &position : waiting->second) enqueue(position);
+		m_waitingLeaves.erase(waiting);
+	}
 	const auto &blocks = Registry::getInstance().blocks();
 	std::vector<bool> active(blocks.size());
 	for (const auto &entry : blocks) {
@@ -187,6 +195,23 @@ void BlockPhysics::seedChunk(ServerChunk &chunk) {
 				if (z == CHUNK_HEIGHT - 1) seed(x, y, z + 1);
 			}
 		}
+	}
+}
+
+void BlockPhysics::forgetChunk(const Vector3i &position) {
+	auto belongs = [&](const Vector3i &point) {
+		return Vector3i{(point.x & -CHUNK_WIDTH)/CHUNK_WIDTH, (point.y & -CHUNK_DEPTH)/CHUNK_DEPTH,
+			(point.z & -CHUNK_HEIGHT)/CHUNK_HEIGHT} == position;
+	};
+	m_queue.erase(std::remove_if(m_queue.begin(),m_queue.end(),[&](const Vector3i &point) {
+		if (!belongs(point)) return false;
+		m_pending.erase(point); return true;
+	}),m_queue.end());
+	for (auto entry=m_waitingLeaves.begin(); entry!=m_waitingLeaves.end();) {
+		for (auto leaf=entry->second.begin(); leaf!=entry->second.end();) {
+			if (belongs(*leaf)) leaf=entry->second.erase(leaf); else ++leaf;
+		}
+		if (entry->second.empty()) entry=m_waitingLeaves.erase(entry); else ++entry;
 	}
 }
 
@@ -321,7 +346,7 @@ void BlockPhysics::updateFalling() {
 		finished.push_back(entity);
 	});
 	for (auto entity : finished) {
-		if (m_world.server()) m_world.server()->sendEntityDespawn(entity);
+		if (m_world.server()) m_world.server()->sendEntityDespawn(entity, m_world.dimension().id());
 		registry.destroy(entity);
 	}
 }

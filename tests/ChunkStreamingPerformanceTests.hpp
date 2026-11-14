@@ -94,5 +94,65 @@ public:
 		TS_ASSERT(metadata.count({-31, 50, -29})); TS_ASSERT(metadata.count({-17, 62, -1}));
 		TS_ASSERT(metadata == inventories);
 	}
+	void testSingleCellChangesUseADeltaAndResubscriptionUsesAFullSnapshot() {
+		Registry definitions; Registry::setInstance(definitions);
+		definitions.registerBlock<ServerBlock>(BLOCK_AIR); definitions.registerItem<Item>({},BLOCK_AIR,"air");
+		ScriptEngine scripts; PlayerList players; Dimension dimension{0,"test:world","world"};
+		ServerWorld world(players,dimension,42); WorldController worlds(definitions); Server server;
+		ServerCommandHandler commands(scripts,server,worlds,players,definitions); world.setServer(&commands);
+		auto session=Network::LocalSession::create(); ClientInfo client{0,session};
+		auto &chunk=world.getOrCreateChunk(0,0,0); chunk.setInitialized(true);
+		chunk.sendData(client); Network::Packet packet; TS_ASSERT(session->receiveOnClient(packet));
+		chunk.setDataRaw(2,3,4,0x12340000); chunk.lightmap().setLightDataRaw(2,3,4,0x5a);
+		chunk.sendChanges(client); TS_ASSERT(session->receiveOnClient(packet));
+		TS_ASSERT_EQUALS(packet.getDataSize(),23u);
+		Network::Command command; s32 x,y,z; u16 count,index; u32 block; u8 light;
+		packet >> command >> x >> y >> z >> count >> index >> block >> light;
+		TS_ASSERT(command==Network::Command::ChunkDelta); TS_ASSERT_EQUALS(count,1);
+		TS_ASSERT_EQUALS(index,(4*16+3)*16+2); TS_ASSERT_EQUALS(block,0x12340000u); TS_ASSERT_EQUALS(light,0x5a);
+		chunk.sendChanges(client); TS_ASSERT(!session->receiveOnClient(packet));
+		chunk.setReadyToSend(); chunk.sendChanges(client); TS_ASSERT(session->receiveOnClient(packet));
+		packet >> command; TS_ASSERT(command==Network::Command::ChunkData);
+	}
+
+	void testEvictionAndLazyReloadPreserveBlocksAndContainerMetadata() {
+		namespace fs=std::filesystem;
+		struct Restore { fs::path original=fs::current_path(); ~Restore() { fs::current_path(original); } } restore;
+		auto directory=fs::temp_directory_path()/("opencraft-residency-"+std::to_string(getpid()));
+		fs::create_directories(directory); fs::current_path(directory);
+		Registry definitions; Registry::setInstance(definitions);
+		definitions.registerBlock<ServerBlock>(BLOCK_AIR).getState(0).isOpaque(false);
+		definitions.registerItem<Item>({},BLOCK_AIR,"air");
+		u16 stone=definitions.registerBlock<ServerBlock>("test:stone").id();
+		PlayerList players; Dimension dimension{0,"test:world","world"}; std::deque<ServerWorld> worlds;
+		worlds.emplace_back(players,dimension,42); auto &world=worlds.front();
+		auto &chunk=world.getOrCreateChunk(-40,30,1); chunk.setInitialized(true); chunk.setBlockRaw(1,2,3,stone); chunk.setModified(true);
+		chunk.addBlockData(1,2,3,9,3)->meta.setInt("marker",17);
+		WorldSaveBasicBackend backend(worlds,players); backend.save("residency");
+		chunk.getBlockData(1,2,3)->meta.setInt("marker",29);
+		for(unsigned i=0;i<30;++i) world.evictDistantChunks();
+		TS_ASSERT(!world.getChunk(-40,30,1));
+		auto &reloaded=world.getOrCreateChunk(-40,30,1); TS_ASSERT(!reloaded.isInitialized()); world.generateChunk(reloaded);
+		TS_ASSERT_EQUALS(reloaded.getBlock(1,2,3),stone);
+		TS_ASSERT(reloaded.getBlockData(1,2,3));
+		if(reloaded.getBlockData(1,2,3)) TS_ASSERT_EQUALS(reloaded.getBlockData(1,2,3)->meta.get<int>("marker"),29);
+		std::deque<ServerWorld> reopened; reopened.emplace_back(players,dimension,42);
+		WorldSaveBasicBackend reader(reopened,players); reader.load("residency");
+		TS_ASSERT_EQUALS(reopened.front().chunks().size(),0u);
+		auto &saved=reopened.front().getOrCreateChunk(-40,30,1); reopened.front().generateChunk(saved);
+		TS_ASSERT_EQUALS(saved.getBlock(1,2,3),stone); TS_ASSERT_EQUALS(saved.getBlockData(1,2,3)->meta.get<int>("marker"),29);
+	}
+
+	void testVerticalTravelReleasesDistantChunksInTheSameColumn() {
+		Registry definitions; Registry::setInstance(definitions);
+		definitions.registerBlock<ServerBlock>(BLOCK_AIR); definitions.registerItem<Item>({},BLOCK_AIR,"air");
+		PlayerList players; auto session=Network::LocalSession::create(); ClientInfo client{0,session};
+		auto *player=players.connectPlayer("tester",client); player->setPosition(1,1,1); player->setReady(true);
+		Dimension dimension{0,"test:world","world"}; ServerWorld world(players,dimension,42);
+		world.getOrCreateChunk(0,0,0).setInitialized(true); world.getOrCreateChunk(0,0,100).setInitialized(true);
+		unsigned saved=0; world.setChunkStorage({},[&](ServerChunk &) { ++saved; }); world.evictDistantChunks();
+		TS_ASSERT(world.getChunk(0,0,0)); TS_ASSERT(!world.getChunk(0,0,100)); TS_ASSERT_EQUALS(saved,1u);
+	}
+
 };
 #endif // CHUNKSTREAMINGPERFORMANCETESTS_HPP_

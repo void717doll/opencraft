@@ -98,7 +98,8 @@ struct ChunkMeshBuildingJob {
 	const TextureAtlas *textureAtlas;
 
 	u64 totalVertexCount = 0;
-	u64 revision = 0;
+	u64 generation = 0;
+	bool urgent = false;
 };
 
 #endif // CHUNKMESHBUILDINGJOB_HPP_

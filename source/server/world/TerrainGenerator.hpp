@@ -47,13 +47,14 @@ class TerrainGenerator {
 		TerrainGenerator(Heightmap &heightmap, const Dimension &dimension, s32 seed);
 
 		void generate(ServerChunk &chunk);
+		bool generateStep(ServerChunk &chunk, unsigned step);
 
 		void setSeed(s32 seed) { m_seed = seed; m_biomeSampler.setSeed(seed); }
 		u16 generationRevision() const { return m_generationRevision; }
 		void setGenerationRevision(u16 revision) { m_generationRevision = revision; }
 
 	private:
-		void fastNoiseGeneration(ServerChunk &chunk);
+		void fastNoiseGeneration(ServerChunk &chunk, int row = -1);
 
 		bool tryPlaceTree(ServerChunk &chunk, int x, int y, int z, const Biome &biome, Random_t &rand) const;
 		bool tryPlaceFlora(ServerChunk &chunk, int x, int y, int z, const Biome &biome, Random_t &rand) const;

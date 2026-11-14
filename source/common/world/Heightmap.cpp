@@ -149,6 +149,15 @@ int Heightmap::getHighestChunkAt(s32 blockX, s32 blockY) {
 	return (getHighestBlockAt(blockX, blockY) & -CHUNK_HEIGHT) / CHUNK_HEIGHT;
 }
 
+void Heightmap::retainChunks(const std::unordered_set<Vector2i> &columns) {
+	for (auto it=m_chunks.begin(); it!=m_chunks.end();) {
+		if (!columns.count(it->first)) it=m_chunks.erase(it); else ++it;
+	}
+	for (auto it=m_netherGlowstone.begin(); it!=m_netherGlowstone.end();) {
+		if (!columns.count(it->first)) it=m_netherGlowstone.erase(it); else ++it;
+	}
+}
+
 void Heightmap::setSeed(s32 seed) {
 	m_chunks.clear();
 	m_netherGlowstone.clear();

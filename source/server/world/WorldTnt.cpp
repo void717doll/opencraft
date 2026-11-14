@@ -58,7 +58,7 @@ void ServerWorld::updateTnt() {
 		const auto effect = registry.get<TntComponent>(entity);
 		const auto position = registry.get<PositionComponent>(entity);
 		Vector3d point{position.x, position.y, position.z};
-		if (m_server) m_server->sendEntityDespawn(entity);
+		if (m_server) m_server->sendEntityDespawn(entity, m_dimension.id());
 		registry.destroy(entity);
 		explodeAt(point, 4, effect.seed, "tnt");
 	}

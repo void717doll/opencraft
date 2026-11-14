@@ -31,11 +31,11 @@
 #include "common/core/GameTime.hpp"
 #include "common/world/Sky.hpp"
 
-u64 GameTime::s_ticks = 0;
-u16 GameTime::s_ticksPerSecond = 0;
+std::atomic<u64> GameTime::s_ticks{0};
+std::atomic<u16> GameTime::s_ticksPerSecond{0};
 
 float GameTime::getCurrentTime(float offset, float speed) {
-	return float(fmod(double(s_ticks + dayStartOffset) * daySpeed * speed + offset, dayLength)) / dayLength;
+	return float(fmod(double(getTicks() + dayStartOffset) * daySpeed * speed + offset, dayLength)) / dayLength;
 }
 
 float GameTime::getSunlightIntensityFromTime(float time) {

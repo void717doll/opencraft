@@ -115,6 +115,50 @@ class LocalSessionTests : public CxxTest::TestSuite {
 			TS_ASSERT(!newSession->receiveOnServer(packet));
 			TS_ASSERT_EQUALS(Network::LocalSession::connect(), newSession);
 		}
+	void testMovementCoalescesButDoesNotCrossLifecycleEvents() {
+		auto session=Network::LocalSession::create();
+		auto movement=[&](u32 value) { Network::Packet packet; packet << Network::Command::EntityPosition << u32(7) << value; session->sendToClient(packet); };
+		movement(1); movement(2);
+		Network::Packet event; event << Network::Command::EntityDespawn << u32(7); session->sendToClient(event);
+		movement(3); movement(4);
+		Network::Packet packet; Network::Command command; u32 id,value;
+		TS_ASSERT(session->receiveOnClient(packet)); packet >> command >> id >> value; TS_ASSERT_EQUALS(value,2u);
+		TS_ASSERT(session->receiveOnClient(packet)); packet >> command >> id; TS_ASSERT(command==Network::Command::EntityDespawn);
+		TS_ASSERT(session->receiveOnClient(packet)); packet >> command >> id >> value; TS_ASSERT_EQUALS(value,4u);
+		TS_ASSERT(!session->receiveOnClient(packet));
+	}
+
+	void testClosingWakesABlockedReliableProducer() {
+		auto session=Network::LocalSession::create();
+		Network::Packet packet; packet << Network::Command::WorldSound << u32(7);
+		for (unsigned i=0; i<4096; ++i) TS_ASSERT(session->sendToClient(packet));
+		std::atomic<bool> started{false}; bool sent=true;
+		std::thread producer([&] { started=true; sent=session->sendToClient(packet); });
+		while (!started) std::this_thread::yield();
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		session->close(); producer.join();
+		TS_ASSERT(!sent);
+	}
+
+	void testDisconnectWakesAFullQueueAndStillDeliversTheSaveAcknowledgement() {
+		auto session=Network::LocalSession::create();
+		Network::Packet packet; packet << Network::Command::WorldSound << u32(7);
+		for (unsigned i=0; i<4096; ++i) TS_ASSERT(session->sendToClient(packet));
+		std::atomic<bool> started{false}; bool sent=true;
+		std::thread server([&] {
+			started=true; sent=session->sendToClient(packet);
+			Network::Packet acknowledgement; acknowledgement << Network::Command::ServerClosed;
+			session->sendToClient(acknowledgement); session->close();
+		});
+		while (!started) std::this_thread::yield();
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		Network::Packet disconnect; disconnect << Network::Command::ClientDisconnect;
+		TS_ASSERT(session->sendToServer(disconnect)); server.join(); TS_ASSERT(!sent);
+		unsigned count=0; Network::Command last;
+		while (session->receiveOnClient(packet)) { packet >> last; ++count; }
+		TS_ASSERT_EQUALS(count,4097u); TS_ASSERT(last==Network::Command::ServerClosed);
+	}
+
 };
 
 #endif // LOCALSESSIONTESTS_HPP_

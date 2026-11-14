@@ -28,6 +28,7 @@
 #define SERVERWORLD_HPP_
 
 #include <deque>
+#include <functional>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -119,7 +120,12 @@ class ServerWorld : public World {
 		Chunk *getChunk(int cx, int cy, int cz) const override;
 
 		bool generateChunk(ServerChunk &chunk);
+		bool generateChunkStep(ServerChunk &chunk);
 		void initializeChunkLighting(ServerChunk &chunk);
+		void setChunkStorage(std::function<bool(ServerChunk &)> load, std::function<void(ServerChunk &)> save) {
+			m_loadChunk = std::move(load); m_saveChunk = std::move(save);
+		}
+		void evictDistantChunks();
 		void tickActiveChunks();
 
 		const PlayerList &players() const { return m_players; }
@@ -160,6 +166,10 @@ class ServerWorld : public World {
 		const Dimension &m_dimension;
 
 		ChunkMap m_chunks;
+		std::function<bool(ServerChunk &)> m_loadChunk;
+		std::function<void(ServerChunk &)> m_saveChunk;
+		u16 m_evictionTicks = 0;
+		std::unordered_map<Vector3i,unsigned> m_generationStages;
 		std::unordered_map<Vector2i, std::vector<ServerChunk *>> m_chunkColumns;
 
 		Heightmap m_heightmap;

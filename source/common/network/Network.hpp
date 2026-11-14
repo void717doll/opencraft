@@ -45,6 +45,7 @@ namespace Network {
 
 		ChunkData             = 0x20,
 		ChunkUnload           = 0x21,
+		ChunkDelta            = 0x22,
 
 		PlayerPlaceBlock      = 0x30,
 		PlayerDigBlock        = 0x31,

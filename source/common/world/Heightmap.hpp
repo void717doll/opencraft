@@ -29,6 +29,7 @@
 
 #include <cstring>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "common/world/RetroTerrain.hpp"
@@ -85,6 +86,7 @@ class Heightmap {
 		int getHighestChunkAt(s32 blockX, s32 blockY);
 
 		void setSeed(s32 seed);
+		void retainChunks(const std::unordered_set<Vector2i> &columns);
 
 		const retro::Terrain &terrain() const { return m_terrain; }
 		const retro::NetherTerrain &netherTerrain() const { return m_netherTerrain; }

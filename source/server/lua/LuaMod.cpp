@@ -102,7 +102,7 @@ void LuaMod::despawnEntity(EntityWrapper &entity) {
 	PositionComponent *position = entity.getPositionComponent();
 	NetworkComponent *network = entity.getNetworkComponent();
 	if (position && network) {
-		m_worldController.server()->sendEntityDespawn(network->entityID);
+		m_worldController.server()->sendEntityDespawn(network->entityID, position->dimension);
 		m_worldController.getWorld(position->dimension).scene().registry().destroy(entity.id());
 	}
 	else

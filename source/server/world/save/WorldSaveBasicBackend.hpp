@@ -48,6 +48,7 @@ class WorldSaveBasicBackend : public WorldSaveBackend {
 		void save(const std::string &worldName) override;
 
 	private:
+		void attachChunkStorage(const std::string &path);
 		void loadEntities(sf::Packet &save, ServerWorld &world);
 		void saveEntities(sf::Packet &save, ServerWorld &world);
 

@@ -485,6 +485,12 @@ class WorldItemTests : public CxxTest::TestSuite {
 				TS_ASSERT_EQUALS(body.pickupDelay, 0);
 				TS_ASSERT_DELTA(body.velocity.z, 0, 0.001);
 			});
+			TS_ASSERT(world.dropWorldItem({8,8,2},"test:stone",99));
+			TS_ASSERT(world.dropWorldItem({8,8,2},"test:stone",99));
+			world.updateItems();
+			TS_ASSERT_EQUALS(registry.view<ItemStack>().size(),3u);
+			unsigned total=0; registry.view<ItemStack>().each([&](const auto &stack) { total+=stack.amount(); });
+			TS_ASSERT_EQUALS(total,238u);
 			TS_ASSERT(world.dropWorldItem({200, 200, 5}, "test:stone", 1));
 			world.updateItems();
 			registry.view<ItemStack, PositionComponent>().each([&](auto entity, auto &, auto &position) {

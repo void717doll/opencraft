@@ -94,6 +94,15 @@ void ChunkDatabase::writeChunk(u16 dimension, int x, int y, int z, const sf::Pac
 	statement.step();
 }
 
+bool ChunkDatabase::readChunk(u16 dimension, int x, int y, int z, sf::Packet &packet) {
+	Statement statement(m_database, "SELECT data FROM blocks WHERE dimension=? AND x=? AND y=? AND z=?");
+	sqlite3_bind_int(statement, 1, dimension); sqlite3_bind_int(statement, 2, x);
+	sqlite3_bind_int(statement, 3, y); sqlite3_bind_int(statement, 4, z);
+	if (statement.step() != SQLITE_ROW) return false;
+	packet = decompress(statement, 0);
+	return true;
+}
+
 void ChunkDatabase::readChunks(u16 dimension, const std::function<void(int, int, int, sf::Packet &)> &read) {
 	Statement statement(m_database, "SELECT x,y,z,data FROM blocks WHERE dimension=? ORDER BY x,y,z");
 	sqlite3_bind_int(statement, 1, dimension);

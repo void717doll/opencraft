@@ -128,7 +128,8 @@ void VertexBuffer::update(const void *data, u32 size, u32 offset) const {
 	assert(m_isDynamic);
 	assert(bgfx::isValid(m_dynamicHandle));
 
-	bgfx::update(m_dynamicHandle, offset, bgfx::copy(data, size));
+	assert(offset % m_layout.m_stride == 0);
+	bgfx::update(m_dynamicHandle, offset / m_layout.m_stride, bgfx::copy(data, size));
 }
 
 void VertexBuffer::free() {

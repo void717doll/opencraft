@@ -283,6 +283,10 @@ void ClientCommandHandler::setupCallbacks() {
 		m_isRegistryInitialized = true;
 	});
 
+	m_client.setCommandCallback(Network::Command::ChunkDelta, [this](Network::Packet &packet) {
+		m_world.receiveChunkData(packet, true);
+	});
+
 	m_client.setCommandCallback(Network::Command::ChunkData, [this](Network::Packet &packet) {
 		m_world.receiveChunkData(packet);
 	});

@@ -94,7 +94,9 @@ public:
 		world.blockPhysics().markLeaves({15,8,8},1);
 		world.blockPhysics().tick(8192);
 		TS_ASSERT_EQUALS(world.getBlock(15,8,8),leaves);
+		TS_ASSERT_EQUALS(world.blockPhysics().pendingCount(),0u);
 		neighbor->setInitialized(true);
+		world.blockPhysics().seedChunk(*static_cast<ServerChunk *>(neighbor));
 		world.blockPhysics().tick(8192);
 		TS_ASSERT_EQUALS(world.getBlock(15,8,8),0);
 		const auto &fern=f.registry.getBlockFromStringID("default:fern").getState(0);
@@ -144,5 +146,22 @@ public:
 		for(unsigned tick=0;tick<10;++tick) world.blockPhysics().tick(8192);
 		TS_ASSERT_EQUALS(world.getBlock(8,8,2),cluster.block().id());
 	}
+	void testIncrementalGenerationPreservesExistingTerrain() {
+		Fixture f;
+		ServerWorld world(f.players,f.worlds.getWorld(0).dimension(),42);
+		struct Sample { Vector3i position; u64 hash; };
+		// seed 42 snapshots from 3ad57c8b keep staging from changing existing terrain.
+		const Sample samples[] = {{{4,7,2},12739743579691621039ULL},
+			{{-2,3,1},6834231152818431003ULL},{{-3,-2,0},4165227049184301928ULL}};
+		for (const auto &sample : samples) {
+			auto &chunk=world.getOrCreateChunk(sample.position.x,sample.position.y,sample.position.z);
+			for (unsigned step=0; step<25; ++step) TS_ASSERT_EQUALS(world.terrainGenerator().generateStep(chunk,step),step==24);
+			u64 hash=1469598103934665603ULL;
+			for (int z=0; z<CHUNK_HEIGHT; ++z) for (int y=0; y<CHUNK_DEPTH; ++y) for (int x=0; x<CHUNK_WIDTH; ++x)
+				hash=(hash^chunk.data(x,y,z))*1099511628211ULL;
+			TS_ASSERT_EQUALS(hash,sample.hash); TS_ASSERT(chunk.blockData().empty());
+		}
+	}
+
 };
 #endif

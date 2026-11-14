@@ -65,7 +65,7 @@ class ClientWorld : public World, public Drawable {
 		void predictBlockDig(const Vector3i &position);
 		bool isBlockDigPending(const Vector3i &position) const { return m_pendingDigs.count(position) != 0; }
 		void receiveBlockUpdate(const Vector3i &position, u32 block);
-		void receiveChunkData(Network::Packet &packet);
+		void receiveChunkData(Network::Packet &packet, bool delta = false);
 		void removeChunk(const Vector3i &chunkPos);
 
 		void appendCollisionBoxes(const DoubleBox &moving, const DoubleBox &broadphase, std::vector<DoubleBox> &boxes) const override;

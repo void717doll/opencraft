@@ -27,6 +27,7 @@
 #ifndef GAMETIME_HPP_
 #define GAMETIME_HPP_
 
+#include <atomic>
 #include "common/core/Color.hpp"
 
 class Sky;
@@ -42,29 +43,29 @@ class GameTime {
 		static float getSunlightIntensityFromTime(float time);
 		static Color getSkyColorFromTime(const Sky &sky, float time);
 
-		static void incrementTicks() { ++s_ticks; updateTpsCounter(); }
-		static void setTicks(u64 ticks) { s_ticks = ticks; updateTpsCounter(); }
+		static void incrementTicks() { s_ticks.fetch_add(1,std::memory_order_relaxed); updateTpsCounter(); }
+		static void setTicks(u64 ticks) { s_ticks.store(ticks,std::memory_order_relaxed); updateTpsCounter(); }
 
-		static u16 getTicksPerSecond() { return s_ticksPerSecond; }
-		static u64 getTicks() { return s_ticks; }
+		static u16 getTicksPerSecond() { return s_ticksPerSecond.load(std::memory_order_relaxed); }
+		static u64 getTicks() { return s_ticks.load(std::memory_order_relaxed); }
 
 		static u32 getCurrentDay() {
-			return u32((s_ticks + dayStartOffset + 6000) / dayLength + 1);
+			return u32((getTicks() + dayStartOffset + 6000) / dayLength + 1);
 		}
 
 		static u8 getCurrentHour() {
-			return u8(((s_ticks + dayStartOffset + 6000) / 1000) % 24);
+			return u8(((getTicks() + dayStartOffset + 6000) / 1000) % 24);
 		}
 
 		static u8 getCurrentMinute() {
-			return u8(((s_ticks + dayStartOffset + 6000) % 1000) * 60 / 1000);
+			return u8(((getTicks() + dayStartOffset + 6000) % 1000) * 60 / 1000);
 		}
 
 	private:
 		static void updateTpsCounter();
 
-		static u64 s_ticks;
-		static u16 s_ticksPerSecond;
+		static std::atomic<u64> s_ticks;
+		static std::atomic<u16> s_ticksPerSecond;
 };
 
 #endif // GAMETIME_HPP_

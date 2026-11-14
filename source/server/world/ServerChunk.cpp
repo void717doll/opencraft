@@ -61,9 +61,9 @@ void ServerChunk::update() {
 void ServerChunk::process() {
 	for (auto &client : m_world.server()->server().info().clients()) {
 		const ServerPlayer *player = m_world.players().getPlayer(client.playerName);
-		bool isChunkLoaded = player->isChunkLoaded({m_x, m_y, m_z});
-		if (player->isReady() && isChunkLoaded && player->dimension() == m_world.dimension().id())
-			sendData(client);
+		bool isChunkLoaded = player && player->isChunkLoaded({m_x, m_y, m_z});
+		if (player && player->isReady() && isChunkLoaded && player->dimension() == m_world.dimension().id())
+			sendChanges(client);
 	}
 }
 
@@ -144,10 +144,12 @@ void ServerChunk::sendData(const ClientInfo &client) {
 	packet << m_x << m_y << m_z;
 	std::array<u8, CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT * 5> cells;
 	std::size_t offset = 0;
+	m_sentCells.resize(CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT);
 	for (u16 z = 0; z < CHUNK_HEIGHT; ++z) {
 		for (u16 y = 0; y < CHUNK_DEPTH; ++y) {
 			for (u16 x = 0; x < CHUNK_WIDTH; ++x) {
 				u32 value = data(x, y, z);
+				m_sentCells[(z * depth + y) * width + x] = u64(value) | (u64(m_lightmap.getLightDataRaw(x, y, z)) << 32);
 				// block words use the same network byte order as sf::Packet.
 				cells[offset++] = u8(value >> 24);
 				cells[offset++] = u8(value >> 16);
@@ -159,6 +161,10 @@ void ServerChunk::sendData(const ClientInfo &client) {
 	}
 	packet.append(cells.data(), cells.size());
 	client.send(packet);
+	sendMetadata(client);
+}
+
+void ServerChunk::sendMetadata(const ClientInfo &client) {
 	// the receiving chunk must exist before its metadata packets arrive.
 	for (const auto &entry : m_blockData) {
 		const auto &position = entry.first;
@@ -171,4 +177,27 @@ void ServerChunk::sendData(const ClientInfo &client) {
 	}
 
 	// logDebug() << "Chunk at" << chunk.x() << chunk.y() << chunk.z() << "sent to client";
+}
+
+void ServerChunk::sendChanges(const ClientInfo &client) {
+	if (m_sentCells.empty()) { sendData(client); return; }
+	Network::Packet changes;
+	u16 count = 0;
+	for (u16 z = 0; z < height; ++z) for (u16 y = 0; y < depth; ++y) for (u16 x = 0; x < width; ++x) {
+		u16 index = (z * depth + y) * width + x;
+		u32 block = data(x,y,z); u8 light = m_lightmap.getLightDataRaw(x,y,z);
+		u64 value = u64(block) | (u64(light) << 32);
+		if (value == m_sentCells[index]) continue;
+		changes << index << block << light;
+		m_sentCells[index] = value;
+		++count;
+	}
+	if (count > 4096) { sendData(client); return; }
+	if (count) {
+		Network::Packet packet;
+		packet << Network::Command::ChunkDelta << m_x << m_y << m_z << count;
+		packet.append(changes.getData(), changes.getDataSize());
+		client.send(packet);
+	}
+	sendMetadata(client);
 }

@@ -272,24 +272,26 @@ void ServerCommandHandler::sendPlayerChangeDimension(u16 clientID, s32 x, s32 y,
 		logError() << ("Failed to send dimension change for player " + std::to_string(clientID) + ": Player not found").c_str();
 }
 
-void ServerCommandHandler::sendEntitySpawn(entt::entity entityID, const ClientInfo *client) const {
-	Network::Packet packet;
-	packet << Network::Command::EntitySpawn << entityID;
-
-	if (!client)
-		m_server.sendToAllClients(packet);
-	else
-		client->send(packet);
+void ServerCommandHandler::sendDimensionPacket(Network::Packet &packet, u16 dimension) const {
+	for (const auto &entry : m_players) {
+		const auto &player = entry.second;
+		if (player.isOnline() && player.isReady() && player.dimension() == dimension)
+			player.client()->send(packet);
+	}
 }
 
-void ServerCommandHandler::sendEntityDespawn(entt::entity entityID, const ClientInfo *client) const {
+void ServerCommandHandler::sendEntitySpawn(entt::entity entityID, u16 dimension, const ClientInfo *client) const {
+	Network::Packet packet;
+	packet << Network::Command::EntitySpawn << entityID;
+	if (client) client->send(packet);
+	else sendDimensionPacket(packet, dimension);
+}
+
+void ServerCommandHandler::sendEntityDespawn(entt::entity entityID, u16 dimension, const ClientInfo *client) const {
 	Network::Packet packet;
 	packet << Network::Command::EntityDespawn << entityID;
-
-	if (!client)
-		m_server.sendToAllClients(packet);
-	else
-		client->send(packet);
+	if (client) client->send(packet);
+	else sendDimensionPacket(packet, dimension);
 }
 
 void ServerCommandHandler::sendPlayerHealth(u16 clientID) const {
@@ -308,10 +310,10 @@ void ServerCommandHandler::sendPlayerScore(u16 clientID) const {
 	player->client()->send(packet);
 }
 
-void ServerCommandHandler::sendEntityHurt(entt::entity entity, u16 amount, double x, double y, double z) const {
+void ServerCommandHandler::sendEntityHurt(entt::entity entity, u16 dimension, u16 amount, double x, double y, double z) const {
 	Network::Packet packet;
 	packet << Network::Command::EntityHurt << entity << amount << x << y << z;
-	m_server.sendToAllClients(packet);
+	sendDimensionPacket(packet, dimension);
 }
 
 void ServerCommandHandler::damagePlayer(u16 clientID, u16 amount, const std::string &cause) {

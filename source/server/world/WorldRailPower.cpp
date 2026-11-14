@@ -68,6 +68,26 @@ void ServerWorld::watchRailDevice(const Vector3i &point) {
 }
 
 void ServerWorld::updateRailDevices() {
+	struct Contact { DoubleBox box; unsigned mask; };
+	std::unordered_map<Vector3i, std::vector<Contact>> contacts;
+	auto add = [&](DoubleBox box, unsigned mask) {
+		for (int z=int(std::floor(box.z/8)); z<=int(std::floor((box.z+box.sizeZ)/8)); ++z)
+			for (int y=int(std::floor(box.y/8)); y<=int(std::floor((box.y+box.sizeY)/8)); ++y)
+				for (int x=int(std::floor(box.x/8)); x<=int(std::floor((box.x+box.sizeX)/8)); ++x)
+					contacts[{x,y,z}].push_back({box,mask});
+	};
+	if (!m_railDeviceQueue.empty()) {
+		m_scene.registry().view<PositionComponent>().each([&](auto entity, const auto &position) {
+			if (position.dimension != m_dimension.id()) return;
+			if (m_scene.registry().all_of<MinecartComponent>(entity)) add({position.x-0.49,position.y-0.49,position.z,0.98,0.98,0.7},1);
+			if (m_scene.registry().all_of<ItemStack>(entity)) add({position.x-0.125,position.y-0.125,position.z-0.125,0.25,0.25,0.25},4);
+			if (m_scene.registry().all_of<MobComponent,DoubleBox>(entity)) {
+				const auto *traits=m_scene.registry().try_get<BetaMobComponent>(entity);
+				if (traits && betaMobIsProjectile(traits->kind)) return;
+				DoubleBox box=m_scene.registry().get<DoubleBox>(entity); box.move(position.x,position.y,position.z); add(box,2);
+			}
+		});
+	}
 	++m_railPowerTicks;
 	std::size_t count=std::min<std::size_t>(64,m_railDeviceQueue.size());
 	for(std::size_t i=0;i<count;++i) {
@@ -91,12 +111,14 @@ void ServerWorld::updateRailDevices() {
 			double height=detector && (state->id()&7)>=2 ? 1.25 : 0.25;
 			DoubleBox trigger{point.x+0.125,point.y+0.125,double(point.z),0.75,0.75,height};
 			bool active=false;
-			if (detector || source==4) m_scene.registry().view<MinecartComponent,PositionComponent>().each([&](auto &,auto &cart) {
-				if (trigger.intersects({cart.x-0.49,cart.y-0.49,cart.z,0.98,0.98,0.7})) active=true;
-			});
-			if (source==4) m_scene.registry().view<ItemStack,PositionComponent>().each([&](auto &,auto &position) {
-				if (trigger.intersects({position.x-0.125,position.y-0.125,position.z-0.125,0.25,0.25,0.25})) active=true;
-			});
+			unsigned mask = detector ? 1 : (source == 4 ? 7 : 2);
+			for (int z=int(std::floor(trigger.z/8)); !active && z<=int(std::floor((trigger.z+trigger.sizeZ)/8)); ++z)
+				for (int y=int(std::floor(trigger.y/8)); !active && y<=int(std::floor((trigger.y+trigger.sizeY)/8)); ++y)
+					for (int x=int(std::floor(trigger.x/8)); !active && x<=int(std::floor((trigger.x+trigger.sizeX)/8)); ++x) {
+						auto found=contacts.find({x,y,z});
+						if (found == contacts.end()) continue;
+						for (const auto &contact : found->second) if ((contact.mask & mask) && trigger.intersects(contact.box)) { active=true; break; }
+					}
 			if (!detector) {
 				for (const auto &entry:m_players) {
 					const auto &player=entry.second;
@@ -104,12 +126,6 @@ void ServerWorld::updateRailDevices() {
 					DoubleBox body=player.hitbox(); body.move(player.x(),player.y(),player.z());
 					if (trigger.intersects(body)) active=true;
 				}
-				m_scene.registry().view<MobComponent,PositionComponent,DoubleBox>().each([&](auto entity,auto &,auto &position,auto &hitbox) {
-					const auto *traits=m_scene.registry().try_get<BetaMobComponent>(entity);
-					if (traits && betaMobIsProjectile(traits->kind)) return;
-					DoubleBox body=hitbox; body.move(position.x,position.y,position.z);
-					if (trigger.intersects(body)) active=true;
-				});
 			}
 			next=detector?u16((state->id()&7)|(active?8:0)):u16(active);
 		}

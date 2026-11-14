@@ -49,31 +49,36 @@ TerrainGenerator::TerrainGenerator(Heightmap &heightmap, const Dimension &dimens
 }
 
 void TerrainGenerator::generate(ServerChunk &chunk) {
-	fastNoiseGeneration(chunk);
-	if (m_dimensionID == 0) decorateOreTerrain(chunk, m_seed);
-	if (m_generationRevision == 1) {
-		decorateExpansionTerrain(chunk, m_heightmap, m_dimensionID, m_seed);
-		if (m_dimensionID == 0) decorateDungeonTerrain(chunk, m_heightmap, m_seed);
-	}
-	if (m_dimensionID == 0) decorateOceanTerrain(chunk, m_heightmap, m_seed);
-	if (m_dimensionID == 1) decorateNetherRuins(chunk, m_heightmap, m_seed);
-	if (m_dimensionID == 0) decorateMineshaftTerrain(chunk, m_heightmap, m_seed, m_mineshafts);
-	if (m_dimensionID == 0) decorateRuinsTerrain(chunk, m_heightmap, m_seed);
-	if (m_dimensionID == 0) decorateCacheTerrain(chunk, m_heightmap, m_seed);
-	if (m_dimensionID == 0) decorateAmethyst(chunk, m_heightmap, m_seed);
+	for (unsigned step = 0; !generateStep(chunk,step); ++step) {}
 }
 
-void TerrainGenerator::fastNoiseGeneration(ServerChunk &chunk) {
+bool TerrainGenerator::generateStep(ServerChunk &chunk, unsigned step) {
+	if (step < 16) { fastNoiseGeneration(chunk,int(step)); return false; }
+	switch (step) {
+		case 16: if (m_dimensionID == 0) decorateOreTerrain(chunk,m_seed); break;
+		case 17: if (m_generationRevision == 1) decorateExpansionTerrain(chunk,m_heightmap,m_dimensionID,m_seed); break;
+		case 18: if (m_generationRevision == 1 && m_dimensionID == 0) decorateDungeonTerrain(chunk,m_heightmap,m_seed); break;
+		case 19: if (m_dimensionID == 0) decorateOceanTerrain(chunk,m_heightmap,m_seed); break;
+		case 20: if (m_dimensionID == 1) decorateNetherRuins(chunk,m_heightmap,m_seed); break;
+		case 21: if (m_dimensionID == 0) decorateMineshaftTerrain(chunk,m_heightmap,m_seed,m_mineshafts); break;
+		case 22: if (m_dimensionID == 0) decorateRuinsTerrain(chunk,m_heightmap,m_seed); break;
+		case 23: if (m_dimensionID == 0) decorateCacheTerrain(chunk,m_heightmap,m_seed); break;
+		case 24: if (m_dimensionID == 0) decorateAmethyst(chunk,m_heightmap,m_seed); return true;
+	}
+	return false;
+}
+
+void TerrainGenerator::fastNoiseGeneration(ServerChunk &chunk, int row) {
 	HeightmapChunk &heightmap = m_heightmap.getOrCreateChunk(chunk.x(), chunk.y());
 	if (m_dimensionID == 1) heightmap.populateNether();
 
-	Random_t rand;
+	auto &rand = chunk.random();
 	std::seed_seq seed{u32(m_seed), u32(m_dimensionID), u32(chunk.x()), u32(chunk.y()), u32(chunk.z())};
 	std::array<u32, 1> chunkSeed;
 	seed.generate(chunkSeed.begin(), chunkSeed.end());
-	rand.seed(chunkSeed[0]);
+	if (row <= 0) rand.seed(chunkSeed[0]);
 
-	for(s8 y = 0 ; y < CHUNK_DEPTH ; y++) {
+	for(int y = row < 0 ? 0 : row; y < (row < 0 ? CHUNK_DEPTH : row+1); ++y) {
 		for(s8 x = 0 ; x < CHUNK_WIDTH ; x++) {
 			u16 biomeIndex = m_dimensionID == 0 ? m_biomeSampler.getDecorationBiomeIndex(heightmap.biomeAt(x, y), x + chunk.x() * CHUNK_WIDTH, y + chunk.y() * CHUNK_DEPTH)
 				: m_biomeSampler.getBiomeIndexAt(x + chunk.x() * CHUNK_WIDTH, y + chunk.y() * CHUNK_DEPTH);

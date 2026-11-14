@@ -28,6 +28,8 @@ class EntityNetworkPerformanceTests : public CxxTest::TestSuite {
 			Server server;
 			server.init();
 			auto session = Network::LocalSession::connect();
+			ClientInfo observer{0,session};
+			auto *player = players.connectPlayer("tester",observer); player->setReady(true);
 			ServerCommandHandler commands{scripts, server, worlds, players, definitions};
 			NetworkController controller;
 			controller.setServer(&commands);
@@ -80,6 +82,32 @@ class EntityNetworkPerformanceTests : public CxxTest::TestSuite {
 			controller.sendEntities(registry, client);
 			TS_ASSERT_EQUALS(drain(), 6);
 		}
+	void testOtherDimensionsCannotOverwriteOrDespawnTheCurrentEntity() {
+		Registry definitions; Registry::setInstance(definitions);
+		ScriptEngine scripts; WorldController worlds(definitions); PlayerList players;
+		Server server; server.init(); auto session=Network::LocalSession::connect();
+		ClientInfo client{0,session}; auto *player=players.connectPlayer("tester",client); player->setReady(true);
+		ServerCommandHandler commands(scripts,server,worlds,players,definitions);
+		NetworkController controller; controller.setServer(&commands);
+		entt::registry current,other;
+		auto a=current.create(), b=other.create(); TS_ASSERT_EQUALS(a,b);
+		current.emplace<NetworkComponent>(a,a); current.emplace<PositionComponent>(a,1,2,3,0);
+		other.emplace<NetworkComponent>(b,b); other.emplace<PositionComponent>(b,90,80,70,1);
+		controller.update(current); controller.update(other); commands.sendEntityDespawn(b,1);
+		Network::Packet packet; unsigned count=0;
+		while(session->receiveOnClient(packet)) {
+			Network::Command command; entt::entity id; packet >> command >> id; ++count;
+			TS_ASSERT(command != Network::Command::EntityDespawn);
+			if(command==Network::Command::EntityPosition) { PositionComponent position; packet >> position; TS_ASSERT_EQUALS(position.dimension,0); }
+		}
+		TS_ASSERT_EQUALS(count,2u);
+		player->setDimension(1);
+		controller.sendEntities(other,client);
+		TS_ASSERT(session->receiveOnClient(packet)); TS_ASSERT(session->receiveOnClient(packet));
+		Network::Command command; entt::entity id; PositionComponent position; packet >> command >> id >> position;
+		TS_ASSERT_EQUALS(position.dimension,1); TS_ASSERT_EQUALS(position.x,90);
+	}
+
 };
 
 #endif // ENTITYNETWORKPERFORMANCETESTS_HPP_

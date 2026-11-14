@@ -37,6 +37,7 @@ std::string Network::commandToString(Network::Command command) {
 
 		{Network::Command::ServerClosed,          "ServerClosed"},
 
+		{Network::Command::ChunkDelta, "ChunkDelta"},
 		{Network::Command::ChunkData,             "ChunkData"},
 		{Network::Command::ChunkUnload,           "ChunkUnload"},
 

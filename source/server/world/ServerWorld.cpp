@@ -59,6 +59,7 @@ void ServerWorld::update(bool doTick) {
 	processSendRequests();
 
 	if (doTick) {
+		if (++m_evictionTicks >= 2) { m_evictionTicks = 0; evictDistantChunks(); }
 		tickActiveChunks();
 
 		m_blockPhysics.tick();
@@ -299,6 +300,47 @@ ServerChunk &ServerWorld::getOrCreateChunk(s32 cx, s32 cy, s32 cz) {
 	return *chunk;
 }
 
+void ServerWorld::evictDistantChunks() {
+	if (!m_saveChunk) return;
+	std::vector<Vector3i> distant;
+	for (const auto &entry : m_chunks) {
+		bool keep = false;
+		for (const auto &playerEntry : m_players) {
+			const auto &player = playerEntry.second;
+			if (!player.isOnline() || player.dimension() != m_dimension.id()) continue;
+			auto center = player.getCurrentChunk();
+			int radius = int(ServerConfig::renderDistance) + 5;
+			if (std::abs(entry.first.x-center.x) <= radius && std::abs(entry.first.y-center.y) <= radius
+			 && std::abs(entry.first.z-center.z) <= radius) { keep = true; break; }
+		}
+		if (!keep) distant.push_back(entry.first);
+	}
+	unsigned removed = 0;
+	auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(2);
+	for (const auto &position : distant) {
+		auto *chunk = m_chunks.at(position).get();
+		// save before invalidating the chunk or its neighbor pointers.
+		if (chunk->isInitialized()) m_saveChunk(*chunk);
+		m_blockPhysics.forgetChunk(position);
+		removeChunkFromQueues(chunk);
+		for (u8 side=0; side<6; ++side)
+			if (auto *neighbor=chunk->getSurroundingChunk(side)) neighbor->setSurroundingChunk(side ^ 1,nullptr);
+		auto column=m_chunkColumns.find({position.x,position.y});
+		auto &chunks=column->second;
+		chunks.erase(std::remove(chunks.begin(),chunks.end(),chunk),chunks.end());
+		if (chunks.empty()) m_chunkColumns.erase(column);
+		m_generationStages.erase(position);
+		m_chunks.erase(position);
+		if (++removed >= 128 || std::chrono::steady_clock::now() >= deadline) break;
+	}
+	if (removed) {
+		std::unordered_set<Vector2i> retained;
+		for (const auto &entry : m_chunkColumns)
+			for (int y=-2; y<=2; ++y) for (int x=-2; x<=2; ++x) retained.emplace(entry.first.x+x,entry.first.y+y);
+		m_heightmap.retainChunks(retained);
+	}
+}
+
 Chunk *ServerWorld::getChunk(int cx, int cy, int cz) const {
 	auto it = m_chunks.find({cx, cy, cz});
 	if (it == m_chunks.end())
@@ -309,15 +351,27 @@ Chunk *ServerWorld::getChunk(int cx, int cy, int cz) const {
 
 bool ServerWorld::generateChunk(ServerChunk &chunk) {
 	if (chunk.isInitialized()) return false;
+	while (!generateChunkStep(chunk)) {}
+	return true;
+}
 
-	createChunkNeighbours(chunk);
-
-	m_terrainGenerator.generate(chunk);
+bool ServerWorld::generateChunkStep(ServerChunk &chunk) {
+	if (chunk.isInitialized()) return true;
+	Vector3i position{chunk.x(),chunk.y(),chunk.z()};
+	auto &stage = m_generationStages[position];
+	if (!stage) {
+		createChunkNeighbours(chunk);
+		if (m_loadChunk && m_loadChunk(chunk)) { chunk.setInitialized(false); stage = 25; }
+	}
+	if (stage < 25) {
+		m_terrainGenerator.generateStep(chunk,stage++);
+		return false;
+	}
 	chunk.setInitialized(true);
 	chunk.initializeTickingBlocks();
 	initializeChunkLighting(chunk);
 	m_blockPhysics.seedChunk(chunk);
-
+	m_generationStages.erase(position);
 	return true;
 }
 
@@ -344,11 +398,11 @@ void ServerWorld::processSendRequests() {
 					chunk.getSurroundingChunk(Chunk::Top)}};
 				bool ready = true;
 				for (Chunk *neighbor : required) {
-					if (neighbor->isInitialized()) continue;
-					if (!generated && Clock::now() < deadline) {
-						generateChunk(static_cast<ServerChunk &>(*neighbor));
+					while (!neighbor->isInitialized() && generated < 64 && Clock::now() < deadline) {
+						generateChunkStep(static_cast<ServerChunk &>(*neighbor));
 						++generated;
-					} else { ready = false; break; }
+					}
+					if (!neighbor->isInitialized()) { ready = false; break; }
 				}
 				// keep the request until its neighbors can supply light and mesh borders.
 				if (!ready) break;

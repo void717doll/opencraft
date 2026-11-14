@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "common/core/Registry.hpp"
+#include "common/world/Dimension.hpp"
 #include "common/scene/component/MobComponent.hpp"
 #include "common/scene/component/PhysicalComponent.hpp"
 #include "common/scene/component/PositionComponent.hpp"
@@ -14,7 +15,7 @@
 void ServerWorld::updateItems() {
 	auto &registry = m_scene.registry();
 	std::vector<entt::entity> removed;
-	std::unordered_map<Vector3i, std::vector<entt::entity>> cells;
+	std::unordered_map<u32, std::unordered_map<Vector3i, std::vector<entt::entity>>> groups;
 	registry.view<ItemStack, PositionComponent, DoubleBox>(entt::exclude<MobComponent>).each(
 		[&](auto entity, auto &stack, auto &position, auto &hitbox) {
 			const Chunk *chunk = getChunkAtBlockPos(int(std::floor(position.x)), int(std::floor(position.y)), int(std::floor(position.z)));
@@ -67,6 +68,8 @@ void ServerWorld::updateItems() {
 				body.velocity.y *= float(1 - friction);
 			}
 			Vector3i cell{int(std::floor(position.x)), int(std::floor(position.y)), int(std::floor(position.z))};
+			if (stack.amount() >= stack.item().maxStackSize()) return;
+			auto &cells = groups[(u32(stack.item().id()) << 16) | stack.damage()];
 			bool merged = false;
 			for (int z = -1; !merged && z <= 1; ++z)
 				for (int y = -1; !merged && y <= 1; ++y)
@@ -75,10 +78,10 @@ void ServerWorld::updateItems() {
 						if (it == cells.end()) continue;
 						for (auto other : it->second) {
 							auto &target = registry.get<ItemStack>(other);
+							if (unsigned(target.amount()) + stack.amount() > target.item().maxStackSize()) continue;
 							const auto &otherPosition = registry.get<PositionComponent>(other);
 							Vector3d delta{otherPosition.x - position.x, otherPosition.y - position.y, otherPosition.z - position.z};
-							if (delta.length() > 0.6 || !target.sameItem(stack)
-							 || unsigned(target.amount()) + stack.amount() > target.item().maxStackSize()) continue;
+							if (delta.length() > 0.6 || !target.sameItem(stack)) continue;
 							target.setAmount(target.amount() + stack.amount());
 							auto &targetBody = registry.get<PhysicalComponent>(other);
 							targetBody.age = 0;
@@ -91,7 +94,7 @@ void ServerWorld::updateItems() {
 			if (!merged) cells[cell].push_back(entity);
 		});
 	for (auto entity : removed) {
-		if (m_server) m_server->sendEntityDespawn(entity);
+		if (m_server) m_server->sendEntityDespawn(entity, m_dimension.id());
 		registry.destroy(entity);
 	}
 }

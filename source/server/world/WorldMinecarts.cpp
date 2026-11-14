@@ -309,7 +309,7 @@ bool ServerWorld::attackMinecart(ServerPlayer &player) {
 		if (!player.isCreative()) dropWorldItem({position.x,position.y,position.z},cargo->kind == 1 ? "default:chest" : "default:furnace",1,0,false);
 	}
 	if (!player.isCreative()) dropWorldItem({position.x,position.y,position.z},"default:minecart",1,0,false);
-	if (m_server) m_server->sendEntityDespawn(target);
+	if (m_server) m_server->sendEntityDespawn(target, m_dimension.id());
 	registry.destroy(target);
 	return true;
 }

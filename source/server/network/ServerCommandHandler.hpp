@@ -27,6 +27,7 @@
 #ifndef SERVERCOMMANDHANDLER_HPP_
 #define SERVERCOMMANDHANDLER_HPP_
 
+#include "common/network/Network.hpp"
 #include <unordered_map>
 
 #include <entt/entt.hpp>
@@ -67,8 +68,9 @@ class ServerCommandHandler {
 		const std::string &worldName() const;
 		void sendPlayerInvUpdate(u16 clientID, const ClientInfo *client = nullptr) const;
 		void sendPlayerChangeDimension(u16 clientID, s32 x, s32 y, s32 z, u16 dimension, const ClientInfo *client = nullptr) const;
-		void sendEntitySpawn(entt::entity entityID, const ClientInfo *client = nullptr) const;
-		void sendEntityDespawn(entt::entity entityID, const ClientInfo *client = nullptr) const;
+		void sendDimensionPacket(Network::Packet &packet, u16 dimension) const;
+		void sendEntitySpawn(entt::entity entityID, u16 dimension, const ClientInfo *client = nullptr) const;
+		void sendEntityDespawn(entt::entity entityID, u16 dimension, const ClientInfo *client = nullptr) const;
 		void sendSound(const std::string &name, const Vector3d &position, u16 dimension, float gain = 1, float pitch = 1, const ClientInfo *client = nullptr) const;
 
 		void sendPlayerHealth(u16 clientID) const;
@@ -79,7 +81,7 @@ class ServerCommandHandler {
 		bool consumeHeldItem(Player &player, u16 amount, u16 clientID);
 		void wearHeldItem(Player &player, u16 amount);
 		void damagePlayer(u16 clientID, u16 amount, const std::string &cause = "damage");
-		void sendEntityHurt(entt::entity entity, u16 amount, double x, double y, double z) const;
+		void sendEntityHurt(entt::entity entity, u16 dimension, u16 amount, double x, double y, double z) const;
 		void respawnPlayer(u16 clientID);
 		void sendPlayerScore(u16 clientID) const;
 

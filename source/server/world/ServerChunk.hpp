@@ -54,21 +54,25 @@ class ServerChunk : public Chunk {
 
 		void tick(unsigned budget = 64);
 		void initializeTickingBlocks();
+		Random_t &random() { return m_random; }
 
 		void sendData(const ClientInfo &client);
+		void sendChanges(const ClientInfo &client);
+		void sendMetadata(const ClientInfo &client);
 
 		bool hasBeenModified() const { return m_hasBeenModified; }
 		void setModified(bool hasBeenModified) { m_hasBeenModified = hasBeenModified; if (hasBeenModified) m_needsSave = true; }
 		bool needsSave() const { return m_needsSave; }
 		void setSaved() { m_needsSave = false; }
 
-		void setReadyToSend() { m_isReadyToSend = true; }
+		void setReadyToSend() { m_isReadyToSend = true; m_sentCells.clear(); }
 
 		void addTickingBlock(int x, int y, int z, const ServerBlock &) { m_tickingBlocks.emplace((z * depth + y) * width + x); }
 
 	private:
 		ServerWorld &m_world;
 
+		std::vector<u64> m_sentCells;
 		bool m_hasBeenModified = false;
 		bool m_needsSave = true;
 		bool m_isReadyToSend = false;

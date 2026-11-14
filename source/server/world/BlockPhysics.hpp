@@ -3,6 +3,7 @@
 
 #include <deque>
 #include <unordered_set>
+#include <unordered_map>
 
 #include "common/core/Vector3.hpp"
 
@@ -18,6 +19,7 @@ class BlockPhysics {
 		void enqueueNeighbors(const Vector3i &position);
 		void markLeaves(const Vector3i &position, int radius);
 		void seedChunk(ServerChunk &chunk);
+		void forgetChunk(const Vector3i &position);
 		std::size_t tick(std::size_t budget = 256);
 		std::size_t pendingCount() const { return m_pending.size(); }
 
@@ -36,6 +38,7 @@ class BlockPhysics {
 		ServerWorld &m_world;
 		std::deque<Vector3i> m_queue;
 		std::unordered_set<Vector3i> m_pending;
+		std::unordered_map<Vector3i, std::unordered_set<Vector3i>> m_waitingLeaves;
 };
 
 #endif // BLOCKPHYSICS_HPP_

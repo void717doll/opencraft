@@ -33,6 +33,7 @@
 #include <unordered_set>
 
 #include "client/world/mesh/ChunkMeshBuildingJob.hpp"
+#include "client/graphics/VertexBuffer.hpp"
 
 class ClientWorld;
 
@@ -43,7 +44,7 @@ class ChunkMeshBuilder {
 		void remove(const Vector3i &position);
 		void clear();
 
-		void addMeshBuildingJob(const Chunk &chunk, const TextureAtlas &textureAtlas);
+		void addMeshBuildingJob(const Chunk &chunk, const TextureAtlas &textureAtlas, bool urgent = false);
 
 		void update();
 
@@ -55,9 +56,18 @@ class ChunkMeshBuilder {
 		std::deque<Vector3i> m_pending;
 		std::unordered_set<Vector3i> m_pendingSet;
 		std::unordered_set<Vector3i> m_active;
-		std::unordered_map<Vector3i, u64> m_revisions;
-		u64 m_nextRevision = 0;
+		std::unordered_set<Vector3i> m_urgent;
+		std::unordered_map<Vector3i, u64> m_generations;
+		u64 m_nextGeneration = 0;
 
+		struct Upload {
+			std::unique_ptr<ChunkMeshBuildingJob> job;
+			VertexBuffer buffer;
+			u8 layer = 0;
+			u32 vertex = 0, offset = 0;
+			bool initialized = false;
+		};
+		std::deque<std::unique_ptr<Upload>> m_uploads;
 		std::vector<thread::ThreadPool::TaskFuture<ChunkMeshBuildingJob *>> m_futures;
 };
 

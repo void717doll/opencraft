@@ -35,7 +35,7 @@ namespace {
 
 	constexpr unsigned char VERSION_MAJOR = 0;
 	constexpr unsigned char VERSION_MINOR = 0;
-	constexpr unsigned char VERSION_PATCH = 31;
+	constexpr unsigned char VERSION_PATCH = 32;
 	constexpr const char *VERSION_SUFFIX = "";
 
 	constexpr float DIST_NEAR  = 0.1f;

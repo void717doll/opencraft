@@ -16,6 +16,7 @@ class ChunkDatabase {
 		void begin();
 		void commit();
 		void writeChunk(u16 dimension, int x, int y, int z, const sf::Packet &packet);
+		bool readChunk(u16 dimension, int x, int y, int z, sf::Packet &packet);
 		void readChunks(u16 dimension, const std::function<void(int, int, int, sf::Packet &)> &read);
 		void writeState(const sf::Packet &packet);
 		sf::Packet readState();

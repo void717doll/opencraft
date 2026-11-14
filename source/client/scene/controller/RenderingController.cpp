@@ -27,6 +27,9 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "common/core/Registry.hpp"
+#include "client/graphics/Camera.hpp"
+#include "client/graphics/RenderTarget.hpp"
+#include "client/core/Config.hpp"
 #include "common/scene/component/DrawableDef.hpp"
 #include "common/scene/component/AnimationComponent.hpp"
 #include "common/scene/component/PositionComponent.hpp"
@@ -72,7 +75,31 @@ void RenderingController::update(entt::registry &registry) {
 }
 
 void RenderingController::draw(entt::registry &registry, RenderTarget &target, RenderStates states) {
+	const auto *camera = dynamic_cast<const Camera *>(target.getView());
 	registry.view<DrawableComponent, PositionComponent, RotationComponent>().each([&](auto entity, auto &drawable, auto &position, auto &rotation) {
+		if (camera) {
+			Vector3d center{position.x, position.y, position.z};
+			double radius = 1;
+			if (const auto *box = registry.try_get<DoubleBox>(entity)) {
+				center += Vector3d{box->x + box->sizeX/2, box->y + box->sizeY/2, box->z + box->sizeZ/2};
+				radius += std::sqrt(box->sizeX*box->sizeX + box->sizeY*box->sizeY + box->sizeZ*box->sizeZ)/2;
+			}
+			Vector3d delta = center - camera->getDPosition();
+			double range = double(Config::renderDistance * CHUNK_WIDTH) + radius;
+			if (delta.x*delta.x + delta.y*delta.y + delta.z*delta.z > range*range) return;
+			const auto &forward = camera->getDirection();
+			const auto &up = camera->getUpVector();
+			glm::dvec3 direction{forward.x,forward.y,forward.z}, vertical{up.x,up.y,up.z};
+			direction = glm::normalize(direction);
+			auto right = glm::normalize(glm::cross(direction,vertical));
+			vertical = glm::cross(right,direction);
+			glm::dvec3 relative{delta.x,delta.y,delta.z};
+			double depth = glm::dot(relative,direction);
+			double height = std::tan(glm::radians(double(camera->getFieldOfView()))/2);
+			double width = height * camera->getAspectRatio();
+			if (depth < -radius || std::abs(glm::dot(relative,vertical)) > depth*height + radius*std::sqrt(1+height*height)
+			 || std::abs(glm::dot(relative,right)) > depth*width + radius*std::sqrt(1+width*width)) return;
+		}
 		if (m_world) {
 			int x = int(std::floor(position.x)), y = int(std::floor(position.y)), z = int(std::floor(position.z));
 			const Chunk *chunk = m_world->getChunkAtBlockPos(x, y, z);

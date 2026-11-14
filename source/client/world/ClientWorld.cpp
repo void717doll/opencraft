@@ -154,8 +154,20 @@ void ClientWorld::changeDimension(u16 dimensionID) {
 }
 
 void ClientWorld::predictBlockDig(const Vector3i &position) {
+	auto *chunk = getChunkAtBlockPos(position.x,position.y,position.z);
+	if (!chunk || !chunk->isInitialized()) return;
 	m_pendingDigs.emplace(position);
-	setBlock(position.x, position.y, position.z, 0);
+	int x=position.x & (CHUNK_WIDTH-1), y=position.y & (CHUNK_DEPTH-1), z=position.z & (CHUNK_HEIGHT-1);
+	// the server supplies light changes; prediction only removes the block and its collision.
+	chunk->setBlockRaw(x,y,z,0);
+	chunk->setData(x,y,z,0);
+	m_chunkMeshBuilder.addMeshBuildingJob(*chunk,m_textureAtlas,true);
+	std::array<bool,6> boundary{x==0,x==CHUNK_WIDTH-1,y==0,y==CHUNK_DEPTH-1,z==0,z==CHUNK_HEIGHT-1};
+	for (u8 side=0; side<6; ++side) {
+		if (!boundary[side]) continue;
+		auto *neighbor=chunk->getSurroundingChunk(side);
+		if (neighbor && neighbor->isInitialized()) m_chunkMeshBuilder.addMeshBuildingJob(*neighbor,m_textureAtlas,true);
+	}
 }
 
 void ClientWorld::receiveBlockUpdate(const Vector3i &position, u32 block) {
@@ -167,7 +179,7 @@ void ClientWorld::receiveBlockUpdate(const Vector3i &position, u32 block) {
 	setData(position.x, position.y, position.z, u16(block >> 16));
 }
 
-void ClientWorld::receiveChunkData(Network::Packet &packet) {
+void ClientWorld::receiveChunkData(Network::Packet &packet, bool delta) {
 	if (!m_dimension) return;
 
 	OM_PROFILE_START("ClientWorld::receiveChunkData");
@@ -177,6 +189,7 @@ void ClientWorld::receiveChunkData(Network::Packet &packet) {
 
 	// Get the chunk from the map or create it if it doesn't exist
 	ClientChunk *chunk = (ClientChunk *)getChunk(cx, cy, cz);
+	if (delta && (!chunk || !chunk->isInitialized())) return;
 	if (!chunk) {
 		auto it = m_chunks.emplace(Vector3i{cx, cy, cz}, new ClientChunk(cx, cy, cz, *m_dimension, *this));
 		chunk = it.first->second.get();
@@ -193,26 +206,30 @@ void ClientWorld::receiveChunkData(Network::Packet &packet) {
 			+ (position.x & (CHUNK_WIDTH - 1));
 		pendingDigs.set(index);
 	}
-	for (u8 z = 0 ; z < CHUNK_HEIGHT ; ++z) {
-		for (u8 y = 0 ; y < CHUNK_DEPTH ; ++y) {
-			for (u8 x = 0 ; x < CHUNK_WIDTH ; ++x) {
-				u32 block;
-				u8 light;
-
-				packet >> block >> light;
-
-				// snapshots queued before the dig must not restore its predicted collision.
-				if (pendingDigs[(z * CHUNK_DEPTH + y) * CHUNK_WIDTH + x])
-					block = 0;
-				if (chunk->data(x, y, z) != block) { chunk->setDataRaw(x, y, z, block); changed = true; }
-				if (chunk->lightmap().getLightDataRaw(x, y, z) != light) {
-					chunk->lightmap().setLightDataRaw(x, y, z, light); changed = true;
-				}
-			}
+	u8 boundaries = 0;
+	u16 count = CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT;
+	if (delta && (!(packet >> count) || count > CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT)) return;
+	for (u16 cell = 0; cell < count; ++cell) {
+		u16 index = cell;
+		if (delta) packet >> index;
+		u32 block; u8 light;
+		if (!(packet >> block >> light) || index >= CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT) return;
+		int x = index % CHUNK_WIDTH, y = (index / CHUNK_WIDTH) % CHUNK_DEPTH, z = index / (CHUNK_WIDTH * CHUNK_DEPTH);
+		if (pendingDigs[index]) block = 0;
+		if (chunk->data(x,y,z) != block || chunk->lightmap().getLightDataRaw(x,y,z) != light)
+			boundaries |= u8((x==0) | ((x==CHUNK_WIDTH-1)<<1) | ((y==0)<<2)
+				| ((y==CHUNK_DEPTH-1)<<3) | ((z==0)<<4) | ((z==CHUNK_HEIGHT-1)<<5));
+		if (chunk->data(x,y,z) != block) { chunk->setDataRaw(x,y,z,block); changed = true; }
+		if (chunk->lightmap().getLightDataRaw(x,y,z) != light) {
+			chunk->lightmap().setLightDataRaw(x,y,z,light); changed = true;
 		}
 	}
 
 	if (changed) addChunkToUpdate(chunk);
+	for (u8 side=0; side<6; ++side) {
+		if (!(boundaries & (1<<side))) continue;
+		if (auto *neighbor=chunk->getSurroundingChunk(side)) { neighbor->setChanged(); addChunkToUpdate(neighbor); }
+	}
 
 	++chunk->debugTimesReceived;
 

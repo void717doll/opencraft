@@ -37,9 +37,9 @@
 using namespace entt::literals;
 
 void NetworkController::update(entt::registry &registry) {
-	registry.view<NetworkComponent>().each([&] (auto entity, auto &network) {
+	registry.view<NetworkComponent, PositionComponent>().each([&] (auto entity, auto &network, auto &position) {
 		if (!network.hasSpawned) {
-			m_server->sendEntitySpawn(network.entityID);
+			m_server->sendEntitySpawn(network.entityID, position.dimension);
 			network.hasSpawned = true;
 		}
 
@@ -47,7 +47,7 @@ void NetworkController::update(entt::registry &registry) {
 			if (!component || !component->isUpdated) return;
 			Network::Packet packet;
 			packet << component->packetType << entity << *component;
-			m_server->server().sendToAllClients(packet);
+			m_server->sendDimensionPacket(packet, position.dimension);
 			component->isUpdated = false;
 		};
 		send(registry.try_get<PositionComponent>(entity));
@@ -60,7 +60,7 @@ void NetworkController::update(entt::registry &registry) {
 			 || box->sizeX != last.sizeX || box->sizeY != last.sizeY || box->sizeZ != last.sizeZ) {
 				Network::Packet packet;
 				packet << Network::Command::EntityHitbox << entity << *box;
-				m_server->server().sendToAllClients(packet);
+				m_server->sendDimensionPacket(packet, position.dimension);
 				network.lastHitbox = *box;
 				network.hasHitbox = true;
 			}
@@ -69,8 +69,8 @@ void NetworkController::update(entt::registry &registry) {
 }
 
 void NetworkController::sendEntities(entt::registry &registry, const ClientInfo &client) {
-	registry.view<NetworkComponent>().each([&] (auto entity, auto &network) {
-		m_server->sendEntitySpawn(network.entityID, &client);
+	registry.view<NetworkComponent, PositionComponent>().each([&] (auto entity, auto &network, auto &position) {
+		m_server->sendEntitySpawn(network.entityID, position.dimension, &client);
 
 		// logDebug() << "sendEntitySpawn" << std::underlying_type_t<entt::entity>(network.entityID);
 

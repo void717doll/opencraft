@@ -24,6 +24,7 @@
 #include "server/core/PlayerList.hpp"
 #include "server/network/ServerCommandHandler.hpp"
 #include "server/world/ServerWorld.hpp"
+#include "server/core/ServerConfig.hpp"
 
 namespace {
 
@@ -530,6 +531,15 @@ void ServerWorld::updateMobs() {
 			auto &traits = traitsFor(registry, entity);
 			Kind kind = traits.kind;
 			Vector3d origin{position.x, position.y, position.z};
+			bool active = m_players.size() == 0;
+			for (const auto &entry : m_players) {
+				const auto &player = entry.second;
+				if (!player.isOnline() || player.dimension() != m_dimension.id()) continue;
+				Vector3d distance = origin - Vector3d{player.x(),player.y(),player.z()};
+				double range = double(ServerConfig::renderDistance + 2) * CHUNK_WIDTH;
+				if (distance.x*distance.x + distance.y*distance.y + distance.z*distance.z <= range*range) { active = true; break; }
+			}
+			if (!active) return;
 			const Chunk *current = getChunkAtBlockPos(int(std::floor(position.x)), int(std::floor(position.y)), int(std::floor(position.z)));
 			if (!current || !current->isInitialized()) {
 				if (projectile(kind)) dead.emplace_back(entity);
@@ -855,7 +865,7 @@ void ServerWorld::updateMobs() {
 			dropItem(*this, {position.x, position.y, position.z}, "default:iron_ingot", 2);
 			dropItem(*this, {position.x, position.y, position.z}, "default:treasure_note", 1);
 		}
-		if (m_server) m_server->sendEntityDespawn(entity);
+		if (m_server) m_server->sendEntityDespawn(entity, m_dimension.id());
 		registry.destroy(entity);
 		if (traits.kind == Kind::Slime && traits.size > 1) {
 			for (int child = 0; child < 4; ++child) {
@@ -1281,7 +1291,7 @@ bool ServerWorld::attackMob(ServerPlayer &player) {
 	}
 	if (dealt && m_server) {
 		const auto &box = registry.get<DoubleBox>(selected);
-		m_server->sendEntityHurt(selected, dealt, position.x, position.y, position.z + box.sizeZ);
+		m_server->sendEntityHurt(selected, m_dimension.id(), dealt, position.x, position.y, position.z + box.sizeZ);
 	}
 	if (experiencePoints && m_server) m_server->sendPlayerScore(player.clientID());
 
