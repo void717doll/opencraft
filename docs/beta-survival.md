@@ -154,3 +154,5 @@ f swaps the selected hotbar stack with the offhand. the equipment screen (i) has
 tall grass and ferns break beneath blocks with a solid bottom face, using their normal seed-drop rules. torches and other small decorations above them do not count as a solid cover.
 
 ferns use the grass tint and only shears collect the fern item. natural leaves decay after log or leaf removal if no log connects through four face-adjacent steps. as in beta, nearby log or leaf removal can also mark placed leaves for decay. unloaded boundaries defer checks. decay timing uses the existing physics queue. bees, hives, honey, wax, and bee smokers are removed; hive block ids remain reserved for old saves. enabling durability also adds `Durability: remaining/maximum` below inventory tooltip names.
+
+durable items keep their name visible above the hotbar while held. durability numbers still follow the durability option; ordinary item names keep their short fade.

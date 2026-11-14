@@ -123,9 +123,10 @@ void Hotbar::updateItemName() {
 		m_durability.setPosition(std::floor((width() - m_durability.getSize().x) / 2.f), -22.f);
 	}
 
-	m_itemNameVisible = !id.empty() && now < m_itemNameUntil;
+	bool persistentName = stack.amount() && stack.maxDamage();
+	m_itemNameVisible = !id.empty() && (persistentName || now < m_itemNameUntil);
 	if (m_itemNameVisible) {
-		float alpha = std::min(1.f, float(m_itemNameUntil - now) / 1000.f);
+		float alpha = persistentName ? 1.f : std::min(1.f, float(m_itemNameUntil - now) / 1000.f);
 		m_itemName.setShadowColor(Color(0.25f, 0.25f, 0.25f, alpha));
 		m_itemName.setColor(Color(1, 1, 1, alpha));
 		m_itemName.updateVertexBuffer();
