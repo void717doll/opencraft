@@ -366,7 +366,9 @@ void LuaGUIState::loadInventoryWidget(const std::string &name, s32 x, s32 y, sf:
 		std::string playerName, inventoryName;
 		packet >> playerName >> inventoryName;
 
-		widgetInventory = inventoryName == "armor" ? &m_player.armor() : &m_player.inventory();
+		if (inventoryName == "armor") widgetInventory = &m_player.armor();
+		else if (inventoryName == "offhand") widgetInventory = &m_player.offhand();
+		else widgetInventory = &m_player.inventory();
 	}
 	else if (inventory == "block") {
 		Vector3i block;

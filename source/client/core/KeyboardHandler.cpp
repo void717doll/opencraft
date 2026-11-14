@@ -47,6 +47,7 @@ KeyboardHandler::KeyboardHandler() {
 
 	addKey(GameKey::Shift,           "Shift",             SDLK_LSHIFT);
 
+	addKey(GameKey::SwapHands, "swap hands", SDLK_f, "_SwapHands");
 	addKey(GameKey::Drop, "drop item", SDLK_q, "_Drop");
 	addKey(GameKey::Noclip, "Creative Noclip", SDLK_v, "_Noclip");
 	for (int i = 0; i < 9; ++i) {

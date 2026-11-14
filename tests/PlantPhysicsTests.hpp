@@ -57,6 +57,23 @@ public:
 		auto movement=retro::movePlayer(world,player,{2,0,0},false,false);
 		TS_ASSERT_DELTA(movement.x,2,0.00001);
 	}
+	void testTallGrassAndFernsBreakUnderSolidCover() {
+		Fixture f; auto &world = f.worlds.getWorld(0);
+		for (const char *plant : {"default:tallgrass", "default:fern"}) {
+			world.setBlock(8,8,1,f.id("default:dirt"));
+			world.setBlock(8,8,2,f.id(plant));
+			world.setBlock(8,8,3,f.id("default:torch"));
+			TS_ASSERT(blockHasSupport(world,{8,8,2},f.registry.getBlockFromStringID(plant).getState(0),0));
+			world.setBlock(8,8,3,f.id("default:stone"));
+			TS_ASSERT(!blockHasSupport(world,{8,8,2},f.registry.getBlockFromStringID(plant).getState(0),0));
+			world.blockPhysics().tick(8192);
+			TS_ASSERT_EQUALS(world.getBlock(8,8,2),0);
+			world.setBlock(8,8,3,0);
+			world.setBlock(8,8,2,f.id(plant));
+			world.blockPhysics().tick(8192);
+			TS_ASSERT_EQUALS(world.getBlock(8,8,2),f.id(plant));
+		}
+	}
 	void testSoilPlantsRejectStoneAndDropWhenTheirGroundChanges() {
 		Fixture f; auto &world=f.worlds.getWorld(0);
 		const auto &rose=f.registry.getBlockFromStringID("default:rose").getState(0);

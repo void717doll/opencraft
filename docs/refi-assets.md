@@ -8,7 +8,7 @@ coverage: 320 png files under the default mod and engine texture directories, wi
 
 ## adaptations
 
-- inventory, workbench, and furnace screens share refi's `mcl_base_textures_background9.png` panel and `mcl_formspec_itemslot.png` slots. the original images are copied unchanged and sized at runtime; the crafting arrow is clipped from the supplied workbench sheet. the inventory has four working armor slots, a 3d character preview, storage and crafting; there is no shield or offhand slot.
+- inventory, workbench, and furnace screens share refi's `mcl_base_textures_background9.png` panel and `mcl_formspec_itemslot.png` slots. the original images are copied unchanged and sized at runtime; the crafting arrow is clipped from the supplied workbench sheet. the inventory has four working armor slots, a 3d character preview, storage and crafting; the offhand slot sits beside the character preview. shields remain excluded.
 - furnace fire uses the supplied foreground/background sprites. the white furnace progress arrow remains an engine ui asset. slot highlights draw behind items and stack counts. hud hearts retain their compact nine-pixel size, with a four-pixel margin below the hotbar.
 - block and item art is 16px. ore/material aliases use the corresponding refi texture, with no fallback to the removed texturepacks directory.
 - wheat seeds use the supplied loose-seed sprite, `farming_wheat_seed.png`, in place of the seed-packet icon. planted wheat keeps its separate growth-stage textures.
@@ -66,4 +66,4 @@ the cyan interior marker in refi's piston-on-front tile is mapped to dark metal 
 
 15 unchanged refi tree textures cover jungle, acacia, and dark oak logs, planks, leaves, and saplings from `textures/default_mcl_core/trees`. seven unchanged amethyst textures come from `textures/mcl_amethyst`. all 22 source paths, dimensions, and sha256 hashes are recorded in the manifest under MysticTempest's cc by-sa 4.0 credit. mineclonia's tree registrations, plant support rules, and amethyst growth and attachment behavior were used as references; the existing beta terrain generator remains in use.
 
-the experience bar and background are unchanged copies from `textures/HUD`, rotated when drawn. the source paths and checksums are in the manifest. slabs and stairs reuse their parent block textures.
+slabs and stairs reuse their parent block textures.

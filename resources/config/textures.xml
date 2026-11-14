@@ -1,6 +1,4 @@
 <textures>
-	<texture name="experience_full" path="resources/textures/experience_bar.png" />
-	<texture name="experience_empty" path="resources/textures/experience_bar_background.png" />
 	<texture name="block_destroy"    path="resources/textures/block_destroy.png" />
 	<texture name="heart_full"       path="resources/textures/heart_full.png" />
 	<texture name="heart_empty"      path="resources/textures/heart_empty.png" />

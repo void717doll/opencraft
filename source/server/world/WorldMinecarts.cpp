@@ -217,7 +217,7 @@ bool ServerWorld::placeMinecart(Player &player, const Vector3i &point) {
 	registry.emplace<DoubleBox>(entity,-0.49,-0.49,0,0.98,0.98,0.7);
 	registry.emplace<NetworkComponent>(entity,entity);
 	registry.emplace<DrawableDef>(entity).setMobModel(32, 1.f, kind > 1 ? u8(kind - 1) : 0);
-	if (!player.isCreative()) player.inventory().setStack(u16(player.heldItemSlot()),0,
+	if (!player.isCreative()) player.heldInventory().setStack(player.activeItemSlot(),0,
 		held.amount() > 1 ? held.stringID() : "",held.amount() - 1);
 	if (m_server) m_server->sendPlayerInvUpdate(player.clientID());
 	return true;
@@ -267,7 +267,7 @@ bool ServerWorld::interactMinecart(ServerPlayer &player) {
 		else {
 			auto held = player.heldItemStack();
 			if (held.amount() && (held.stringID() == "default:coal" || held.stringID() == "default:charcoal") && cargo->addCoal()) {
-				if (!player.isCreative()) player.inventory().setStack(u16(player.heldItemSlot()),0,
+				if (!player.isCreative()) player.heldInventory().setStack(player.activeItemSlot(),0,
 					held.amount() > 1 ? held.stringID() : "",held.amount() - 1);
 				if (m_server) m_server->sendPlayerInvUpdate(player.clientID());
 			}

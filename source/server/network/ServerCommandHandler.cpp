@@ -52,6 +52,12 @@
 #include "common/scene/component/PositionComponent.hpp"
 
 namespace {
+struct UseHand {
+	Player &player;
+	explicit UseHand(Player &value) : player(value) { player.setUsingOffhand(player.shouldUseOffhand()); }
+	~UseHand() { player.setUsingOffhand(false); }
+};
+
 bool canReachBlock(const ServerWorld &world, const ServerPlayer &player, int x, int y, int z) {
 	const Chunk *chunk = world.getChunkAtBlockPos(x, y, z);
 	if (!player.isReady() || !player.health() || !chunk || !chunk->isInitialized()) return false;
@@ -86,13 +92,13 @@ void ServerCommandHandler::sendParticles(Vector3d position, u16 dimension, u8 ef
 
 bool ServerCommandHandler::consumeHeldItem(Player &player, u16 amount, u16 clientID) {
 	if (player.clientID() != clientID || !amount) return false;
-	int slot = player.heldItemSlot();
+	int slot = player.activeItemSlot();
 	if (slot < 0 || slot >= player.inventory().width()) return false;
 	ItemStack stack = player.heldItemStack();
 	if (stack.amount() < amount) return false;
 	if (player.isCreative()) return true;
 	stack.setAmount(stack.amount() - amount);
-	player.inventory().setItemStack(u16(slot), 0, stack);
+	player.heldInventory().setItemStack(u16(slot), 0, stack);
 	sendPlayerInvUpdate(clientID);
 	return true;
 }
@@ -134,9 +140,9 @@ bool ServerCommandHandler::usePortal(u16 clientID, s32 x, s32 y, s32 z) {
 
 void ServerCommandHandler::wearHeldItem(Player &player, u16 amount) {
 	if (player.isCreative()) return;
-	int slot = player.heldItemSlot();
+	int slot = player.activeItemSlot();
 	if (slot < 0 || slot >= player.inventory().width()) return;
-	auto &stack = player.inventory().getStackRef(u16(slot), 0);
+	auto &stack = player.heldInventory().getStackRef(u16(slot), 0);
 	u16 previous = stack.amount();
 	std::string name = stack.stringID();
 	if (amount && previous) ++player.statistics().items[name].used;
@@ -226,7 +232,7 @@ void ServerCommandHandler::sendPlayerInvUpdate(u16 clientID, const ClientInfo *c
 	if (player) {
 		Network::Packet packet;
 		packet << Network::Command::PlayerInvUpdate;
-		packet << clientID << player->inventory() << player->heldItemSlot() << player->armor();
+		packet << clientID << player->inventory() << player->heldItemSlot() << player->armor() << player->offhand();
 
 		if (!client)
 			m_server.sendToAllClients(packet);
@@ -565,6 +571,11 @@ void ServerCommandHandler::setupCallbacks() {
 					return;
 				}
 			}
+			if (!packet.endOfPacket()) {
+				Inventory offhand;
+				if (!(packet >> offhand) || offhand.width() != 1 || offhand.height() != 1 || offhand.name() != "offhand" || offhand.inBlock()) return;
+				player->offhand() = std::move(offhand);
+			}
 			player->inventory() = std::move(inventory);
 			player->armor() = std::move(armor);
 		}
@@ -600,6 +611,7 @@ void ServerCommandHandler::setupCallbacks() {
 	m_server.setCommandCallback(Network::Command::PlayerPlaceBlock, [this](ClientInfo &client, Network::Packet &packet) {
 		ServerPlayer *player = m_players.getPlayerFromClientID(client.id);
 		if (player) {
+			UseHand hand(*player);
 			s32 x, y, z;
 			u32 block;
 			packet >> x >> y >> z >> block;
@@ -661,7 +673,7 @@ void ServerCommandHandler::setupCallbacks() {
 				return;
 			}
 			if (!player->isCreative())
-				player->inventory().setStack(player->heldItemSlot(), 0,
+				player->heldInventory().setStack(player->activeItemSlot(), 0,
 					stack.amount() > 1 ? stack.item().stringID() : "", stack.amount() - 1);
 			sendPlayerInvUpdate(client.id);
 			if (merged) world.setBlockState(x, y, z, 1);
@@ -701,6 +713,7 @@ void ServerCommandHandler::setupCallbacks() {
 	m_server.setCommandCallback(Network::Command::PlayerInteract, [this](ClientInfo &client, Network::Packet &) {
 		ServerPlayer *player = m_players.getPlayerFromClientID(client.id);
 		if (!player || !player->isReady() || !player->health()) return;
+		UseHand hand(*player);
 		auto &world = getWorldForClient(client.id);
 		if (!world.interactMinecart(*player)) world.interactMob(*player);
 	});
@@ -756,7 +769,7 @@ void ServerCommandHandler::setupCallbacks() {
 
 			if (!player->isCreative()) m_scriptEngine.luaCore().onEvent(LuaEventType::BlockDigged, glm::ivec3{x, y, z}, *blockState, *player, world, client, *this);
 			if (player->heldItemSlot() >= 0 && player->heldItemSlot() < player->inventory().width()) {
-				auto &tool = player->inventory().getStackRef(player->heldItemSlot(), 0);
+				auto &tool = player->heldInventory().getStackRef(player->activeItemSlot(), 0);
 				wearHeldItem(*player, retro::diggingWear(tool.item(), *blockState));
 			}
 
@@ -782,6 +795,11 @@ void ServerCommandHandler::setupCallbacks() {
 		}
 		else
 			logError() << ("Failed to change held item of player " + std::to_string(client.id) + ": Player not found").c_str();
+	});
+
+	m_server.setCommandCallback(Network::Command::PlayerSwapHands, [this](ClientInfo &client, Network::Packet &) {
+		auto *player = m_players.getPlayerFromClientID(client.id);
+		if (player && player->isReady() && player->health() && player->swapHands()) sendPlayerInvUpdate(client.id);
 	});
 
 	m_server.setCommandCallback(Network::Command::PlayerDropItem, [this](ClientInfo &client, Network::Packet &) {
@@ -815,6 +833,7 @@ void ServerCommandHandler::setupCallbacks() {
 	m_server.setCommandCallback(Network::Command::BlockActivated, [this](ClientInfo &client, Network::Packet &packet) {
 		ServerPlayer *player = m_players.getPlayerFromClientID(client.id);
 		if (player) {
+			UseHand hand(*player);
 			s32 x, y, z;
 			packet >> x >> y >> z >> client.screenWidth >> client.screenHeight >> client.guiScale;
 
@@ -860,6 +879,11 @@ void ServerCommandHandler::setupCallbacks() {
 			const auto &stack = armor.getStack(0, slot);
 			if (stack.amount() && (stack.amount() != 1 || stack.item().getGroupValue("group:om_armor_slot") != slot + 1)) return;
 		}
+		if (!packet.endOfPacket()) {
+			Inventory offhand;
+			if (!(packet >> offhand) || offhand.width() != 1 || offhand.height() != 1 || offhand.name() != "offhand" || offhand.inBlock()) return;
+			player->offhand() = std::move(offhand);
+		}
 		cargo.inventory = std::move(inventory);
 		player->inventory() = std::move(main);
 		player->armor() = std::move(armor);
@@ -899,6 +923,7 @@ void ServerCommandHandler::setupCallbacks() {
 	m_server.setCommandCallback(Network::Command::ItemActivated, [this](ClientInfo &client, Network::Packet &packet) {
 		ServerPlayer *player = m_players.getPlayerFromClientID(client.id);
 		if (player) {
+			UseHand hand(*player);
 			s32 x, y, z;
 			s8 face;
 			packet >> x >> y >> z >> face >> client.screenWidth >> client.screenHeight >> client.guiScale;

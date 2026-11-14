@@ -66,6 +66,26 @@ bool Player::pickItem(const std::string &itemID) {
 	return true;
 }
 
+bool Player::shouldUseOffhand() const {
+	if (m_heldItemSlot < 0 || m_heldItemSlot >= m_inventory.width()) return false;
+	const auto &main = m_inventory.getStack(m_heldItemSlot, 0);
+	u16 tool = main.item().getGroupValue("group:om_tool_type");
+	return m_offhand.getStack(0, 0).amount() && (!main.amount()
+		|| ((tool == 1 || tool == 2) && !main.item().canBeActivated()));
+}
+
+const ItemStack &Player::useItemStack() const {
+	return shouldUseOffhand() ? m_offhand.getStack(0, 0) : m_inventory.getStack(m_heldItemSlot, 0);
+}
+
+bool Player::swapHands() {
+	if (m_heldItemSlot < 0 || m_heldItemSlot >= m_inventory.width()) return false;
+	ItemStack main = m_inventory.getStack(m_heldItemSlot, 0);
+	m_inventory.setItemStack(m_heldItemSlot, 0, m_offhand.getStack(0, 0));
+	m_offhand.setItemStack(0, 0, main);
+	return true;
+}
+
 u16 Player::armorValue() const {
 	unsigned protection = 0, maximum = 0, remaining = 0;
 	for (const auto &stack : m_armor.items()) {

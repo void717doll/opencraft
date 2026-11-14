@@ -43,10 +43,14 @@ void PaperMap::upload() {
 	} else m_texture.updateRegion(0, 0, 0, 128, 128, pixels.data());
 }
 void PaperMap::update(ClientPlayer &player, ClientWorld &world) {
-	m_visible = player.heldItemSlot() >= 0 && player.heldItemSlot() < player.inventory().width() && player.heldItemStack().amount()
-		&& player.heldItemStack().stringID() == "default:map" && player.heldItemStack().damage();
+	if (player.heldItemSlot() < 0 || player.heldItemSlot() >= player.inventory().width()) { m_visible = false; flush(); return; }
+	const auto &main = player.heldItemStack();
+	const auto &offhand = player.offhand().getStack(0, 0);
+	bool mapInOffhand = !main.amount() || main.stringID() != "default:map";
+	const auto &map = mapInOffhand ? offhand : main;
+	m_visible = map.amount() && map.stringID() == "default:map" && map.damage();
 	if (!m_visible) { flush(); return; }
-	u16 id = player.heldItemStack().damage();
+	u16 id = map.damage();
 	if (id != m_id || m_worldName != GameConfig::worldName) {
 		flush();
 		m_id = id;
@@ -62,7 +66,7 @@ void PaperMap::update(ClientPlayer &player, ClientWorld &world) {
 	float pixelScale = std::min({2.f,(float(Config::screenWidth)-16)/140,(float(Config::screenHeight)-100)/140});
 	pixelScale = std::max(0.25f,pixelScale);
 	float half = 70 * pixelScale;
-	float x = std::clamp(float(Config::screenWidth)*0.75f,half+8,float(Config::screenWidth)-half-8);
+	float x = std::clamp(float(Config::screenWidth)*(mapInOffhand ? 0.25f : 0.75f),half+8,float(Config::screenWidth)-half-8);
 	float bottom = std::min(float(Config::screenHeight)*0.8f,float(Config::screenHeight)-40);
 	setPosition((x-64*pixelScale)/guiScale,(bottom-134*pixelScale)/guiScale);
 	setScale(pixelScale/guiScale,pixelScale/guiScale,1);

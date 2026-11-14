@@ -10,13 +10,13 @@ namespace {
 
 bool replaceBucket(Player &player, const std::string &replacement) {
 	if (player.isCreative()) return true;
-	int slot = player.heldItemSlot();
+	int slot = player.activeItemSlot();
 	ItemStack held = player.heldItemStack();
-	if (held.amount() == 1) player.inventory().setStack(u16(slot), 0, replacement, 1);
+	if (held.amount() == 1) player.heldInventory().setStack(u16(slot), 0, replacement, 1);
 	else {
 		if (player.inventory().addStack(replacement, 1).amount()) return false;
 		held.setAmount(held.amount() - 1);
-		player.inventory().setItemStack(u16(slot), 0, held);
+		player.heldInventory().setItemStack(u16(slot), 0, held);
 	}
 	return true;
 }

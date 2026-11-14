@@ -166,7 +166,7 @@ bool ServerWorld::placeRedstoneDust(Player &player, const Vector3i &point, s8 fa
 	if (!held.amount() || held.stringID() != "default:redstone_dust") return false;
 	setData(target.x,target.y,target.z,0);
 	setBlock(target.x,target.y,target.z,definitions.getBlockFromStringID("default:redstone_wire").id());
-	if (!player.isCreative()) player.inventory().setStack(u16(player.heldItemSlot()),0,
+	if (!player.isCreative()) player.heldInventory().setStack(player.activeItemSlot(),0,
 		held.amount()>1?held.stringID():"",held.amount()-1);
 	if (m_server) m_server->sendPlayerInvUpdate(player.clientID());
 	notifyRedstone(target);

@@ -19,7 +19,7 @@ class TextureAtlas;
 
 class WieldRenderer : public Drawable {
 	public:
-		explicit WieldRenderer(ClientPlayer &player);
+		explicit WieldRenderer(ClientPlayer &player, bool offhand = false);
 		~WieldRenderer();
 		void onEvent(const SDL_Event &event);
 		void update();
@@ -31,6 +31,7 @@ class WieldRenderer : public Drawable {
 		void draw(RenderTarget &target, RenderStates states) const override;
 
 		ClientPlayer &m_player;
+		bool m_offhand;
 		TextureAtlas &m_atlas;
 		Shader m_shader;
 		Texture m_skin;

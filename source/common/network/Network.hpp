@@ -96,6 +96,7 @@ namespace Network {
 		ParticleBurst         = 0x88,
 		Jukebox               = 0x89,
 		PlayerNoclip          = 0x8b,
+		PlayerSwapHands       = 0x95,
 		PlayerStatistics      = 0x8a,
 		PlayerCrafted         = 0x8c,
 		PlayerRideState       = 0x85,

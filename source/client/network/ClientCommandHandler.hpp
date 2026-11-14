@@ -57,6 +57,7 @@ class ClientCommandHandler {
 		void sendPlayerDigBlock(const glm::ivec4 &selectedBlock);
 		void sendNotePreview(const glm::ivec4 &selectedBlock);
 		void sendPlayerPlaceBlock(s32 x, s32 y, s32 z, u32 block);
+		void sendPlayerSwapHands();
 		void sendPlayerHeldItemChanged(u8 hotbarSlot, u16 itemID);
 		void sendPlayerReady();
 		void sendPlayerAttack();

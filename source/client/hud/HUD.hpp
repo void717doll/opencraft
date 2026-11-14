@@ -55,7 +55,7 @@ class HUD : public Transformable, public Drawable {
 
 		void update();
 
-		void pause() { m_blockCursor.reset(); m_wield.pause(); }
+		void pause() { m_blockCursor.reset(); m_wield.pause(); m_offhandWield.pause(); }
 		void setSpyglass(bool active) { m_isSpyglassActive = active; }
 
 		const BlockCursor &blockCursor() const { return m_blockCursor; }
@@ -73,6 +73,7 @@ class HUD : public Transformable, public Drawable {
 
 		Hotbar m_hotbar;
 		WieldRenderer m_wield;
+		WieldRenderer m_offhandWield;
 		Texture m_spyglassTexture;
 		Image m_spyglassScope;
 		bool m_isSpyglassActive = false;
@@ -86,11 +87,8 @@ class HUD : public Transformable, public Drawable {
 
 		Text m_fpsText;
 		Text m_coordinatesText;
-		Image m_experienceEmpty;
-		Image m_experienceFilled;
-		Text m_experienceLevel;
-		s32 m_experienceScore=-1;
-		unsigned m_experiencePixels=0;
+		Text m_scoreLabel;
+		Text m_scoreValue;
 		Text m_hitText;
 		Text m_chatText;
 		RectangleShape m_chatBackground;

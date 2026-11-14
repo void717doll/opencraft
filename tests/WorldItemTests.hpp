@@ -93,14 +93,17 @@ class WorldItemTests : public CxxTest::TestSuite {
 			auto &helmet = definitions.registerItem<Item>({}, "test:helmet", "helmet");
 			helmet.addGroup("group:om_armor_slot", 1); helmet.addGroup("group:om_max_damage",100);
 			PlayerList players; auto &player = players.addPlayer("tester", false);
+			player.setScore(281); player.offhand().setItemStack(0,0,ItemStack{"test:helmet",1,23});
 			player.setHealth(13); player.armor().setItemStack(0,0,ItemStack{"test:helmet",1,17});
 			Dimension dimension{0,"test:world","world"}; std::deque<ServerWorld> worlds;
 			worlds.emplace_back(players, dimension, 42); worlds.front().setCreative(true);
 			WorldSaveBasicBackend backend(worlds,players); backend.save("creative");
-			worlds.front().setCreative(false); player.setHealth(1); player.armor().clearStack(0,0);
+			worlds.front().setCreative(false); player.setHealth(1); player.setScore(0); player.offhand().clearStack(0,0); player.armor().clearStack(0,0);
 			backend.load("creative");
 			TS_ASSERT(worlds.front().isCreative()); TS_ASSERT_EQUALS(player.health(),13);
 			TS_ASSERT_EQUALS(player.armor().getStack(0,0).damage(),17);
+			TS_ASSERT_EQUALS(player.score(),281);
+			TS_ASSERT_EQUALS(player.offhand().getStack(0,0).damage(),23);
 			ChunkDatabase database("saves/creative/map.sqlite", true);
 			auto state = database.readState();
 			std::string legacy(static_cast<const char *>(state.getData()), state.getDataSize());
@@ -109,6 +112,7 @@ class WorldItemTests : public CxxTest::TestSuite {
 			worlds.front().setCreative(false); player.armor().clearStack(0,0); backend.load("legacy");
 			TS_ASSERT(!worlds.front().isCreative()); TS_ASSERT_EQUALS(player.health(),13);
 			TS_ASSERT_EQUALS(player.armor().getStack(0,0).amount(),0);
+			TS_ASSERT_EQUALS(player.offhand().getStack(0,0).amount(),0);
 			player.setCreative(true); player.damage(100); TS_ASSERT_EQUALS(player.health(),20);
 			player.setCreative(false); player.damage(5); TS_ASSERT_EQUALS(player.health(),15);
 			} catch (const Exception &e) { TS_FAIL(e.what()); } catch (const std::exception &e) { TS_FAIL(e.what()); }
@@ -278,6 +282,7 @@ class WorldItemTests : public CxxTest::TestSuite {
 			TS_ASSERT(player); if (!player) return;
 			player->setPosition(8, 8, 5); player->setScore(123);
 			player->inventory().setItemStack(0, 0, {"test:tool", 1, 37});
+			player->offhand().setItemStack(0, 0, {"test:tool", 1, 19});
 			ServerCommandHandler commands(scripts, server, worlds, players, definitions);
 			auto &registry = worlds.getWorld(0).scene().registry();
 			for (int i = 0; i < 128; ++i) registry.emplace<ItemStack>(registry.create(), "test:tool", 1);
@@ -285,11 +290,12 @@ class WorldItemTests : public CxxTest::TestSuite {
 			TS_ASSERT_EQUALS(player->health(), 0);
 			TS_ASSERT_EQUALS(player->score(), 123);
 			TS_ASSERT_EQUALS(player->inventory().getStack(0, 0).amount(), 0);
-			TS_ASSERT_EQUALS(registry.view<ItemStack>().size(), 129u);
-			commands.damagePlayer(1, 20);
-			TS_ASSERT_EQUALS(registry.view<ItemStack>().size(), 129u);
-			TS_ASSERT(worlds.getWorld(0).dropPlayerStack(*player, {"test:tool", 1, 41}));
+			TS_ASSERT_EQUALS(player->offhand().getStack(0, 0).amount(), 0);
 			TS_ASSERT_EQUALS(registry.view<ItemStack>().size(), 130u);
+			commands.damagePlayer(1, 20);
+			TS_ASSERT_EQUALS(registry.view<ItemStack>().size(), 130u);
+			TS_ASSERT(worlds.getWorld(0).dropPlayerStack(*player, {"test:tool", 1, 41}));
+			TS_ASSERT_EQUALS(registry.view<ItemStack>().size(), 131u);
 			commands.sendPlayerScore(1);
 			Network::Packet packet; Network::Command command;
 			bool sawDead = false, sawScore = false;

@@ -206,6 +206,7 @@ void WorldSaveBasicBackend::load(const std::string &name) {
 
 			auto &player = m_playerList.addPlayer(username, false);
 			player.clearBedSpawn();
+			player.offhand().clearStack(0, 0);
 			player.statistics() = {};
 			player.deserialize(save);
 			if (!save) throw std::runtime_error("incomplete saved player");
@@ -234,6 +235,16 @@ void WorldSaveBasicBackend::load(const std::string &name) {
 					s32 score;
 					if (!(save >> name >> score)) break;
 					if (auto *player = m_playerList.getPlayer(name)) player->setScore(score);
+				}
+			}
+			else if (marker == 0x4f464648) {
+				for (u16 i = 0; i < count; ++i) {
+					std::string name;
+					Inventory offhand;
+					if (!(save >> name >> offhand)) break;
+					if (auto *player = m_playerList.getPlayer(name)) {
+						if (offhand.width() == 1 && offhand.height() == 1 && offhand.name() == "offhand" && !offhand.inBlock()) player->offhand() = std::move(offhand);
+					}
 				}
 			}
 			else if (marker == 0x41524d52) {
@@ -342,6 +353,9 @@ void WorldSaveBasicBackend::save(const std::string &name) {
 	save << u32(0x53434f52) << u16(m_playerList.size());
 	for (const auto &entry : m_playerList)
 		save << entry.first << entry.second.score();
+
+	save << u32(0x4f464648) << u16(m_playerList.size());
+	for (const auto &entry : m_playerList) save << entry.first << entry.second.offhand();
 
 	save << u32(0x41524d52) << u16(m_playerList.size());
 	for (const auto &entry : m_playerList)

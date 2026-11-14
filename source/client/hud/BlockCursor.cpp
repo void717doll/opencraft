@@ -110,7 +110,7 @@ void BlockCursor::onEvent(const SDL_Event &event, const Hotbar &hotbar) {
 	if (hotbar.cursorPos() == -1) return;
 
 	if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_RIGHT
-	 && m_selectedBlock.w == -1 && hotbar.currentItem().canBeActivated()) {
+	 && m_selectedBlock.w == -1 && m_player.useItemStack().item().canBeActivated()) {
 		m_client.sendItemActivated({int(std::floor(m_player.x())), int(std::floor(m_player.y())), int(std::floor(m_player.z())), -1});
 		return;
 	}
@@ -226,7 +226,7 @@ void BlockCursor::update(const Hotbar &hotbar) {
 	// Repeat block activation when right click is held
 	u64 now = GameClock::getInstance().getTicks();
 	u64 last = m_lastActivationTime.value_or(now);
-	if (now - last > m_activationRepeatDelay && !hotbar.currentItem().hasGroup("group:om_treasure_note"))
+	if (now - last > m_activationRepeatDelay && !m_player.useItemStack().item().hasGroup("group:om_treasure_note"))
 		activateBlock(hotbar);
 }
 
@@ -238,7 +238,7 @@ void BlockCursor::activateBlock(const Hotbar &hotbar) {
 
 	u16 blockId = m_world.getBlock(m_selectedBlock.x, m_selectedBlock.y, m_selectedBlock.z);
 	const Block &block = Registry::getInstance().getBlock(blockId);
-	const Item &item = hotbar.currentItem();
+	const Item &item = m_player.useItemStack().item();
 
 	if (item.hasGroup("group:om_map") && block.canBeActivated() && !GamePad::isKeyPressed(GameKey::Sneak)) {
 		m_client.sendBlockActivated(m_selectedBlock);
@@ -262,7 +262,7 @@ void BlockCursor::activateBlock(const Hotbar &hotbar) {
 		blockActivationSent = true;
 	}
 
-	if (block.id() && !itemActivationSent && !blockActivationSent && hotbar.currentItem().id() && item.isBlock()) {
+	if (block.id() && !itemActivationSent && !blockActivationSent && m_player.useItemStack().item().id() && item.isBlock()) {
 		s8 face = (s8)m_selectedBlock.w;
 
 		s32 x = m_selectedBlock.x;
@@ -283,7 +283,7 @@ void BlockCursor::activateBlock(const Hotbar &hotbar) {
 			blockState = m_world.getBlockState(x, y, z);
 		}
 
-		const Block &newBlock = Registry::getInstance().getBlockFromStringID(hotbar.currentItem().stringID());
+		const Block &newBlock = Registry::getInstance().getBlockFromStringID(m_player.useItemStack().item().stringID());
 		Vector3i destination{x, y, z};
 		bool merged = resolveSlabPlacement(m_world, destination, newBlock);
 		x = destination.x; y = destination.y; z = destination.z;
@@ -453,7 +453,7 @@ void BlockCursor::draw(RenderTarget &target, RenderStates states) const {
 
 glm::ivec4 BlockCursor::findSelectedBlock() const {
 	bool includeSources = m_player.heldItemSlot() >= 0 && m_player.heldItemSlot() < m_player.inventory().width()
-		&& m_player.heldItemStack().item().getGroupValue("group:om_bucket") == 1;
+		&& m_player.useItemStack().item().getGroupValue("group:om_bucket") == 1;
 	glm::dvec3 position{m_player.camera().getDPosition().x,
 	                    m_player.camera().getDPosition().y,
 	                    m_player.camera().getDPosition().z};

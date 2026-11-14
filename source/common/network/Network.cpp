@@ -50,6 +50,7 @@ std::string Network::commandToString(Network::Command command) {
 		{Network::Command::PlayerChangeDimension, "PlayerChangeDimension"},
 		{Network::Command::PlayerHeldItemChanged, "PlayerHeldItemChanged"},
 		{Network::Command::PlayerDropItem, "PlayerDropItem"},
+		{Network::Command::PlayerSwapHands, "PlayerSwapHands"},
 		{Network::Command::PlayerToolBroken, "PlayerToolBroken"},
 		{Network::Command::PlayerHurt, "PlayerHurt"},
 		{Network::Command::PlayerRespawn, "PlayerRespawn"},

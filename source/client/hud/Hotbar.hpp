@@ -52,6 +52,8 @@ class Hotbar : public Widget {
 		void draw(RenderTarget &target, RenderStates states) const override;
 
 		Image m_background;
+		Image m_offhandBackground;
+		ItemWidget m_offhandItem;
 
 		Image m_cursor;
 		int m_cursorPos = -1;

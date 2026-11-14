@@ -61,6 +61,12 @@ local function show_inventory(keyID, client)
 	end
 
 	gui:inventory {
+		name = "inv_offhand", pos = {x = 76, y = 61},
+		inventory = {source = "player", player = "player", inventory_name = "offhand", offset = 0, count = 1},
+		size = {x = 1, y = 1}, shift_destination = "inv_main,inv_hotbar",
+	}
+
+	gui:inventory {
 		name = "inv_main",
 		pos = {x = 7, y = 83},
 

@@ -62,6 +62,14 @@ class Player : public ISerializable {
 		u16 clientID() const { return m_clientID; }
 
 		Inventory &inventory() { return m_inventory; }
+		Inventory &offhand() { return m_offhand; }
+		const Inventory &offhand() const { return m_offhand; }
+		Inventory &heldInventory() { return m_usingOffhand ? m_offhand : m_inventory; }
+		u16 activeItemSlot() const { return m_usingOffhand ? 0 : u16(m_heldItemSlot); }
+		bool shouldUseOffhand() const;
+		const ItemStack &useItemStack() const;
+		void setUsingOffhand(bool value) { m_usingOffhand = value; }
+		bool swapHands();
 		Inventory &armor() { return m_armor; }
 		const Inventory &armor() const { return m_armor; }
 		u16 armorValue() const;
@@ -75,7 +83,7 @@ class Player : public ISerializable {
 
 		const FloatBox &hitbox() const { return m_hitbox; }
 
-		const ItemStack &heldItemStack() { return m_inventory.getStack(m_heldItemSlot, 0); }
+		const ItemStack &heldItemStack() { return heldInventory().getStack(activeItemSlot(), 0); }
 		s8 heldItemSlot() const { return m_heldItemSlot; }
 		void setHeldItemSlot(u8 heldItemSlot) { m_heldItemSlot = heldItemSlot; }
 		bool pickItem(const std::string &itemID);
@@ -119,6 +127,8 @@ class Player : public ISerializable {
 
 		Inventory m_inventory{9, 4};
 		Inventory m_armor{1, 4, "armor"};
+		Inventory m_offhand{1, 1, "offhand"};
+		bool m_usingOffhand = false;
 		u16 m_armorRemainder = 0;
 
 		FloatBox m_hitbox;

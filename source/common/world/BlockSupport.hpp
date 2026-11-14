@@ -84,6 +84,13 @@ inline bool blockHasSupport(const World &world, const Vector3i &pos, const Block
 		return box.x == 0 && box.y == 0 && box.z == 0 && box.sizeX == 1 && box.sizeY == 1 && box.sizeZ == 1;
 	}
 	if (block.hasGroup("group:om_sapling") || block.hasGroup("group:om_soil_plant")) {
+		if (block.hasGroup("group:om_replaceable")) {
+			const auto *above = loadedSupport(world, pos + Vector3i{0,0,1});
+			if (above && above->isCollidable()) {
+				const auto box = collision::blockBox(*above, world.getData(pos.x, pos.y, pos.z + 1), 0, 0, 0);
+				if (box.x == 0 && box.y == 0 && box.z == 0 && box.sizeX == 1 && box.sizeY == 1) return false;
+			}
+		}
 		const auto *floor = loadedSupport(world, pos + Vector3i{0,0,-1});
 		return floor && floor->block().hasGroup("group:om_material_dirt") && hasSolidTop(world, pos + Vector3i{0,0,-1});
 	}

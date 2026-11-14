@@ -100,7 +100,7 @@ void ClientCommandHandler::sendPlayerInvUpdate() {
 	if (m_minecartInventory) { sendMinecartInvUpdate(*m_minecartInventory); return; }
 	Network::Packet invPacket;
 	invPacket << Network::Command::PlayerInvUpdate;
-	invPacket << m_player.inventory() << m_player.armor();
+	invPacket << m_player.inventory() << m_player.armor() << m_player.offhand();
 	m_client.send(invPacket);
 }
 
@@ -138,6 +138,12 @@ void ClientCommandHandler::sendPlayerDigBlock(const glm::ivec4 &selectedBlock) {
 void ClientCommandHandler::sendPlayerPlaceBlock(s32 x, s32 y, s32 z, u32 block) {
 	Network::Packet packet;
 	packet << Network::Command::PlayerPlaceBlock << x << y << z << block;
+	m_client.send(packet);
+}
+
+void ClientCommandHandler::sendPlayerSwapHands() {
+	Network::Packet packet;
+	packet << Network::Command::PlayerSwapHands;
 	m_client.send(packet);
 }
 
@@ -185,7 +191,7 @@ bool ClientCommandHandler::minecartInReach(u32 id) const {
 void ClientCommandHandler::sendMinecartInvUpdate(Inventory &inventory) {
 	Network::Packet packet;
 	packet << Network::Command::MinecartInvUpdate << u32(inventory.blockPos().x) << inventory
-		<< m_player.inventory() << m_player.armor();
+		<< m_player.inventory() << m_player.armor() << m_player.offhand();
 	m_client.send(packet);
 }
 
@@ -337,7 +343,7 @@ void ClientCommandHandler::setupCallbacks() {
 			packet >> m_player.inventory();
 
 			s8 heldItemSlot;
-			packet >> heldItemSlot >> m_player.armor();
+			packet >> heldItemSlot >> m_player.armor() >> m_player.offhand();
 
 			if (m_player.heldItemSlot() == -1) {
 				m_player.setHeldItemSlot(heldItemSlot);

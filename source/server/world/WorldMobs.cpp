@@ -39,7 +39,7 @@ double unitRandom(MobComponent &mob) { return double(nextRandom(mob)) / 42949672
 bool projectile(Kind kind) { return betaMobIsProjectile(kind); }
 
 bool holdingItem(ServerPlayer &player, const std::string &id) {
-	int slot = player.heldItemSlot();
+	int slot = player.activeItemSlot();
 	if (slot < 0 || slot >= player.inventory().width()) return false;
 	const ItemStack &held = player.heldItemStack();
 	return held.amount() && held.stringID() == id;
@@ -292,10 +292,10 @@ bool consumeFor(ServerPlayer &player, const std::string &replacement) {
 	if (player.isCreative()) return true;
 	ItemStack held = player.heldItemStack();
 	if (!held.amount()) return false;
-	if (held.amount() == 1) player.inventory().setStack(player.heldItemSlot(), 0, replacement, replacement.empty() ? 0 : 1);
+	if (held.amount() == 1) player.heldInventory().setStack(player.activeItemSlot(), 0, replacement, replacement.empty() ? 0 : 1);
 	else {
 		if (!replacement.empty() && player.inventory().addStack(replacement, 1).amount()) return false;
-		player.inventory().setStack(player.heldItemSlot(), 0, held.item().stringID(), held.amount() - 1);
+		player.heldInventory().setStack(player.activeItemSlot(), 0, held.item().stringID(), held.amount() - 1);
 	}
 	return true;
 }
@@ -1118,7 +1118,7 @@ bool ServerWorld::interactMob(ServerPlayer &player) {
 		dropItem(*this, {position.x, position.y, position.z}, "default:pumpkin", 1);
 		if (!player.isCreative()) {
 			if (m_server) m_server->wearHeldItem(player, 1);
-			else player.inventory().getStackRef(player.heldItemSlot(), 0).wear(1);
+			else player.heldInventory().getStackRef(player.activeItemSlot(), 0).wear(1);
 		}
 		handled = true;
 	}
@@ -1130,7 +1130,7 @@ bool ServerWorld::interactMob(ServerPlayer &player) {
 		auto &position = registry.get<PositionComponent>(entity);
 		dropItem(*this, {position.x, position.y, position.z}, "default:wool", u16(2 + nextRandom(mob) % 3));
 		if (m_server) m_server->wearHeldItem(player, 1);
-		else player.inventory().getStackRef(player.heldItemSlot(), 0).wear(1);
+		else player.heldInventory().getStackRef(player.activeItemSlot(), 0).wear(1);
 		handled = true;
 	}
 	else if (traits.kind == Kind::Wolf) {
@@ -1176,7 +1176,7 @@ bool ServerWorld::dropWorldItem(Vector3d position, const std::string &id, u16 co
 }
 
 bool ServerWorld::dropHeldItem(ServerPlayer &player) {
-	int slot = player.heldItemSlot();
+	int slot = player.activeItemSlot();
 	if (!player.isReady() || !player.health() || player.dimension() != m_dimension.id()
 	 || slot < 0 || slot >= 9 || slot >= player.inventory().width()) return false;
 	ItemStack stack = player.heldItemStack();
@@ -1194,7 +1194,7 @@ bool ServerWorld::dropHeldItem(ServerPlayer &player) {
 		float(std::sin(yaw) * std::cos(pitch) * 6), float(std::sin(pitch) * 6 + 2)};
 	body.pickupDelay = 40;
 	stack.setAmount(stack.amount() - 1);
-	player.inventory().setItemStack(u16(slot), 0, stack.amount() ? stack : ItemStack::Empty);
+	player.heldInventory().setItemStack(u16(slot), 0, stack.amount() ? stack : ItemStack::Empty);
 	if (m_server) m_server->sendPlayerInvUpdate(player.clientID());
 	return true;
 }
@@ -1212,6 +1212,9 @@ void ServerWorld::dropPlayerItems(ServerPlayer &player) {
 				player.inventory().clearStack(x, y);
 		}
 	}
+	ItemStack offhand = player.offhand().getStack(0, 0);
+	if (offhand.amount() && dropItem(*this, {player.x(), player.y(), player.z()}, offhand.stringID(), offhand.amount(), offhand.damage(), false) != entt::null)
+		player.offhand().clearStack(0, 0);
 	if (m_server) m_server->sendPlayerInvUpdate(player.clientID());
 }
 
@@ -1258,7 +1261,7 @@ bool ServerWorld::attackMob(ServerPlayer &player) {
 	}
 	u16 damage = 1;
 	if (player.heldItemSlot() >= 0 && player.heldItemSlot() < player.inventory().width()) {
-		auto &tool = player.inventory().getStackRef(player.heldItemSlot(), 0);
+		auto &tool = player.heldInventory().getStackRef(player.activeItemSlot(), 0);
 		damage = retro::attackDamage(tool.item());
 		if (m_server) m_server->wearHeldItem(player, retro::attackingWear(tool.item()));
 		else tool.wear(retro::attackingWear(tool.item()));

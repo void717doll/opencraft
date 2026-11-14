@@ -41,7 +41,7 @@ undamaged stacks retain their original serialized bytes. a damaged stack writes 
 
 death drops the inventory once and leaves health at zero. the death screen shows `you died!`, the score, and respawn/title-menu buttons. respawning returns to the overworld with full health and a new life score. dead players cannot move, attack, or collect drops. closing an inventory returns carried items and temporary crafting ingredients; overflow and items carried at death drop into the world. player-owned items bypass the ambient-loot cap so the cap cannot silently destroy them.
 
-experience appears as a green bar and level above the survival hotbar. the death screen shows the raw points total. the existing `SCOR` save trailer preserves points; older saves start at zero. survival kills and qualifying ores award points using the modernmcp level progression described below.
+the hud and death screen show the numeric score. the existing `SCOR` save trailer preserves points; older saves start at zero. survival kills and qualifying ores increase the score.
 
 the pause menu stops world ticks and player movement. inventory and death screens leave the world running, matching the beta screen behavior. movement positions are sent after each physics tick: combining several ticks into one displacement could make the server reject valid paths off ledges and around corners.
 
@@ -137,14 +137,20 @@ grass, ferns, flowers, and saplings allow walking through them. grass and ferns 
 
 block breaking keeps a local removal pending until the authoritative block update arrives. queued snapshots cannot restore that block during the wait; a rejected break restores the actual block. identical snapshots skip remeshing, and server movement validation now retains the grounded step path used by the client.
 
-## building shapes and experience
+## building shapes and score
 
 birch, spruce, cherry, jungle, acacia, and dark oak planks make their own slabs and stairs. amethyst blocks have matching shapes too. three blocks in a row make three slabs; six blocks in either stair pattern make four stairs. matching slabs merge and drop two halves; stairs follow the existing beta rule and drop their parent block. wood shapes use axes and burn as fuel, while amethyst shapes use pickaxes. oak recipes now require oak planks.
 
 wild cherry patches are 128 times less frequent than before, and cherry groves require an extreme regional-noise value. trees inside those groves are ten times less dense. planted saplings and bone meal keep their normal growth. the change affects newly generated terrain.
 
-the previous points counter now feeds an experience bar and level number above the survival hotbar. modernmcp's level costs are used: 17 points per early level, increasing after level 15 and again after level 30. survival mob kills and properly harvested coal, diamond, redstone, lapis, and quartz ores grant experience. animals give 1–3 points, ordinary hostile mobs give 5, and slimes use their size. bats and snow golems give none. creative actions give none.
+the numeric score increases from survival mob kills and properly harvested coal, diamond, redstone, lapis, and quartz ores. animals give 1–3 points, ordinary hostile mobs give 5, and slimes use their size. bats and snow golems give none. creative actions give none.
 
-experience is credited directly, without floating orbs. existing saved points carry over as the experience total; death resets it on respawn. smelting, breeding, fishing rewards, enchanting, and experience spending are not included.
+points are credited directly to the score, without an experience bar, levels, or floating orbs. existing saved points carry over; death resets the score on respawn. smelting, breeding, fishing rewards, enchanting, and point spending are not included.
 
 the creative scrollbar reads the same scroll position as its item grid. wheel scrolling moves the thumb, search resets it, and dragging stays inside the visible track.
+
+## offhand
+
+f swaps the selected hotbar stack with the offhand. the equipment screen (i) has an offhand slot; its contents also appear beside the hotbar and in the left hand. right-click uses the offhand when the main hand is empty or holds a tool without a use action. blocks, food, buckets, and other usable items in the main hand take priority. left-click mining and attacks use the main hand. picked-up items refill a matching offhand stack before entering the main inventory; overflow goes into normal storage. empty offhand slots stay empty. offhand items save with the world and drop on death. shields remain excluded.
+
+tall grass and ferns break beneath blocks with a solid bottom face, using their normal seed-drop rules. torches and other small decorations above them do not count as a solid cover.

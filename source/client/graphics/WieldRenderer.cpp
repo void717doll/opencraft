@@ -25,8 +25,8 @@ constexpr u64 swingDuration = 286;
 
 }
 
-WieldRenderer::WieldRenderer(ClientPlayer &player)
-	: m_player(player), m_atlas(ResourceHandler::getInstance().get<TextureAtlas>("atlas-blocks")) {
+WieldRenderer::WieldRenderer(ClientPlayer &player, bool offhand)
+	: m_player(player), m_offhand(offhand), m_atlas(ResourceHandler::getInstance().get<TextureAtlas>("atlas-blocks")) {
 	m_shader.loadFromFile("basic");
 	m_skin.loadFromFile("resources/textures/player.png");
 	m_armVertices.setupDefaultLayout();
@@ -65,8 +65,14 @@ void WieldRenderer::onEvent(const SDL_Event &event) {
 	if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) pause();
 	if (event.type != SDL_MOUSEBUTTONDOWN && event.type != SDL_MOUSEBUTTONUP) return;
 	bool pressed = event.type == SDL_MOUSEBUTTONDOWN;
-	if (event.button.button == SDL_BUTTON_LEFT) m_attacking = pressed;
-	else if (event.button.button == SDL_BUTTON_RIGHT) m_using = pressed;
+	if (event.button.button == SDL_BUTTON_LEFT) {
+		if (m_offhand) return;
+		m_attacking = pressed;
+	}
+	else if (event.button.button == SDL_BUTTON_RIGHT) {
+		if (pressed && m_player.shouldUseOffhand() != m_offhand) return;
+		m_using = pressed;
+	}
 	else return;
 	if (pressed && !m_swinging) {
 		m_swingStart = GameClock::getInstance().getTicks();
@@ -115,7 +121,7 @@ void WieldRenderer::update() {
 
 	const Item *item = nullptr;
 	if (m_player.heldItemSlot() >= 0) {
-		const ItemStack &stack = m_player.heldItemStack();
+		const ItemStack &stack = m_offhand ? m_player.offhand().getStack(0, 0) : m_player.heldItemStack();
 		if (stack.amount() && stack.item().id()) item = &stack.item();
 	}
 	u64 now = GameClock::getInstance().getTicks();
@@ -141,6 +147,7 @@ void WieldRenderer::update() {
 }
 
 void WieldRenderer::draw(RenderTarget &target, RenderStates states) const {
+	if (m_offhand && !m_player.offhand().getStack(0, 0).amount()) return;
 	Vector2u size = target.getSize();
 	if (!size.x || !size.y) return;
 	float aspect = float(size.x) / float(size.y);
@@ -180,12 +187,22 @@ void WieldRenderer::draw(RenderTarget &target, RenderStates states) const {
 		states.transform *= Transform{glm::mat4_cast(rotation)};
 		states.transform.rotateX(-90.f);
 		states.transform.translate(-0.15f, -0.15f, -0.15f);
+		if (m_offhand) {
+			Transform mirror;
+			mirror.scale(-1, 1, 1);
+			states.transform = mirror * states.transform;
+		}
 		target.draw(*m_cube, states);
 	}
 	else if (m_itemVertexCount) {
 		states.transform.scale(1, 1, -1);
 		states.transform *= Transform{glm::mat4_cast(rotation)};
 		states.texture = &m_atlas.texture();
+		if (m_offhand) {
+			Transform mirror;
+			mirror.scale(-1, 1, 1);
+			states.transform = mirror * states.transform;
+		}
 		target.draw(m_itemVertices, 0, m_itemVertexCount, states);
 	}
 	else {

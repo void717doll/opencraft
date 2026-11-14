@@ -43,7 +43,7 @@ bool useClimbingRope(ServerWorld &world, Player &player, Vector3i position, s8 f
 	for (const auto &cell : cells) world.setBlock(cell.x,cell.y,cell.z,rope);
 	if (!player.isCreative()) {
 		held.setAmount(u16(held.amount()-cells.size()));
-		player.inventory().setItemStack(u16(player.heldItemSlot()),0,held);
+		player.heldInventory().setItemStack(player.activeItemSlot(),0,held);
 	}
 	return true;
 }

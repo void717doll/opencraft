@@ -116,7 +116,8 @@ ItemStack LuaMod::giveItemStack(ServerPlayer &player, ItemStack *itemStack) {
 		return ItemStack::Empty;
 	}
 
-	ItemStack stackRet = player.inventory().addItemStack(*itemStack, 0, 0, true, true);
+	ItemStack stackRet = player.offhand().addItemStack(*itemStack, 0, 0, true);
+	stackRet = player.inventory().addItemStack(stackRet, 0, 0, true, true);
 	if (stackRet.amount() != itemStack->amount()) {
 		m_worldController.server()->sendPlayerInvUpdate(player.clientID(), player.client());
 		float pitch = 0.7f + float(GameTime::getTicks() % 41) / 100.f;

@@ -93,7 +93,7 @@ void GameState::onStateInactive() {
 bool GameState::holdingSpyglass() {
 	int slot = m_player.heldItemSlot();
 	if (slot < 0 || slot >= m_player.inventory().width()) return false;
-	const ItemStack &stack = m_player.inventory().getStack(u16(slot), 0);
+	const ItemStack &stack = m_player.useItemStack();
 	return stack.amount() && stack.stringID() == "default:spyglass";
 }
 
@@ -154,6 +154,7 @@ void GameState::onEvent(const SDL_Event &event) {
 			}
 		}
 		else if (event.type == SDL_KEYDOWN) {
+			if (!event.key.repeat && event.key.keysym.sym == keyboardHandler->getKeycode(GameKey::SwapHands)) m_clientCommandHandler.sendPlayerSwapHands();
 			if (!event.key.repeat && event.key.keysym.sym == keyboardHandler->getKeycode(GameKey::Noclip)) {
 				m_player.toggleNoclip();
 				m_clientCommandHandler.sendPlayerNoclip(m_player.isNoclip());

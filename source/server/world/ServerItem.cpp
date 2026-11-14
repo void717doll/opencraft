@@ -62,7 +62,7 @@ bool ServerItem::onItemActivated(const glm::ivec3 &pos, Block &block, Player &pl
 				return true;
 			}
 			note.setDamage(id);
-			player.inventory().setItemStack(u16(player.heldItemSlot()), 0, note);
+			player.heldInventory().setItemStack(player.activeItemSlot(), 0, note);
 			server.sendPlayerInvUpdate(client.id);
 		}
 		auto target = exploration::loadNote(server.worldName(), note.damage());
@@ -78,15 +78,15 @@ bool ServerItem::onItemActivated(const glm::ivec3 &pos, Block &block, Player &pl
 		u16 id = navigation::create(server.worldName(),player.x(),player.y(),player.dimension());
 		if (!id) return false;
 		ItemStack filled("default:map",1); filled.setDamage(id);
-		Inventory inventory = player.inventory();
-		if (held.amount() == 1) inventory.setItemStack(u16(player.heldItemSlot()),0,filled);
+		Inventory inventory = player.heldInventory();
+		if (held.amount() == 1) inventory.setItemStack(player.activeItemSlot(),0,filled);
 		else {
 			held.setAmount(held.amount()-1);
-			inventory.setItemStack(u16(player.heldItemSlot()),0,held);
+			inventory.setItemStack(player.activeItemSlot(),0,held);
 			auto remainder = inventory.addItemStack(filled);
 			if (remainder.amount() && !static_cast<ServerWorld &>(world).dropWorldItem({player.x(),player.y(),player.z()+1},"default:map",1,id,false)) return false;
 		}
-		player.inventory() = std::move(inventory);
+		player.heldInventory() = std::move(inventory);
 		server.sendPlayerInvUpdate(client.id);
 		return true;
 	}
@@ -96,7 +96,7 @@ bool ServerItem::onItemActivated(const glm::ivec3 &pos, Block &block, Player &pl
 		if (slot > 4) return false;
 		ItemStack previous = player.armor().getStack(0, slot - 1);
 		player.armor().setItemStack(0, slot - 1, player.heldItemStack());
-		player.inventory().setItemStack(u16(player.heldItemSlot()), 0, previous);
+		player.heldInventory().setItemStack(player.activeItemSlot(), 0, previous);
 		server.sendPlayerInvUpdate(client.id);
 		return true;
 	}
@@ -122,7 +122,7 @@ bool ServerItem::onItemActivated(const glm::ivec3 &pos, Block &block, Player &pl
 				remaining = 1;
 			}
 		}
-		player.inventory().setStack(player.heldItemSlot(), 0, result, remaining);
+		player.heldInventory().setStack(player.activeItemSlot(), 0, result, remaining);
 		player.heal(m_healAmount);
 		server.sendPlayerInvUpdate(client.id);
 		server.sendPlayerHealth(client.id);
@@ -134,7 +134,7 @@ bool ServerItem::onItemActivated(const glm::ivec3 &pos, Block &block, Player &pl
 			ItemStack held = player.heldItemStack();
 			m_onItemActivated(pos, block, player, world, client, server);
 			if (player.isCreative()) {
-				player.inventory().setItemStack(u16(player.heldItemSlot()), 0, held);
+				player.heldInventory().setItemStack(player.activeItemSlot(), 0, held);
 				server.sendPlayerInvUpdate(client.id);
 			}
 			u16 type = getGroupValue("group:om_tool_type");
