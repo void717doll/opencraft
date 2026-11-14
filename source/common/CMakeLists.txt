@@ -163,6 +163,10 @@ om_add_library(${PROJECT_NAME} "${SOURCE_FILES}" "${HEADER_FILES}")
 target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/external/SFML/src/SFML/Network/Packet.cpp)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/external/SFML/src)
 
+if (WIN32)
+	target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
+endif ()
+
 
 #------------------------------------------------------------------------------
 # Dependencies
