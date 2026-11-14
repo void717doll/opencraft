@@ -10,7 +10,7 @@ mod:block {
 }
 mod:block {
 	id = "cherry_leaves", name = "Cherry Leaves", hardness = 0.2,
-	tiles = "refi_cherry_leaves.png", draw_type = "leaves", is_opaque = false,
+	tiles = "refi_cherry_leaves.png", draw_type = "leaves", custom_param_bits = 1, is_opaque = false,
 	item_drop = {id = "default:cherry_sapling", amount = 1},
 }
 mod:block {

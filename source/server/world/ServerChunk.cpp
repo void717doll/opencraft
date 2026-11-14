@@ -92,6 +92,11 @@ void ServerChunk::onBlockPlaced(int x, int y, int z, const Block &block) {
 
 void ServerChunk::onBlockDestroyed(int x, int y, int z, const Block &block) {
 	const ServerBlock &serverBlock = (ServerBlock &)block;
+	bool leaves = block.getState(0).drawType() == BlockDrawType::Leaves;
+	const auto &id = block.stringID();
+	bool log = block.hasGroup("group:om_material_wood") && id.size() >= 5 && id.compare(id.size()-5,5,"_wood") == 0;
+	if (leaves || log)
+		m_world.blockPhysics().markLeaves({x + m_x * width, y + m_y * depth, z + m_z * height}, leaves ? 1 : 4);
 	serverBlock.onBlockDestroyed(glm::ivec3{x + m_x * CHUNK_WIDTH, y + m_y * CHUNK_DEPTH, z + m_z * CHUNK_HEIGHT}, (ServerWorld &)m_world);
 
 	setModified(true);

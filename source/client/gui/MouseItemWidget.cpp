@@ -202,7 +202,11 @@ void MouseItemWidget::updateCurrentItem(ItemWidget *currentItemWidget) {
 		m_currentItemWidget = (currentItemWidget->stack().item().id()) ? currentItemWidget : nullptr;
 		const std::string &label = currentItemWidget->stack().item().label();
 		auto start = label.find_first_not_of(" \t\r\n");
-		m_tooltipText.setString(start == std::string::npos ? "" : label.substr(start, label.find_last_not_of(" \t\r\n") - start + 1));
+		std::string tooltip = start == std::string::npos ? "" : label.substr(start, label.find_last_not_of(" \t\r\n") - start + 1);
+		const auto &stack = currentItemWidget->stack();
+		if (Config::isItemDurabilityVisible && stack.amount() && stack.maxDamage())
+			tooltip += "\nDurability: " + std::to_string(stack.maxDamage() - std::min(stack.damage(), stack.maxDamage())) + "/" + std::to_string(stack.maxDamage());
+		m_tooltipText.setString(tooltip);
 		m_tooltipText.updateVertexBuffer();
 		float width = float(m_tooltipText.getSize().x);
 		float x = 22, y = -2;
@@ -210,7 +214,9 @@ void MouseItemWidget::updateCurrentItem(ItemWidget *currentItemWidget) {
 		if (m_mouseX + (x - 10 + width + 3) * scaleX > Config::screenWidth) x -= width + 24;
 		if (m_mouseY + (y - 13) * scaleY < 0) y = 22;
 		m_tooltipBackground.setPosition(x - 3, y - 3);
-		if (m_tooltipBackground.width() != width + 6) m_tooltipBackground.setSize(width + 6, 14);
+		float height = float(m_tooltipText.getSize().y) + 6;
+		if (m_tooltipBackground.width() != width + 6 || m_tooltipBackground.height() != height)
+			m_tooltipBackground.setSize(width + 6, height);
 		m_tooltipText.setPosition(x, y);
 	}
 	else {

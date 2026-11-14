@@ -87,11 +87,63 @@ void BlockPhysics::enqueueNeighbors(const Vector3i &position) {
 	}
 }
 
+// beta 1.7.3 connects leaves to logs through at most four face-adjacent leaves.
+void BlockPhysics::markLeaves(const Vector3i &position, int radius) {
+	for (int z=-radius; z<=radius; ++z) for (int y=-radius; y<=radius; ++y) for (int x=-radius; x<=radius; ++x) {
+		Vector3i point = position + Vector3i{x,y,z};
+		if (!loaded(point)) continue;
+		const auto &block = m_world.getBlockState(point.x,point.y,point.z)->block();
+		if (block.getState(0).drawType() != BlockDrawType::Leaves || !block.param().hasParam(BlockParam::Custom)) continue;
+		u16 data = m_world.getData(point.x,point.y,point.z);
+		u16 flags = block.param().getParam(BlockParam::Custom,data);
+		m_world.setData(point.x,point.y,point.z,block.param().setParam(BlockParam::Custom,data,flags | 1));
+		enqueue(point);
+	}
+}
+
+void BlockPhysics::updateLeaves(const Vector3i &position) {
+	const auto &block = m_world.getBlockState(position.x,position.y,position.z)->block();
+	if (!block.param().hasParam(BlockParam::Custom)) return;
+	u16 data = m_world.getData(position.x,position.y,position.z);
+	u16 flags = block.param().getParam(BlockParam::Custom,data);
+	if (!(flags & 1)) return;
+	for (int z : {-5,5}) for (int y : {-5,5}) for (int x : {-5,5}) {
+		Vector3i corner = position + Vector3i{x,y,z};
+		corner.z = std::clamp(corner.z, worldBounds::minHeight, worldBounds::height-1);
+		if (!loaded(corner)) { enqueue(position); return; }
+	}
+	std::vector<Vector3i> frontier{position};
+	std::array<bool,729> visited{};
+	auto index = [&](const Vector3i &point) {
+		Vector3i offset = point - position + Vector3i{4,4,4};
+		return std::size_t(offset.x + offset.y*9 + offset.z*81);
+	};
+	visited[index(position)] = true;
+	for (int distance=1; distance<=4; ++distance) {
+		std::vector<Vector3i> next;
+		for (const auto &point : frontier) for (const auto &side : directions) {
+			Vector3i neighbor = point + side;
+			if (!worldBounds::contains(neighbor.z)) continue;
+			const auto &candidate = m_world.getBlockState(neighbor.x,neighbor.y,neighbor.z)->block();
+			const auto &id = candidate.stringID();
+			if (candidate.hasGroup("group:om_material_wood") && id.size() >= 5 && id.compare(id.size()-5,5,"_wood") == 0) {
+				m_world.setData(position.x,position.y,position.z,block.param().setParam(BlockParam::Custom,data,flags & ~1));
+				return;
+			}
+			if (candidate.getState(0).drawType() != BlockDrawType::Leaves || visited[index(neighbor)]) continue;
+			visited[index(neighbor)] = true; next.push_back(neighbor);
+		}
+		frontier = std::move(next);
+	}
+	dropAttached(position);
+}
+
 void BlockPhysics::seedNode(const Vector3i &position) {
 	if (!loaded(position)) return;
 	const Block &block = m_world.getBlockState(position.x, position.y, position.z)->block();
 	if (falls(block) && replaceable(position + Vector3i{0, 0, -1})) enqueue(position);
 	if (block.getGroupValue("group:attached_node")) enqueue(position);
+	if (block.getState(0).drawType() == BlockDrawType::Leaves) enqueue(position);
 	if (block.getGroupValue("group:om_power_source") || block.getGroupValue("group:om_redstone_device")
 	 || block.stringID() == "default:tnt") m_world.queueRedstone(position);
 	int kind = fluidKind(block);
@@ -116,7 +168,7 @@ void BlockPhysics::seedChunk(ServerChunk &chunk) {
 		const Block &block = *entry;
 		active[block.id()] = falls(block) || fluidKind(block) || block.getGroupValue("group:attached_node")
 			|| block.getGroupValue("group:om_power_source") || block.getGroupValue("group:om_redstone_device")
-			|| block.stringID() == "default:tnt";
+			|| block.stringID() == "default:tnt" || block.getState(0).drawType() == BlockDrawType::Leaves;
 	}
 	auto seed = [&](int x, int y, int z) {
 		if (active[chunk.getBlock(x, y, z)])
@@ -163,6 +215,7 @@ void BlockPhysics::update(const Vector3i &position) {
 	const auto *state = m_world.getBlockState(position.x, position.y, position.z);
 	if (!state) return;
 	const Block &block = state->block();
+	if (state->drawType() == BlockDrawType::Leaves) { updateLeaves(position); return; }
 	if (falls(block) && replaceable(position + Vector3i{0, 0, -1})) {
 		startFalling(position);
 		return;

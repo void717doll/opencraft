@@ -99,7 +99,7 @@ void ItemWidget::updateImage(const BlockState *blockState) {
 	m_image.setScale(16.0f / clipRect.sizeX, 16.0f / clipRect.sizeY);
 
 	if (blockState)
-		m_image.setColor(blockState->colorMultiplier());
+		m_image.setColor(blockState->inventoryImage().empty() ? blockState->colorMultiplier() : Color::White);
 	else {
 		u16 brightness = stack().item().getGroupValue("group:om_item_brightness");
 		float multiplier = brightness ? float(std::min<u16>(100, brightness)) / 100.f : 1.f;

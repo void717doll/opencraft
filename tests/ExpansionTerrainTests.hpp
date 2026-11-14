@@ -196,25 +196,21 @@ public:
 		Registry registry; definitions(registry);
 		PlayerList players; Dimension dimension(0, "test:surface", "surface");
 		ServerWorld world(players, dimension, 42);
-		unsigned crops = 0, hives = 0;
+		unsigned crops = 0;
 		for (int cy = -8; cy < 8; cy += 2) for (int cx = -8; cx < 8; cx += 2) {
 			auto &base = world.heightmap().getOrCreateChunk(cx, cy); prepareColumn(base, 2);
 			auto &chunk = world.getOrCreateChunk(cx, cy, 2); fillChunk(chunk, base, true);
 			decorateExpansionTerrain(chunk, world.heightmap(), 0, 42);
 			for (int y = 0; y < 16; ++y) for (int x = 0; x < 16; ++x) {
 				u16 block = chunk.getBlock(x, y, 1);
+				TS_ASSERT_DIFFERS(block, id("default:wild_hive"));
 				if ((x + y + 65) % 17 == 0) TS_ASSERT_EQUALS(block, id("default:nether_bricks"));
-				if (block == id("default:wild_hive")) {
-					++hives; auto biome = base.biomeAt(x, y);
-					TS_ASSERT(biome == retro::Biome::Forest || biome == retro::Biome::SeasonalForest || biome == retro::Biome::Rainforest);
-					TS_ASSERT_EQUALS(chunk.getBlock(x, y, 0), id("default:grass"));
-				}
 				if (block == id("default:wild_potato") || block == id("default:wild_tomato") || block == id("default:wild_barley")) {
 					++crops; TS_ASSERT_EQUALS(chunk.getBlock(x, y, 0), id("default:grass"));
 				}
 			}
 		}
-		TS_ASSERT(crops > 0); TS_ASSERT(hives > 0);
+		TS_ASSERT(crops > 0);
 	}
 };
 

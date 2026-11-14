@@ -226,7 +226,7 @@ void decorateCherryTrees(ServerChunk &chunk, Heightmap &heightmap, s32 seed) {
 
 void decorateSurface(ServerChunk &chunk, const HeightmapChunk &base, s32 seed) {
 	const u16 crops[] = {blockID("default:wild_potato"), blockID("default:wild_tomato"), blockID("default:wild_barley")};
-	u16 hive = blockID("default:wild_hive"), grass = blockID("default:grass"), dirt = blockID("default:dirt");
+	u16 grass = blockID("default:grass"), dirt = blockID("default:dirt");
 	int originX = chunk.x() * CHUNK_WIDTH, originY = chunk.y() * CHUNK_DEPTH;
 	int originZ = chunk.z() * CHUNK_HEIGHT;
 	for (int y = 0; y < CHUNK_DEPTH; ++y) {
@@ -238,12 +238,6 @@ void decorateSurface(ServerChunk &chunk, const HeightmapChunk &base, s32 seed) {
 			int worldX = originX + x, worldY = originY + y;
 			auto biome = base.biomeAt(x, y);
 			int cellX = cellAt(worldX, 32), cellY = cellAt(worldY, 32);
-			auto nest = featureHash(seed, cellX, cellY, 0, 0x57494c4448495645ULL);
-			if (hive && nest % 2 == 0 && (biome == retro::Biome::Forest || biome == retro::Biome::SeasonalForest || biome == retro::Biome::Rainforest)
-				&& worldX == cellX * 32 + int((nest >> 8) & 31) && worldY == cellY * 32 + int((nest >> 16) & 31)) {
-				placeDecoration(chunk, x, y, z, hive);
-				continue;
-			}
 			for (int cy = cellY - 1; cy <= cellY + 1; ++cy) {
 				for (int cx = cellX - 1; cx <= cellX + 1; ++cx) {
 					auto patch = featureHash(seed, cx, cy, 0, 0x57494c4443524f50ULL);

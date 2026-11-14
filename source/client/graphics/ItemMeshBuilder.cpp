@@ -70,7 +70,8 @@ std::vector<Vertex> buildItemMesh(const Item &item, const TextureAtlas &atlas, c
 		SDL_FreeSurface(surface);
 	}
 	if (item.isBlock()) {
-		const Color &color = Registry::getInstance().getBlockFromStringID(item.stringID()).getState(0).colorMultiplier();
+		const auto &state = Registry::getInstance().getBlockFromStringID(item.stringID()).getState(0);
+		const Color &color = state.inventoryImage().empty() ? state.colorMultiplier() : Color::White;
 		for (auto &vertex : vertices) {
 			vertex.color[0] = color.r;
 			vertex.color[1] = color.g;

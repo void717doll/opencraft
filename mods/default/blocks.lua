@@ -66,7 +66,7 @@ mod:block {
 	tiles = "oak_leaves.png",
 	color_multiplier = {106, 173, 51, 255},
 	hardness = 0.2,
-	draw_type = "leaves",
+	draw_type = "leaves", custom_param_bits = 1,
 	-- is_opaque = false, -- FIXME
 }
 

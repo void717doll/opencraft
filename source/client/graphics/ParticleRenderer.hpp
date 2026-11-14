@@ -21,7 +21,7 @@ class ParticleRenderer {
 		void draw(const World &world, const Camera &camera, RenderTarget &target, RenderStates states);
 
 	private:
-		enum Kind : u8 { Bee, Smoke, Bubble, Flame, Lava, Spark, Effect, Red, Violet, White, Firefly, Count };
+		enum Kind : u8 { Smoke, Bubble, Flame, Lava, Spark, Effect, Red, Violet, White, Firefly, Count };
 		struct Particle {
 			Vector3d position;
 			Vector3f velocity;

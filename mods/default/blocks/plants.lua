@@ -4,6 +4,7 @@ for _, plant in ipairs({{"fern", "Fern"}, {"rose", "Rose"}, {"mushroom_brown", "
 		name = plant[2],
 		tiles = plant[1] .. ".png",
 		inventory_image = plant[1] == "fern" and "fern_item.png" or nil,
+		color_multiplier = plant[1] == "fern" and {129, 191, 91, 255} or nil,
 		hardness = 0,
 		draw_type = "xshape",
 		is_opaque = false,

@@ -74,6 +74,36 @@ public:
 			TS_ASSERT_EQUALS(world.getBlock(8,8,2),f.id(plant));
 		}
 	}
+	void testLeavesDecayWithinFourConnectionsAndWaitForLoadedNeighbors() {
+		Fixture f; auto &world=f.worlds.getWorld(0);
+		u16 leaves=f.id("default:oak_leaves"), log=f.id("default:oak_wood");
+		world.setBlock(6,8,8,log);
+		for (int x=7;x<=11;++x) world.setBlock(x,8,8,leaves);
+		world.blockPhysics().markLeaves({8,8,8},4);
+		for(int tick=0;tick<8;++tick) world.blockPhysics().tick(8192);
+		TS_ASSERT_EQUALS(world.getBlock(10,8,8),leaves);
+		TS_ASSERT_EQUALS(world.getBlock(11,8,8),0);
+		world.setBlock(6,8,8,0);
+		for(int tick=0;tick<8;++tick) world.blockPhysics().tick(8192);
+		TS_ASSERT_EQUALS(world.getBlock(7,8,8),0);
+		TS_ASSERT_EQUALS(world.getBlock(8,8,8),0);
+		TS_ASSERT_EQUALS(world.getBlock(9,8,8),0);
+		TS_ASSERT_EQUALS(world.getBlock(10,8,8),0);
+		world.setBlock(15,8,8,leaves);
+		auto *neighbor=world.getChunkAtBlockPos(16,8,8); neighbor->setInitialized(false);
+		world.blockPhysics().markLeaves({15,8,8},1);
+		world.blockPhysics().tick(8192);
+		TS_ASSERT_EQUALS(world.getBlock(15,8,8),leaves);
+		neighbor->setInitialized(true);
+		world.blockPhysics().tick(8192);
+		TS_ASSERT_EQUALS(world.getBlock(15,8,8),0);
+		const auto &fern=f.registry.getBlockFromStringID("default:fern").getState(0);
+		TS_ASSERT(fern.colorMultiplier().g > fern.colorMultiplier().r);
+		TS_ASSERT(fern.colorMultiplier().g > fern.colorMultiplier().b);
+		const auto &shears=f.registry.getItemFromStringID("default:shears");
+		TS_ASSERT_EQUALS(fern.getItemDrops(&shears).front().stringID(),"default:fern");
+		for(int attempt=0;attempt<100;++attempt) for(const auto &drop:fern.getItemDrops()) TS_ASSERT_DIFFERS(drop.stringID(),"default:fern");
+	}
 	void testSoilPlantsRejectStoneAndDropWhenTheirGroundChanges() {
 		Fixture f; auto &world=f.worlds.getWorld(0);
 		const auto &rose=f.registry.getBlockFromStringID("default:rose").getState(0);

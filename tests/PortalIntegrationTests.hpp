@@ -145,25 +145,11 @@ class PortalIntegrationTests : public CxxTest::TestSuite {
 			f.player->inventory().clearStack(0, 0); TS_ASSERT(!f.commands.consumeHeldItem(*f.player, 1, 1));
 		}
 
-		void testRealHiveCallbacksProduceAndHarvestThroughLua() {
-			Fixture f; auto &world = f.worlds.getWorld(0); auto &chunk = world.getOrCreateChunk(0,0,2);
-			chunk.setInitialized(true);
-			world.setBlock(8,8,65,f.definitions.getBlockFromStringID("default:beehive").id());
-			world.setBlock(9,8,65,f.definitions.getBlockFromStringID("default:rose").id());
-			world.setBlock(8,9,65,f.definitions.getBlockFromStringID("default:dandelion").id());
-			chunk.lightmap().setLightDataRaw(8,8,2,0xf0);
-			auto &hive = static_cast<const ServerBlock &>(f.definitions.getBlockFromStringID("default:beehive"));
-			for (int tick=200;tick<=4800;tick+=200) {
-				GameTime::setTicks(6000 + tick); hive.onTick({8,8,65},chunk,world,f.commands);
+		void testBeeContentIsRemoved() {
+			Fixture f;
+			for (const char *id : {"default:wild_hive", "default:beehive", "default:honeycomb", "default:honey", "default:beeswax", "default:bee_smoker"}) {
+				TS_ASSERT(!f.definitions.hasBlock(id)); TS_ASSERT(!f.definitions.hasItem(id));
 			}
-			auto *data=world.getBlockData(8,8,65); TS_ASSERT(data); if(!data)return;
-			TS_ASSERT(data->meta.hasInt("bee_honey")); if(!data->meta.hasInt("bee_honey"))return;
-			TS_ASSERT_EQUALS(data->meta.get<int>("bee_honey"),1);
-			f.player->setHeldItemSlot(0); f.player->setHealth(20);
-			TS_ASSERT(hive.onBlockActivated({8,8,65},*f.player,world,f.client,f.commands));
-			TS_ASSERT_EQUALS(data->meta.get<int>("bee_honey"),0);
-			TS_ASSERT_EQUALS(f.player->inventory().getStack(0,0).stringID(),"default:honeycomb");
-			TS_ASSERT_EQUALS(f.player->health(),18);
 		}
 
 		void testBucketSourcesPlacementCreativeAndNetherEvaporation() {

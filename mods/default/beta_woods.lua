@@ -12,7 +12,7 @@ for _, wood in ipairs({{"birch", "Birch"}, {"spruce", "Spruce"}}) do
 	}
 	mod:block {
 		id = id .. "_leaves", name = name .. " Leaves", hardness = 0.2,
-		tiles = "refi_" .. id .. "_leaves.png", draw_type = "leaves", is_opaque = false,
+		tiles = "refi_" .. id .. "_leaves.png", draw_type = "leaves", custom_param_bits = 1, is_opaque = false,
 		item_drop = {id = "default:" .. id .. "_sapling", amount = 1},
 	}
 	mod:block {

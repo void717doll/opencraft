@@ -16,6 +16,7 @@ class BlockPhysics {
 
 		void enqueue(const Vector3i &position);
 		void enqueueNeighbors(const Vector3i &position);
+		void markLeaves(const Vector3i &position, int radius);
 		void seedChunk(ServerChunk &chunk);
 		std::size_t tick(std::size_t budget = 256);
 		std::size_t pendingCount() const { return m_pending.size(); }
@@ -26,6 +27,7 @@ class BlockPhysics {
 		void write(const Vector3i &position, u16 block, u16 data = 0);
 		void seedNode(const Vector3i &position);
 		void update(const Vector3i &position);
+		void updateLeaves(const Vector3i &position);
 		void updateFluid(const Vector3i &position);
 		void startFalling(const Vector3i &position);
 		void updateFalling();

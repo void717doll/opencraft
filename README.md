@@ -23,7 +23,7 @@ choose survival to mine, craft, farm, and fight mobs, or creative to build with 
 - natural diamond, redstone, lapis, and gold veins; connected fences, merging slabs, oak and cobblestone stairs, and double chests with shared storage.
 - nether portals, ghasts, zombie pigmen, glowstone clusters, basalt, quartz, and nether masonry.
 - cave moss, fungi, crystals, lush cave plants, cherry trees, and a spyglass.
-- potatoes, tomatoes, barley, extra food recipes, bone meal, mulch, fertilizer, beehives, honey, and wax.
+- potatoes, tomatoes, barley, extra food recipes, bone meal, mulch, and fertilizer.
 - ocelots and bats, working buckets, beds, clocks, minecarts, powered rails, and detector rails.
 - dungeon rooms with loot chests and mob spawners, plus jukeboxes with eight mineclonia music tracks.
 - ravines, abandoned mineshafts, coral reefs, nether brick ruins, and birch, spruce, jungle, acacia, and dark oak trees.
@@ -31,6 +31,7 @@ choose survival to mine, craft, farm, and fight mobs, or creative to build with 
 - natural amethyst patches, growing buds and clusters, collectible shards, and craftable amethyst blocks.
 - matching wood and amethyst slabs and stairs, plus score points earned from survival kills and ore mining.
 - an offhand slot with f to swap hands and right-click use beside a main-hand tool; no shields.
+- beta-style leaf decay, shears-only fern collection, and optional durability text in item tooltips.
 - connected beta-style ore pockets, including larger coal veins and underground dirt and gravel. copper remains more common than iron.
 - rare named cave monsters, mossy underground ruins, and treasure notes leading to buried caches. caches contain supplies and can hold rare discs or worn equipment. right-click a note to read its coordinates; earlier notes keep their ruin destinations. new ore pockets, ruins, and caches appear in newly generated terrain.
 - climbing rope that lowers in eight-block batches, up to 32 blocks per hanging line.

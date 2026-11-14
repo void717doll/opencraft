@@ -37,7 +37,7 @@ void ParticleRenderer::burst(Vector3d position, u8 effect) {
 
 void ParticleRenderer::scan(const World &world, Vector3d eye) {
 	m_anchors.clear();
-	unsigned hives = 0, insects = 0, sources = 0;
+	unsigned insects = 0, sources = 0;
 	bool day = GameTime::getTicks() % GameTime::dayLength < 12000;
 	int cx = int(std::floor(eye.x)), cy = int(std::floor(eye.y)), cz = int(std::floor(eye.z));
 	for (int z = cz - 6; z <= cz + 6; ++z) for (int y = cy - 12; y <= cy + 12; ++y) for (int x = cx - 12; x <= cx + 12; ++x) {
@@ -45,10 +45,7 @@ void ParticleRenderer::scan(const World &world, Vector3d eye) {
 		if (!state || !state->block().id() || world.getLight(x, y, z + 1) < 0) continue;
 		const auto &id = state->block().stringID();
 		u32 seed = u32(x) * 73856093u ^ u32(y) * 19349663u ^ u32(z) * 83492791u;
-		if (day && hives < 16 && (id == "default:wild_hive" || id == "default:beehive")) {
-			m_anchors.push_back({{x,y,z},Bee}); ++hives;
-		}
-		else if (sources < 24 && (id == "default:torch" || id == "default:lava")) {
+		if (sources < 24 && (id == "default:torch" || id == "default:lava")) {
 			const auto *above = world.getBlockState(x,y,z+1);
 			if (id == "default:torch" || (above && !above->block().id() && seed % 17 == 0)) {
 				m_anchors.push_back({{x,y,z},id == "default:torch" ? Smoke : Lava}); ++sources;
@@ -125,17 +122,8 @@ void ParticleRenderer::draw(const World &world, const Camera &camera, RenderTarg
 		const auto &p = anchor.position;
 		const auto *state=world.getBlockState(p.x,p.y,p.z); if(!state || !state->block().id()) continue;
 		float phase=float(double(now)/1000 + double(p.x)*0.37 + double(p.y)*0.61);
-		if (anchor.kind == Bee) {
-			const auto &id=state->block().stringID();
-			if (id != "default:wild_hive" && id != "default:beehive") continue;
-			BlockData *data=world.getBlockData(p.x,p.y,p.z);
-			if (!data || !data->meta.hasInt("bee_active") || !data->meta.get<int>("bee_active")) continue;
-			for(int bee=0;bee<3;++bee) {
-				float angle=phase*1.7f+bee*2.0944f;
-				quad(Vector3d(p)+Vector3d{0.5+std::cos(angle)*0.85,0.5+std::sin(angle)*0.65,1.1+std::sin(angle*2.3)*0.25},Bee,0.35f,0,1,std::sin(angle)>0);
-			}
-		}
-		else if (anchor.kind >= Red) {
+
+		if (anchor.kind >= Red) {
 			bool firefly=anchor.kind==Firefly;
 			quad(Vector3d(p)+Vector3d{0.5+std::sin(phase)*0.8,0.5+std::cos(phase*0.8)*0.8,1.2+std::sin(phase*1.3)*0.35},
 				anchor.kind,firefly ? 0.2f : 0.3f,int(now/100)%8,8);
@@ -146,7 +134,7 @@ void ParticleRenderer::draw(const World &world, const Camera &camera, RenderTarg
 		Vector3d position=particle.position+Vector3d(particle.velocity)*age;
 		quad(position,particle.kind,particle.size*(particle.kind==Smoke ? 1+float(age)*0.5f : 1),0,1);
 	}
-	static const char *files[] = {"mobs/refi_bees_particle_bee.png","particles/refi_smoke.png","particles/refi_bubble.png",
+	static const char *files[] = {"particles/refi_smoke.png","particles/refi_bubble.png",
 		"particles/refi_flame.png","particles/refi_lava.png","particles/refi_bonemeal.png","particles/refi_effect.png",
 		"particles/refi_butterfly_red.png","particles/refi_butterfly_violet.png","particles/refi_butterfly_white.png","particles/refi_firefly.png"};
 	for(unsigned kind=0;kind<Count;++kind) {
