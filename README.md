@@ -93,15 +93,15 @@ launch a source build from the project directory so it can find its files.
 
 ## packages
 
-the `packages` github actions workflow builds on pushes to `master` or `main`, version tags, pull requests, and manual runs. download the packages from that run's artifacts:
+the `packages` github actions workflow builds on pushes to `master` or `main`, version tags, pull requests, and manual runs. successful pushes and manual runs create or update a draft release containing all packages. pull requests only upload workflow artifacts.
 
 - linux x64: deb, rpm, and AppImage.
 - macos 14 or newer: separate intel and apple silicon dmg files containing `OpenCraft.app`.
-- windows: separate 64-bit and 32-bit zip files. extract the whole zip and launch `opencraft.cmd`.
+- windows: separate 64-bit and 32-bit exe installers and portable zip files. installers add a start menu shortcut; for zip builds, extract the whole archive and launch `opencraft.cmd`.
 
-each artifact includes sha256 checksums. package versions come from `source/common/core/EngineConfig.hpp`; a version tag must match `v` followed by that version. the workflow packages files without publishing a release. mac builds are ad-hoc signed, without apple notarization.
+each artifact includes sha256 checksums, and the draft release includes one combined `SHA256SUMS` file. package versions come from `source/common/core/EngineConfig.hpp`; a version tag must match `v` followed by that version. reruns replace files only while the release is a draft; published releases stay unchanged. publish the draft manually when ready. mac builds are ad-hoc signed, without apple notarization.
 
-installed linux packages and AppImages keep saves in `${XDG_DATA_HOME:-~/.local/share}/opencraft`; mac apps use `~/Library/Application Support/OpenCraft`. set `OPENCRAFT_DATA_DIR` to choose a different folder. windows zip builds keep saves beside the executable. the first packaged launch moves the old default openminer data folder to the new name when the new folder does not exist. existing source-build saves are kept in place; copy the `saves` folder to the package's data folder to continue them.
+installed linux packages and AppImages keep saves in `${XDG_DATA_HOME:-~/.local/share}/opencraft`; mac apps use `~/Library/Application Support/OpenCraft`. windows installers use `%LOCALAPPDATA%\OpenCraft`, outside the installation folder. set `OPENCRAFT_DATA_DIR` to choose a different folder. windows zip builds keep saves beside the executable. the first packaged launch moves the old default openminer data folder to the new name when the new folder does not exist. existing source-build saves are kept in place; copy the `saves` folder to the package's data folder to continue them.
 
 runner architectures follow [github's supported runner labels](https://docs.github.com/en/actions/reference/runners/github-hosted-runners). the AppImage uses [linuxdeploy](https://github.com/linuxdeploy/linuxdeploy), and mac library bundling uses [dylibbundler](https://github.com/auriamg/macdylibbundler). the mac app uses a native launcher and follows [apple’s bundle signing layout](https://developer.apple.com/library/archive/technotes/tn2206/).
 

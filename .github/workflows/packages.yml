@@ -61,6 +61,33 @@ jobs:
           version=$(python packaging/version.py)
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
+      - name: check release packaging
+        run: python tests/PackagingTests.py
+
+      - name: check windows launcher
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $fixture = Join-Path $env:RUNNER_TEMP "opencraft launcher $([guid]::NewGuid())"
+          New-Item -ItemType Directory -Force "$fixture/mods", "$fixture/resources" | Out-Null
+          Copy-Item packaging/opencraft.cmd "$fixture/opencraft.cmd"
+          Copy-Item $env:ComSpec "$fixture/opencraft.exe"
+          $env:OPENCRAFT_DATA_DIR = $null
+          $output = @(& "$fixture/opencraft.cmd" /c cd)
+          if ($LASTEXITCODE -ne 0 -or $output[-1] -ne $fixture) { throw 'portable launcher failed' }
+          New-Item -ItemType File "$fixture/Uninstall.exe" | Out-Null
+          $env:LOCALAPPDATA = Join-Path $fixture 'user data'
+          $output = @(& "$fixture/opencraft.cmd" /c cd)
+          $expected = Join-Path $env:LOCALAPPDATA 'OpenCraft'
+          if ($LASTEXITCODE -ne 0 -or $output[-1] -ne $expected) { throw 'installed launcher failed' }
+          foreach ($directory in @('mods', 'resources')) {
+            $link = Get-Item "$expected/$directory"
+            if (-not ($link.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'asset junction missing' }
+          }
+          $env:OPENCRAFT_DATA_DIR = Join-Path $fixture 'custom data'
+          $output = @(& "$fixture/opencraft.cmd" /c cd)
+          if ($LASTEXITCODE -ne 0 -or $output[-1] -ne $env:OPENCRAFT_DATA_DIR) { throw 'custom data launcher failed' }
+
       - name: install linux dependencies
         if: matrix.platform == 'linux'
         run: |
@@ -80,6 +107,10 @@ jobs:
         run: |
           & "$env:VCPKG_INSTALLATION_ROOT/vcpkg.exe" install sqlite3 zstd libpng --triplet '${{ matrix.triplet }}'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: install windows packager
+        if: matrix.platform == 'windows'
+        run: choco install nsis --yes --no-progress
 
       - name: configure linux
         if: matrix.platform == 'linux'
@@ -154,9 +185,14 @@ jobs:
           ln -s /Applications build/mac/Applications
           hdiutil create -volname OpenCraft -srcfolder build/mac -ov -format UDZO "dist/opencraft-$VERSION-macos-$ARCH.dmg"
 
-      - name: package windows zip
+      - name: package windows installer and zip
         if: matrix.platform == 'windows'
-        run: cpack --config build/CPackConfig.cmake -C Release -G ZIP -B dist
+        shell: pwsh
+        run: |
+          cpack --config build/CPackConfig.cmake -C Release -G NSIS -B dist
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cpack --config build/CPackConfig.cmake -C Release -G ZIP -B dist
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: checksums
         shell: bash
@@ -170,8 +206,39 @@ jobs:
             dist/*.rpm
             dist/*.AppImage
             dist/*.dmg
+            dist/*.exe
             dist/*.zip
             dist/SHA256SUMS
           if-no-files-found: error
           compression-level: 0
           retention-days: 30
+
+  release:
+    name: draft release
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    concurrency:
+      group: draft-release-${{ github.repository }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@v6
+        with:
+          pattern: opencraft-*
+          path: dist
+          merge-multiple: true
+
+      - name: combine checksums
+        run: python packaging/checksums.py dist
+
+      - name: create or update draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: python packaging/release.py dist

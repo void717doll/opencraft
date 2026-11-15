@@ -5,7 +5,7 @@ from pathlib import Path
 
 folder = Path(sys.argv[1])
 packages = sorted(path for path in folder.iterdir()
-                  if path.suffix in {".deb", ".rpm", ".AppImage", ".dmg", ".zip"})
+                  if path.suffix in {".deb", ".rpm", ".AppImage", ".dmg", ".exe", ".zip"})
 if not packages:
     raise SystemExit("no packages found")
 with (folder / "SHA256SUMS").open("w", newline="\n") as output:
